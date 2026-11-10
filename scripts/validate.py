@@ -59,6 +59,18 @@ def check_skill(path: Path, expected_name: str) -> None:
     if fm is None:
         errors.append(f"{path.relative_to(ROOT)}: missing YAML frontmatter")
         return
+    # An unquoted ": " inside a plain scalar is invalid YAML and can make a
+    # harness drop the skill from its catalog without any visible error.
+    end = text.find("\n---", 4)
+    for line in text[4:end].splitlines():
+        if not line.strip() or line.startswith((" ", "\t", "#")) or ":" not in line:
+            continue
+        key, value = line.split(":", 1)
+        if ": " in value:
+            errors.append(
+                f"{path.relative_to(ROOT)}: unquoted ': ' in frontmatter value "
+                f"for '{key.strip()}'; quote the value or use a dash"
+            )
     for key in ("name", "description"):
         if not fm.get(key):
             errors.append(f"{path.relative_to(ROOT)}: missing frontmatter key '{key}'")
