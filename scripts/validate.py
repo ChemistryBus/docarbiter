@@ -158,6 +158,7 @@ def main() -> int:
         "docs/harness-integration.md",
         "docs/install-routed-tools.md",
         "docs/updating.md",
+        "docs/handoff.md",
         "docs/release-notes-v0.1.0.md",
         "docs/release-notes-v0.1.1.md",
         "docs/release-checklist.md",

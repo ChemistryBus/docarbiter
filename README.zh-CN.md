@@ -154,6 +154,7 @@ python3 -I scripts/route.py file.pdf --goal table-structure --json
 | 实测坑与失败模式 | [docs/gotchas.md](docs/gotchas.md) |
 | Harness 接入 | [docs/harness-integration.md](docs/harness-integration.md) |
 | 更新技能 | [docs/updating.md](docs/updating.md) |
+| 维护交接 | [docs/handoff.md](docs/handoff.md) |
 | Release notes | [v0.1.1](https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.1) · [docs/release-notes-v0.1.1.md](docs/release-notes-v0.1.1.md) |
 
 ## 许可

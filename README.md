@@ -156,6 +156,7 @@ Keep **exactly one** document-extraction router per harness. If `doc-extract` an
 | Traps and failure modes | [docs/gotchas.md](docs/gotchas.md) |
 | Harness integration | [docs/harness-integration.md](docs/harness-integration.md) |
 | Updating skills | [docs/updating.md](docs/updating.md) |
+| Maintainer handoff | [docs/handoff.md](docs/handoff.md) |
 | Release notes | [v0.1.1](https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.1) · [docs/release-notes-v0.1.1.md](docs/release-notes-v0.1.1.md) |
 
 ## License
