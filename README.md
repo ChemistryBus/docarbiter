@@ -1,4 +1,4 @@
-🌐 **English** | [简体中文](README.zh-CN.md)
+🌐 **English** | [Simplified Chinese](README.zh-CN.md)
 
 <h1 align="center">docarbiter</h1>
 
@@ -31,11 +31,11 @@ There is no shortage of PDF extractors. The hard part is knowing **which one to 
 **No CLI? Let your agent install it.** Paste this into Claude Code / Codex / ZCode / MiniMax:
 
 ```text
-请先问我是否允许在本机安装 docarbiter。得到允许后执行：
+Ask me whether you may install docarbiter on this machine, and wait for my permission. Then run:
 curl -fsSL https://raw.githubusercontent.com/ChemistryBus/docarbiter/main/bootstrap.sh | bash
-如果当前 harness 里已有 doc-extract，先把它备份到技能目录之外，再安装 docarbiter。
-安装完成后运行 ./scripts/doctor.sh --check-conflicts，并告诉我缺哪些工具。
-不要上传或读取我的文档内容。
+If the current harness already has doc-extract, back it up outside the skills directory before installing docarbiter.
+After installation, run ./scripts/doctor.sh --check-conflicts and tell me which tools are missing.
+Do not upload or read my documents.
 ```
 
 The bootstrap only clones this repository and runs `scripts/install.sh`; it does not clone
