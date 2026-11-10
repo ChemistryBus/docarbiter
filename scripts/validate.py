@@ -213,6 +213,8 @@ def main() -> int:
         errors.append("scripts/bench_abstract.py is missing")
     if not (ROOT / "scripts" / "bench_policy.py").exists():
         errors.append("scripts/bench_policy.py is missing")
+    if not (ROOT / "scripts" / "check_pagemarkers.py").exists():
+        errors.append("scripts/check_pagemarkers.py is missing")
     for name in ("survey_pdfs.py", "sample_real.py"):
         if not (ROOT / "scripts" / name).exists():
             errors.append(f"scripts/{name} is missing")

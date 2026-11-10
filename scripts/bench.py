@@ -423,7 +423,9 @@ def main() -> int:
             print(f"[{doc.name}] {tool:12} {row['status']:5} {row['seconds']}s "
                   f"{'CER=' + row['cer_text'] if row['cer_text'] else ''}")
 
-    with (outdir / "per_page.csv").open("w", newline="", encoding="utf-8") as fh:
+    # One row per document/tool pair. Page-level structure is checked by
+    # scripts/check_pagemarkers.py; naming this "per_page" was misleading.
+    with (outdir / "per_document.csv").open("w", newline="", encoding="utf-8") as fh:
         writer = csv.DictWriter(fh, fieldnames=list(rows[0].keys()))
         writer.writeheader()
         writer.writerows(rows)
