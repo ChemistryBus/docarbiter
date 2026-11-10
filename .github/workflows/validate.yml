@@ -48,7 +48,7 @@ jobs:
         run: |
           for f in bootstrap.sh scripts/*.sh scripts/wrappers/*.sh; do bash -n "$f"; done
       - name: Python syntax
-        run: python3 -I -m py_compile scripts/bench.py scripts/bench_tables.py scripts/bench_abstract.py scripts/bench_policy.py scripts/survey_pdfs.py scripts/sample_real.py scripts/route.py scripts/check_pagemarkers.py scripts/validate.py benchmarks/fixtures/make_demo.py benchmarks/fixtures/make_corpus.py benchmarks/fixtures/real/make_real.py benchmarks/fixtures/edge/make_edge.py benchmarks/fixtures/tables/make_tables.py
+        run: python3 -I -m py_compile scripts/bench.py scripts/bench_tables.py scripts/bench_abstract.py scripts/bench_policy.py scripts/bench_real_tables.py scripts/survey_pdfs.py scripts/sample_real.py scripts/route.py scripts/check_pagemarkers.py scripts/validate.py benchmarks/fixtures/make_demo.py benchmarks/fixtures/make_corpus.py benchmarks/fixtures/real/make_real.py benchmarks/fixtures/edge/make_edge.py benchmarks/fixtures/tables/make_tables.py
       - name: SVG XML
         run: |
           python3 -I - <<'PY'

@@ -98,17 +98,25 @@ Fixed in this round:
 - `scripts/check_pagemarkers.py`: real MinerU regression for page order, blank-page
   preservation, and selected-page numbering (passes on the repository's 4-page fixture).
 - `scripts/bench.py`: the misnamed `per_page.csv` is now `per_document.csv`.
+- `scripts/bench_real_tables.py`: per-cell CER on two real, hand-checked tables.
+  WS/T 578.1 p8 — pdfplumber default / Docling / MinerU all 0.0000 `nopunct` CER;
+  GB 28050 p6 — Docling 0.0000, MinerU 0.1237, pdfplumber default 0.3010,
+  pdfplumber `text` 0.9916. Truth was drafted from Docling and hand-checked, so
+  Docling's zero is a ceiling check; the pdfplumber/MinerU numbers are independent.
+  These are two pages only.
 - English README install prompt; user-facing docs translated to English.
 
 Still open:
 
-- Real-table per-cell CER with human truth: WS/T 578.1 p8 and GB 28050 p6.
+- Per-cell CER on the remaining real tables and other editions (WS/T p8 and
+  GB 28050 p6 are done).
 - Real two-column full-body CER (currently only the BERT abstract).
 - True vertical text; all tools are weak.
 - `extra` tools (PaddleOCR/Marker/Unstructured/olmOCR) not fully benchmarked.
 - Mixed-document detection is implemented, but end-to-end OCR recall on mixed documents
   still needs a real-document benchmark.
-- Keep the current claim boundary: structural/spot-check results are not "accuracy".
+- Keep the current claim boundary: structural/spot-check results are not "accuracy",
+  and two-page per-cell CER is not a general accuracy claim.
 
 Deferred from the harness feedback:
 
@@ -129,3 +137,4 @@ Deferred from the harness feedback:
 - `docs/install-routed-tools.md`: upstream links and install commands.
 - `scripts/update.sh`, `bootstrap.sh`: update/install commands.
 - `scripts/check_pagemarkers.py`: real MinerU page-structure regression (skips without MinerU).
+- `scripts/bench_real_tables.py`: real-table per-cell CER (private PDFs/truth, gitignored; CI only py_compiles it).

@@ -112,10 +112,11 @@ Full licenses, install commands, and exclusion reasons: [docs/tool-registry.md](
 | P0 routing policy (22 documents with answer keys) | `router:text` 100% success / median CER 0.0000 / 4.73 s; fixed MinerU 100% / 0.0115 / 61.98 s |
 | Router commands | Availability and the generated command share one entry point; spaces, quotes, `$`, and CJK paths covered by the self-test |
 | Page structure | MinerU page markers checked for full and selected exports; blank page preserved (`scripts/check_pagemarkers.py`) |
+| Real-table per-cell CER | WS/T 578.1 p8: pdfplumber default / Docling / MinerU all 0.0000 `nopunct` CER; GB 28050 p6: Docling 0.0000, MinerU 0.1237, pdfplumber 0.3010 (two hand-checked pages) |
 | Harness trigger | Claude Code, DSH, ZCode and MiniMax tested; Codex conditional (large skill catalog) |
 | CI | GitHub Actions `validate` green on Ubuntu + macOS; Windows unverified |
 
-Known limits are explicit: true vertical text, full-body two-column CER, per-cell CER on real tables, and symbol-glyph fidelity are not solved. The README keeps the summary; the evidence lives in [docs/policy.md](docs/policy.md), [docs/benchmarks.md](docs/benchmarks.md), and [docs/gotchas.md](docs/gotchas.md).
+Known limits are explicit: true vertical text, full-body two-column CER, and symbol-glyph fidelity are not solved. Per-cell CER is measured on two real table pages (WS/T 578.1 p8, GB 28050 p6); that is not a general accuracy claim. The README keeps the summary; the evidence lives in [docs/policy.md](docs/policy.md), [docs/benchmarks.md](docs/benchmarks.md), and [docs/gotchas.md](docs/gotchas.md).
 
 ## Install options
 

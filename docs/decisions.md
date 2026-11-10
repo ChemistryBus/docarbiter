@@ -309,3 +309,15 @@ Reproduce:
 4. Confirm `skill({name:"docarbiter"})` loads and `Location:` points at the expected copy.
 
 Decision: use a whole-directory symlink for MiniMax; keep exactly one document-extraction router per harness.
+
+### Real-table per-cell CER (2026-11-11)
+
+- Inputs: WS/T 578.1—2017 p8 (isolated PDF page 8; 25×13 truth including 3 header rows and 22 data rows) and GB 28050—2025 p6 (29×4 truth including the header and 28 data rows). These are private local standards; they are not redistributed and their body text is not saved in the repository.
+- Truth: a hand-checked cell matrix; a merged cell keeps its text in the top-left and `""` in covered positions; extra note rows are trimmed to the truth dimensions.
+- Metric: per-cell CER after whitespace/dash normalisation; `nopunct` also removes Unicode punctuation. Script: `scripts/bench_real_tables.py`.
+- Results (micro CER, `nopunct`):
+  - WS/T p8: pdfplumber default 0.0000; Docling 0.0000; MinerU 0.0000. pdfplumber `text` 0.7311.
+  - GB 28050 p6: Docling 0.0000; MinerU 0.1237; pdfplumber default 0.3010; pdfplumber `text` 0.9916.
+- Caveat: truth was drafted from Docling and hand-checked, so Docling's zero is a ceiling check, not independent evidence; the pdfplumber/MinerU numbers are independent. This covers two pages only; do not generalise to another edition, page, or tool version.
+- Earlier structure-only notes were corrected: WS/T has 22 data rows (not 21), and pdfplumber 0.11.10's default strategy preserves the header spans.
+- Decision: keep `--goal table-structure` → Docling for complex multi-line/merged tables. This is now supported by per-cell CER on GB 28050 p6, not only structure/spot checks.

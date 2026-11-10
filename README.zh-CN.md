@@ -110,10 +110,11 @@ python3 -I scripts/route.py file.pdf --goal table-structure --json
 | P0 路由策略（22 个有答案文档） | `router:text` 成功率 100% / 中位 CER 0.0000 / 4.73s；固定 MinerU 100% / 0.0115 / 61.98s |
 | 路由命令 | 可用性检查与生成的命令使用同一入口；空格、引号、`$`、中文路径均由自测覆盖 |
 | 页码结构 | 全页与选页导出的 MinerU 页码标记已回归；空白页保留（`scripts/check_pagemarkers.py`） |
+| 真实表逐单元格 CER | WS/T 578.1 p8：pdfplumber 默认 / Docling / MinerU 均 0.0000（nopunct）；GB 28050 p6：Docling 0.0000、MinerU 0.1237、pdfplumber 0.3010（两页人工 truth） |
 | Harness 触发 | Claude Code、DSH、ZCode、MiniMax 已测；Codex 条件通过（大技能目录） |
 | CI | GitHub Actions `validate` 通过；Ubuntu + macOS 由 CI 覆盖，Windows 未验证 |
 
-已知边界写清楚：真竖排、真实双栏全文 CER、真实表逐单元格 CER、符号字形保真都还没解决。README 只放摘要，完整证据在 [docs/policy.md](docs/policy.md)、[docs/benchmarks.md](docs/benchmarks.md) 和 [docs/gotchas.md](docs/gotchas.md)。
+已知边界写清楚：真竖排、真实双栏全文 CER、符号字形保真还没解决；真实表逐单元格 CER 已在两页上实测（WS/T 578.1 p8、GB 28050 p6），但不能外推成通用准确率。README 只放摘要，完整证据在 [docs/policy.md](docs/policy.md)、[docs/benchmarks.md](docs/benchmarks.md) 和 [docs/gotchas.md](docs/gotchas.md)。
 
 ## 安装选项
 

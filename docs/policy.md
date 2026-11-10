@@ -55,17 +55,19 @@ On 2026-11-10 we ran supplementary tests with real high-frequency tables from th
 
 | Real document (page) | Expected structure | pdfplumber `lines` | pdfplumber `text` | MinerU | Docling |
 |---|---|---|---|---|---|
-| WS/T 578.1—2017 p8 | 21 data rows × 13 columns, 3-level header | 27×13; header flattened, merge semantics lost | 50×13; broken | 27×13; `rowspan/colspan` correct | 21×13; three-level header expanded to the Chinese sample "男性PAL - 轻(I) - MJ/d" |
-| GB 28050—2025 p6 | 28 data rows × 4 columns, multi-line cells | 29×4; cell reading order scrambled | 76×6; broken | 29×4; characters interleaved in 7 multi-line cells | 29×4; spot-check correct |
+| WS/T 578.1—2017 p8 | 22 data rows × 13 columns, 3-level header (25 rows including the 3 header rows) | 27×13; header spans correct; 2 note rows trimmed | 26×13 after dropping empty rows; broken | 27×13; `rowspan/colspan` correct; 2 note rows trimmed | 25×13; header expanded correctly |
+| GB 28050—2025 p6 | 28 data rows × 4 columns, multi-line cells | 29×4; cells out of order | 72×6 after dropping empty rows; broken | 29×4; 6 multi-line cells interleaved | 29×4; exact after normalization |
 | DRIs 2023 p65 | 2 symbol tables: 15×6, 14×6 | 0 tables | 69×9; unusable | 15×6 + 14×6; Chinese names correct, ●/○ become "empty/O" | Names wrong (no-OCR); with OCR on, names correct, ●→`.`, ○→`O` |
 | GB 2760—2024 p13 | 26 data rows × 4 columns | 27×4; spot-check correct | 84×3; broken | 27×4; characters interleaved in 4 multi-line cells | 27×4; spot-check correct |
 | China Food Composition Tables, 6th ed., Vol. 1, p246 | 65 entries, two-column book table | 0 tables | 45×4; unusable | 6 columns; 65 entries; first 3 rows misaligned | With OCR on, 7 columns, most rows correct; bottom 3 rows misaligned; no-OCR unusable |
 
+Per-cell CER (2026-11-11, hand-checked truth; two pages only): WS/T p8 — pdfplumber default / Docling / MinerU all 0.0000 micro CER after normalization; GB 28050 p6 — Docling 0.0000, MinerU 0.1237, pdfplumber default 0.3010, pdfplumber text 0.9916. Truth was drafted from Docling and hand-checked, so Docling's 0.0000 is a ceiling check; the pdfplumber/MinerU figures are independent. Details: `docs/benchmarks.md` section 5-12.
+
 Conclusion:
 
-1. **Complex merged headers/multi-line cells → Docling.** WS/T 578.1, GB 28050, and GB 2760 have the best structure and reading order; this is the current default quality path for real tables (`--goal table-structure`).
+1. **Complex merged headers/multi-line cells → Docling.** WS/T 578.1, GB 28050, and GB 2760 have the best structure and reading order; per-cell CER on GB 28050 p6 confirms it (Docling 0.0000 vs MinerU 0.1237 vs pdfplumber 0.3010), and WS/T p8 is a clean grid where all three match exactly. This is the current default quality path for real tables (`--goal table-structure`).
 2. **Bad text layers/symbol tables/scans → MinerU.** The DRIs 2023 page 65 text layer itself turns ● into `.` and ○ into `。`; MinerU recovers the Chinese names and distinguishes ●/○ as "empty/O", but **does not preserve the original symbols**, so spot-checking is mandatory.
-3. **pdfplumber is only for simple grids/coordinates.** It is fast (single page <0.5s), but multi-line cells in real book tables/standards tables come out scrambled; the `text` strategy rescues borderless tables but inflates 29×4 into 76×6.
+3. **pdfplumber is only for simple grids/coordinates.** It is fast (single page <0.5s), but multi-line cells in real book tables/standards tables come out scrambled; the `text` strategy rescues borderless tables but inflates 29×4 into 76×6 raw (72×6 after dropping empty rows).
 4. **composition has no supporting evidence; do not do it.** No single real table showed "MinerU drops structure + pdfplumber has good cells"; Docling already provides both structure and readable cells. Adding another composition layer only adds complexity and new failure points.
 5. **Dense two-column book tables are still not guaranteed.** On the 65-entry two-column table on p246 of the China Food Composition Tables, both Docling OCR and MinerU show row misalignment at the top/bottom of the page; such tables must be manually spot-checked, and "the whole table is accurate" cannot be claimed.
 6. **Routing is file-level, not page-level.** `route.py` only looks at the first 3 pages; for DRIs 2023 the first 3 pages have a usable text layer, but the page 65 symbol table's text layer is bad. For books/standards, first locate the target page, then use `pdftotext -f PAGE -l PAGE` or pdfplumber as a page-level probe.

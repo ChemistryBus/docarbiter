@@ -175,7 +175,7 @@ Interpretation:
 - **no-punct CER is 0.0000 for every tool**: the remaining CER all comes from punctuation normalization (MinerU turns full-width `：`/`；` into ASCII; liteparse/markitdown turn quotes/dashes into ASCII), not character errors. This is why both `cer_text` and `cer_nopunct` must be reported.
 - **MinerU has the lowest median CER (0.0030) across the 11 documents in this round, but its worst page is still zh-footnote (0.0385, punctuation)**; Docling's worst is en-scan (0.0712, OCR errors).
 - Runtimes are warm starts with the model already loaded; the first cold start is noticeably longer (see the previous section).
-- `pdfplumber` has a text CER of 0.0000 on the two simple table fixtures; for the structure/spot checks of real merged tables see 5-8, but **per-cell CER is still unmeasured**; do not treat it as table structure being validated.
+- `pdfplumber` has a text CER of 0.0000 on the two simple table fixtures; for the structure/spot checks of real merged tables see 5-8. Per-cell CER is now measured on two real pages (section 5-12), but **that is not a general table-accuracy claim**; the other real tables still have only structure/spot checks.
 - **The two-column fixture is too gentle**: reportlab writes the two columns into the content stream in "left column → right column" order, and `markitdown` reads it correctly too. It does not force "one line from the left, one from the right" interleaving, so it cannot prove that real two-column PDFs pass. The next round should construct a PDF whose content stream interleaves line by line.
 - This is still a synthetic corpus and cannot replace real PDFs; the next round adds real CC BY-SA articles and CID/no-ToUnicode samples.
 
@@ -332,12 +332,12 @@ Conclusion: **no single setting works for everything**. The default suits border
 
 ### Real high-frequency tables (2026-11-10, private local files, read-only)
 
-The above are synthetic fixtures. To answer "whether real book tables/standards tables are usable", we also tested 5 high-frequency PDFs from this machine. **These files are not in the repository, are not uploaded, and their body text is not saved; below are structure and spot-check results, not CER scores.**
+The above are synthetic fixtures. To answer "whether real book tables/standards tables are usable", we also tested 5 high-frequency PDFs from this machine. **These files are not in the repository, are not uploaded, and their body text is not saved.** For WS/T 578.1 p8 and GB 28050 p6 we now also have per-cell CER (section 5-12); the other three remain structure/spot-check only.
 
 | Real document (page) | Expected structure | pdfplumber `lines` | pdfplumber `text` | MinerU | Docling |
 |---|---|---|---|---|---|
-| WS/T 578.1—2017 p8 | 21 data rows × 13 columns, 3-level header | 27×13; header flattened | 50×13; broken | 27×13; rowspan/colspan correct | 21×13; header expanded correctly |
-| GB 28050—2025 p6 | 28 data rows × 4 columns, multi-line cells | 29×4; cells out of order | 76×6; broken | 29×4; 7 cells interleaved | 29×4; spot-check correct |
+| WS/T 578.1—2017 p8 | 22 data rows × 13 columns, 3-level header (25 rows including the 3 header rows) | 27×13; header spans correct; 2 note rows trimmed | 26×13 after dropping empty rows; broken | 27×13; rowspan/colspan correct; 2 note rows trimmed | 25×13; header expanded correctly |
+| GB 28050—2025 p6 | 28 data rows × 4 columns, multi-line cells | 29×4; cells out of order | 72×6 after dropping empty rows; broken | 29×4; 6 multi-line cells interleaved | 29×4; exact after normalization |
 | DRIs 2023 p65 | 2 symbol tables 15×6, 14×6 | 0 tables | 69×9; unusable | 15×6 + 14×6; Chinese names correct, ●/○ → empty/O | Names require OCR; ●→`.`, ○→`O` |
 | GB 2760—2024 p13 | 26 data rows × 4 columns | 27×4; spot-check correct | 84×3; broken | 27×4; 4 cells interleaved | 27×4; spot-check correct |
 | China Food Composition Tables, 6th ed., Vol. 1, p246 | 65 entries, two-column book table | 0 tables | 45×4; unusable | 6 columns; 65 entries; first 3 rows misaligned | 7 columns after OCR; bottom 3 rows misaligned |
@@ -457,6 +457,62 @@ It runs MinerU twice:
 Result on 2026-11-11: **PASS** (`full markers [1, 2, 3, 4]`, `selected markers [3, 4]`,
 blank page preserved). The script skips with exit 0 when MinerU is not installed, so CI can
 run it on machines without the model.
+
+## 5-12. Real-table per-cell CER (2026-11-11)
+
+This is the per-cell follow-up to the structure/spot-check table above. Two
+single-page PDFs were isolated from private local standards (not redistributed):
+
+- WS/T 578.1—2017 p8 (PDF page 8): 3-level header, 22 data rows, 13 columns.
+- GB 28050—2025 p6 (PDF page 6): 4 columns, 28 data rows, multi-line cells.
+
+Truth was written as a cell matrix and hand-checked against the rendered page.
+A merged cell keeps its text in the top-left position and `""` in covered
+positions. Extra note rows are trimmed to the truth dimensions. Normalisation
+removes whitespace and unifies dash/quote variants; `nopunct` additionally
+removes Unicode punctuation. CER is edit distance divided by truth length.
+
+| Page | Tool / strategy | Predicted | micro CER (text / nopunct) | Exact content cells (nopunct) |
+|---|---|---|---|---|
+| WS/T p8 | pdfplumber default | 27×13 | 0.0000 / 0.0000 | 1.000 |
+| WS/T p8 | pdfplumber text | 26×13 | 0.6246 / 0.7311 | 0.027 |
+| WS/T p8 | Docling JSON | 25×13 | 0.0000 / 0.0000 | 1.000 |
+| WS/T p8 | MinerU Markdown/HTML | 27×13 | 0.0000 / 0.0000 | 1.000 |
+| GB 28050 p6 | pdfplumber default | 29×4 | 0.3106 / 0.3010 | 0.612 |
+| GB 28050 p6 | pdfplumber text | 72×6 | 0.9975 / 0.9916 | 0.000 |
+| GB 28050 p6 | Docling JSON | 29×4 | 0.0101 / 0.0000 | 1.000 |
+| GB 28050 p6 | MinerU Markdown | 29×4 | 0.1162 / 0.1237 | 0.948 |
+
+Interpretation:
+
+- **WS/T p8 is a clean grid.** After normalisation, pdfplumber's default
+  strategy, Docling, and MinerU all reproduce every cell; the `text` strategy
+  breaks the header/row structure.
+- **GB 28050 p6 is the multi-line-cell stress case.** Docling is the only tool
+  with zero `nopunct` CER. MinerU is about 12.4%, pdfplumber's default strategy
+  about 30.1%, and pdfplumber's `text` strategy about 99.2%. The remaining
+  MinerU errors are exactly the interleaved multi-line cells (`n-3`,
+  mono/polyunsaturated fat, the vitamin A/E units, and the folate unit);
+  pdfplumber's default strategy instead merges header/unit text into data cells.
+- **Caveats.** The truth was hand-checked but drafted from Docling's grid, so
+  Docling's 0.0000 is a ceiling/sanity check, not independent evidence; the
+  pdfplumber and MinerU numbers are independent. This covers two pages and two
+  editions only. It is cell-text CER, not proof that merged-cell semantics are
+  understood. Do not generalise it to another edition, page, or tool version.
+- **Earlier structure-only note corrected.** The earlier table recorded "21 data
+  rows" and a flattened pdfplumber header. The isolated-page rerun with
+  pdfplumber 0.11.10 finds 22 data rows (25 rows including the 3 header rows)
+  and correct header spans.
+
+Reproduce with private inputs (PDFs and truth stay gitignored):
+
+```bash
+python3 -I scripts/bench_real_tables.py \
+  --dir benchmarks/private/tables --tools pdfplumber,docling,mineru
+```
+
+CI only `py_compile`s this script; it does not run it, because the PDFs and truth
+are private and gitignored.
 
 ## 6. Anti-patterns (enforced in CI)
 
