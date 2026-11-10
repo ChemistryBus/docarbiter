@@ -72,6 +72,26 @@ Conclusion:
 5. **Dense two-column book tables are still not guaranteed.** On the 65-entry two-column table on p246 of the China Food Composition Tables, both Docling OCR and MinerU show row misalignment at the top/bottom of the page; such tables must be manually spot-checked, and "the whole table is accurate" cannot be claimed.
 6. **Routing is file-level, not page-level.** `route.py` only looks at the first 3 pages; for DRIs 2023 the first 3 pages have a usable text layer, but the page 65 symbol table's text layer is bad. For books/standards, first locate the target page, then use `pdftotext -f PAGE -l PAGE` or pdfplumber as a page-level probe.
 
+## P2b: real two-column full-text CER (2026-11-11)
+
+Two papers with independent truth:
+
+- BERT, NAACL 2019 (arXiv:1810.04805) → ar5iv HTML.
+- Cell 2020 MoTrPAC Perspective (PMC8800485) → PMC JATS XML.
+
+Scope: abstract plus main body, excluding references, figure/table content and captions, and appendices. A row is valid only with `start+end` alignment and coverage 0.5–1.5.
+
+| Paper | pdftotext | liteparse | Docling | MinerU |
+|---|---:|---:|---:|---:|
+| BERT | 0.2108 | 0.1398 | **0.0656** | 0.0773 |
+| Cell | **0.0349** | — (alignment failed) | 0.1099 | 0.0953 |
+
+Values are `nopunct` CER; coverage and text-CER are in `docs/benchmarks.md` section 5-13.
+
+- **BERT is the cleaner comparison.** Docling is best, MinerU close, liteparse worse, pdftotext worst. `pdftotext -layout` is invalid on two-column because it preserves physical order.
+- **Cell has a scope caveat.** pdftotext is lowest, but Docling/MinerU coverage is 1.08–1.10 because this Perspective has text inside its figures, which the truth excludes. Their CER includes extra figure text, so the ranking is not directly comparable. Do not read this as "pdftotext always wins".
+- Two papers only; full-text CER is sensitive to figure text, headers/footers, and caption stripping. Do not generalise.
+
 Runtime (this machine, M2 Pro, models warm): pdfplumber <0.5s per page; MinerU about 2.5s per page; Docling about 3–5s/page with no-OCR, about 10–12s/page with OCR.
 
 ## P3: recommended defaults

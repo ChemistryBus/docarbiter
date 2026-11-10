@@ -104,19 +104,26 @@ Fixed in this round:
   pdfplumber `text` 0.9916. Truth was drafted from Docling and hand-checked, so
   Docling's zero is a ceiling check; the pdfplumber/MinerU numbers are independent.
   These are two pages only.
+- `scripts/bench_fulltext.py`: full-text CER on two real two-column papers with
+  independent truth (PMC JATS / ar5iv). BERT — Docling 0.0656, MinerU 0.0773,
+  liteparse 0.1398, pdftotext 0.2108 `nopunct`; Cell Perspective — pdftotext
+  0.0349, MinerU 0.0953, Docling 0.1099. The Cell figures contain text, so
+  Docling/MinerU coverage is 1.08–1.10 and the ranking is not directly comparable.
+  These are two papers only.
 - English README install prompt; user-facing docs translated to English.
 
 Still open:
 
 - Per-cell CER on the remaining real tables and other editions (WS/T p8 and
   GB 28050 p6 are done).
-- Real two-column full-body CER (currently only the BERT abstract).
+- Full-text CER on more papers and layouts (BERT full and the Cell Perspective
+  are done; the Cell figure-text caveat still needs a cleaner scope).
 - True vertical text; all tools are weak.
 - `extra` tools (PaddleOCR/Marker/Unstructured/olmOCR) not fully benchmarked.
 - Mixed-document detection is implemented, but end-to-end OCR recall on mixed documents
   still needs a real-document benchmark.
 - Keep the current claim boundary: structural/spot-check results are not "accuracy",
-  and two-page per-cell CER is not a general accuracy claim.
+  and two-page per-cell CER or two-paper full-text CER is not a general accuracy claim.
 
 Deferred from the harness feedback:
 
@@ -138,3 +145,4 @@ Deferred from the harness feedback:
 - `scripts/update.sh`, `bootstrap.sh`: update/install commands.
 - `scripts/check_pagemarkers.py`: real MinerU page-structure regression (skips without MinerU).
 - `scripts/bench_real_tables.py`: real-table per-cell CER (private PDFs/truth, gitignored; CI only py_compiles it).
+- `scripts/bench_fulltext.py`: real two-column full-text CER (PMC JATS / ar5iv truth; private inputs; CI only py_compiles it).

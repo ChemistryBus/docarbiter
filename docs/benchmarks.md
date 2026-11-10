@@ -296,7 +296,7 @@ Conclusions:
 - markitdown passes clean text-only two-column (synthetic); **markitdown breaks on real papers containing figures/axis labels**. Do not treat "synthetic two-column passes" as "real two-column passes".
 - For real two-column, prefer MinerU / Docling / liteparse; use pdfplumber only for tables, not for extracting the full text directly.
 - We tried PLOS ONE `10.1371/journal.pone.0296319` (CC BY 4.0): page 2 is a left sidebar + right body text, not a classic academic two-column layout; it is not used as a two-column CER fixture.
-- Next round: find a CC BY classic two-column paper (CVPR/IEEE style), use the HTML full text as the answer, and compute real CER.
+- Done in section 5-13 (2026-11-11): BERT full text and Cell 2020 MoTrPAC Perspective, with independent PMC JATS / ar5iv truth and full-text CER.
 
 ## 5-8. Table cell-level accuracy (pdfplumber, 2026-11-09)
 
@@ -513,6 +513,48 @@ python3 -I scripts/bench_real_tables.py \
 
 CI only `py_compile`s this script; it does not run it, because the PDFs and truth
 are private and gitignored.
+
+## 5-13. Full-text CER on two real two-column papers (2026-11-11)
+
+Scope: abstract plus main body (section headings and paragraphs). References,
+figure/table content and captions, and appendices are excluded. Truth comes from
+an independent source, not from a tool under test:
+
+- Cell 2020 MoTrPAC Perspective, PMC8800485 → PMC JATS XML;
+- BERT, NAACL 2019 (arXiv:1810.04805) → ar5iv HTML.
+
+Tool output is stripped of Markdown/HTML, cut at acknowledgments/references, and
+aligned to the truth's first/last anchors before CER. A row is valid only with
+`start+end` alignment and coverage 0.5–1.5.
+
+| Paper | Tool | CER (text) | CER (nopunct) | Coverage | Valid |
+|---|---|---|---:|---:|---|
+| BERT | pdftotext | 0.2280 | 0.2108 | 1.047 | yes |
+| BERT | liteparse | 0.1569 | 0.1398 | 1.059 | yes |
+| BERT | Docling | **0.0766** | **0.0656** | 1.014 | yes |
+| BERT | MinerU | 0.0930 | 0.0773 | 1.035 | yes |
+| BERT | pdftotext `-layout` | — | — | 1.663 | no (whole-document alignment) |
+| Cell | pdftotext | **0.0386** | **0.0349** | 1.008 | yes |
+| Cell | Docling | 0.1159 | 0.1099 | 1.099 | yes |
+| Cell | MinerU | 0.1010 | 0.0953 | 1.084 | yes |
+| Cell | liteparse | — | — | 1.189 | no (start-only) |
+| Cell | pdftotext `-layout` | — | — | 0.954 | no (start-only) |
+
+Interpretation:
+
+- **BERT is the cleaner comparison.** Docling (6.56%) is best, MinerU (7.73%)
+  close, liteparse (13.98%) worse, pdftotext (21.08%) worst. `pdftotext -layout`
+  is invalid because it preserves physical two-column order.
+- **Cell needs a scope caveat.** pdftotext is 3.49%, MinerU 9.53%, Docling
+  10.99%; but Docling/MinerU coverage is 1.08–1.10 because this Perspective has
+  text inside its figures, which the main-body truth excludes. Their CER
+  therefore includes extra figure text. pdftotext's low CER is partly a clean
+  text layer and reading order, not a general win.
+- **Two papers only.** Full-text CER is still sensitive to figure text,
+  headers/footers, and caption stripping. Do not generalise to another paper,
+  publisher layout, or tool version.
+- The script is `scripts/bench_fulltext.py`; private PDFs and truth are
+  gitignored, and CI only `py_compile`s the script.
 
 ## 6. Anti-patterns (enforced in CI)
 

@@ -321,3 +321,13 @@ Decision: use a whole-directory symlink for MiniMax; keep exactly one document-e
 - Caveat: truth was drafted from Docling and hand-checked, so Docling's zero is a ceiling check, not independent evidence; the pdfplumber/MinerU numbers are independent. This covers two pages only; do not generalise to another edition, page, or tool version.
 - Earlier structure-only notes were corrected: WS/T has 22 data rows (not 21), and pdfplumber 0.11.10's default strategy preserves the header spans.
 - Decision: keep `--goal table-structure` → Docling for complex multi-line/merged tables. This is now supported by per-cell CER on GB 28050 p6, not only structure/spot checks.
+
+### Real two-column full-text CER (2026-11-11)
+
+- Inputs: BERT, NAACL 2019 full paper (16 pages, ACL two-column; ar5iv HTML truth) and Cell 2020 MoTrPAC Perspective (11 pages; PMC8800485 JATS truth). Private PDFs; not redistributed.
+- Scope: abstract plus main body (section headings and paragraphs); excludes references, figure/table content and captions, and appendices. Tool output is aligned to the truth's first/last anchors; a row is valid only with `start+end` alignment and coverage 0.5–1.5.
+- Results (`nopunct` CER):
+  - BERT: Docling 0.0656; MinerU 0.0773; liteparse 0.1398; pdftotext 0.2108. `pdftotext -layout` invalid.
+  - Cell: pdftotext 0.0349; MinerU 0.0953; Docling 0.1099; liteparse and `pdftotext -layout` invalid (alignment).
+- Caveat: the Cell Perspective has text inside its figures; Docling/MinerU coverage is 1.08–1.10 because their output includes that extra text while the truth excludes it, so the ranking is not directly comparable. BERT is the cleaner comparison.
+- Decision: keep MinerU/Docling as the two-column quality paths; do not claim pdftotext wins from the Cell result; collect more papers before changing any default.

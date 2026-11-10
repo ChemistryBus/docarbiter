@@ -113,10 +113,11 @@ Full licenses, install commands, and exclusion reasons: [docs/tool-registry.md](
 | Router commands | Availability and the generated command share one entry point; spaces, quotes, `$`, and CJK paths covered by the self-test |
 | Page structure | MinerU page markers checked for full and selected exports; blank page preserved (`scripts/check_pagemarkers.py`) |
 | Real-table per-cell CER | WS/T 578.1 p8: pdfplumber default / Docling / MinerU all 0.0000 `nopunct` CER; GB 28050 p6: Docling 0.0000, MinerU 0.1237, pdfplumber 0.3010 (two hand-checked pages) |
+| Full-text two-column CER | BERT full: Docling 0.0656 / MinerU 0.0773 / liteparse 0.1398 / pdftotext 0.2108 `nopunct`; Cell Perspective: pdftotext 0.0349 / MinerU 0.0953 / Docling 0.1099 (two papers; Cell figure-text caveat) |
 | Harness trigger | Claude Code, DSH, ZCode and MiniMax tested; Codex conditional (large skill catalog) |
 | CI | GitHub Actions `validate` green on Ubuntu + macOS; Windows unverified |
 
-Known limits are explicit: true vertical text, full-body two-column CER, and symbol-glyph fidelity are not solved. Per-cell CER is measured on two real table pages (WS/T 578.1 p8, GB 28050 p6); that is not a general accuracy claim. The README keeps the summary; the evidence lives in [docs/policy.md](docs/policy.md), [docs/benchmarks.md](docs/benchmarks.md), and [docs/gotchas.md](docs/gotchas.md).
+Known limits are explicit: true vertical text and symbol-glyph fidelity are not solved. Per-cell CER is measured on two real table pages (WS/T 578.1 p8, GB 28050 p6), and full-text two-column CER on two papers (BERT full, Cell Perspective); the Cell figures contain text, so that ranking is caveated. These are not general accuracy claims. The README keeps the summary; the evidence lives in [docs/policy.md](docs/policy.md), [docs/benchmarks.md](docs/benchmarks.md), and [docs/gotchas.md](docs/gotchas.md).
 
 ## Install options
 
