@@ -32,9 +32,17 @@ ln -sfn "$PWD/skills/docarbiter" "$DIR/docarbiter"
 | Codex | `~/.codex/skills` | 可能也读 `~/.agents` | **条件通过**：全量技能时隐式受容量影响；显式调用通过，最小集隐式通过 |
 | MiniMax | `~/.agents/skills`（不是 `~/.minimax/skills`） | 项目 `.agents/skills`；`.minimax/skills` 不被扫描 | 子会话验收通过；需整目录软链 |
 
+> **术语：条件通过** = 安装正确，且在受限条件（子代理/子会话、最小技能集、显式调用）下通过；但默认的顶层新会话或全量技能环境尚未稳定通过。条件通过可以继续用，但不能在发布说明里写成“全量环境已验证”。
+>
 > **DSH 的坑**：只移 `~/.dsh/skills/doc-extract` 不够，它还会读 `~/.agents/skills`。
 > **ZCode 的坑**：`~/.zcode/skills` 和 `~/.agents/skills` 会各发现一次；切换要同时处理。
 > **MiniMax / Codex 的坑**：MiniMax 跳过“目录 + SKILL.md 文件软链”，只识别实体文件或整目录软链。MiniMax 实测：实体文件 ✅、SKILL.md 软链 ❌、整目录软链 ✅。Codex 能识别两种链接，但全量 600+ 技能时 `docarbiter` 可能因技能容量不可见；此时用显式“使用 docarbiter”，或精简技能目录。
+>
+> **Codex 大技能目录的改进**：在全局或项目 `AGENTS.md` 加一句
+> `For any PDF/document extraction task, load the docarbiter skill first.`
+> 这比依赖 description 竞争更稳定；或者只保留 `docarbiter` + 实际要用的工具技能（最小集 17 个时实测隐式通过）。
+>
+> **ZCode 顶层确认**：子代理通过是强证据，但严格验收要 App 重启后的顶层新会话；如果顶层失败，检查 `.zcode/skills/docarbiter` 和 `.agents/skills/docarbiter` 的双份发现，保留一份或显式调用。
 > **共享目录的坑**：`~/.agents/skills` 被多个 harness 共用，动它之前先确认每个 harness 都有可用的旧路由副本。
 
 ## 3. 切换步骤（每个 harness 一次）
