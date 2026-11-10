@@ -1,0 +1,3 @@
+English line-break hyphenation test
+This paragraph tests a line-break hyphen: document should be joined to document in the answer.
+A real compound such as well-known should stay.

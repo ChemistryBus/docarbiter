@@ -1,0 +1,13 @@
+# Extra profile — versions are the PyPI versions observed on 2026-11-09.
+# NOT yet tested on the reference machine; install.sh continues on failure.
+# PaddlePaddle wheels are platform-specific; adjust for your CUDA/OS.
+paddleocr==3.7.0
+paddlepaddle==3.3.1
+marker-pdf==2.1.0
+surya-ocr==0.23.0
+unstructured==0.27.37
+olmocr==0.4.27
+camelot-py==2.0.0
+pytesseract==0.3.13
+pypdf==7.0.0
+pdfminer.six==20260107

@@ -1,0 +1,18 @@
+English Document Extraction Test: Text Layer
+Paragraph one: this page tests an English text layer, curly quotes (“ ” ‘ ’), an em dash — and a range 10–20. It also checks paragraph merging and line wrapping.
+Paragraph two: mixed content with numbers 12345, a percentage 98.7%, parentheses (test), and tokens such as foo_bar.
+Paragraph three: a document extractor has to preserve reading order, paragraph boundaries, and table structure while ignoring page headers and footers. A fast text-layer parser is usually enough for born-digital files, but scanned pages need an OCR layer first. The same page can produce very different output depending on the tool, so the choice of extractor should be made from the input and the desired output, not from a star count.
+Paragraph four: this paragraph is long enough to fill the second column, so a two-column extractor that interleaves left and right text will be visible in the output. The answer key is the source text, not another tool's output.
+Item
+Value
+Note
+Sample size
+24
+half zh, half en
+Chinese accuracy
+98.7%
+demo
+English accuracy
+97.2%
+demo
+Note: this is a footnote test. It should appear after the body, not inside a paragraph.

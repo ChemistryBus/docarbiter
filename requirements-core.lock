@@ -1,0 +1,9 @@
+# Core profile — verified on macOS 26 / M2 Pro / Python 3.11.11 on 2026-11-09.
+# Poppler and qpdf are system packages; install.sh handles them separately.
+mineru==4.1.7
+docling==2.149.0
+liteparse==2.18.0
+markitdown==0.1.9
+rapidocr==3.10.0
+ocrmypdf==17.12.1
+pdfplumber==0.11.10

@@ -1,0 +1,46 @@
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Skills-only install smoke test
+        run: |
+          rm -rf /tmp/docarbiter-ci-home
+          mkdir -p /tmp/docarbiter-ci-home/.claude/skills
+          HOME=/tmp/docarbiter-ci-home bash ./scripts/install.sh \
+            --skills-only --skills-dir /tmp/docarbiter-ci-home/.claude/skills
+          test -L /tmp/docarbiter-ci-home/.claude/skills/docarbiter/SKILL.md
+      - name: Install poppler for the router self-test
+        run: sudo apt-get update -qq && sudo apt-get install -y poppler-utils
+      - name: Validate skill frontmatter and notices
+        run: python3 -I scripts/validate.py
+      - name: Router self-test
+        run: python3 -I scripts/route.py --selftest
+      - name: Shell syntax
+        run: |
+          for f in scripts/*.sh scripts/wrappers/*.sh; do bash -n "$f"; done
+      - name: Python syntax
+        run: python3 -I -m py_compile scripts/bench.py scripts/bench_tables.py scripts/bench_abstract.py scripts/bench_policy.py scripts/survey_pdfs.py scripts/sample_real.py scripts/route.py scripts/validate.py benchmarks/fixtures/make_demo.py benchmarks/fixtures/make_corpus.py benchmarks/fixtures/real/make_real.py benchmarks/fixtures/edge/make_edge.py benchmarks/fixtures/tables/make_tables.py
+      - name: SVG XML
+        run: |
+          python3 -I - <<'PY'
+          import xml.etree.ElementTree as ET
+          for p in ("docs/assets/overview-zh.svg", "docs/assets/overview-en.svg"):
+              ET.parse(p)
+              print("ok", p)
+          PY
+      - name: Forbidden files
+        run: |
+          if find skills -iname '*pymupdf*' -o -iname 'pdf' | grep -q .; then
+            echo "forbidden AGPL/proprietary skill found"; exit 1
+          fi

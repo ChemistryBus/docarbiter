@@ -1,0 +1,29 @@
+PDF (Wikipedia)
+Portable Document Format
+Filename extension | .pdf
+Internet media type |
+- application/pdf,
+- application/x-pdf
+- application/x-bzpdf
+- application/x-gzpdf
+Type code | PDF  (including a single trailing space)
+Uniform Type Identifier (UTI) | com.adobe.pdf
+Magic number | %PDF-
+Developed by | Adobe Inc. (1991–2008)
+ISO (2008–)
+Initial release | June 15, 1993
+Latest release |
+2.0
+Extended to | PDF/A, PDF/E, PDF/UA, PDF/VT, PDF/X
+Standard | ISO 32000-2
+Open format? | Yes
+Website | iso
+Portable Document Format (PDF), standardized as ISO 32000, is a file format developed by Adobe in 1993 used to present documents, including text formatting and images, in a manner independent of application software, hardware, and operating systems. Based on the PostScript language, a PDF file encapsulates a complete description of a fixed-layout document, including the text, fonts, vector graphics, raster images and other information needed to display it.
+PDF has its roots in "The Camelot Project" initiated by Adobe co-founder John Warnock in 1991. PDF was standardized as ISO 32000 in 2008. It is maintained by ISO TC 171 SC 2 WG8, of which the PDF Association is the committee manager. The last edition as ISO 32000-2:2020 was published in December 2020.
+PDF files may contain a variety of content besides flat text and graphics including logical structuring elements, interactive elements such as annotations and form-fields, layers, rich media (including video content), three-dimensional objects using U3D or PRC, and various other data formats. The PDF specification also provides for encryption and digital signatures, file attachments, and metadata to enable workflows requiring these features.
+History
+[edit | edit source]
+The development of PDF began in 1991 when John Warnock wrote a paper for a project then code-named Camelot, in which he proposed the creation of a simplified version of PostScript called Interchange PostScript (IPS). Unlike traditional PostScript, which was tightly focused on rendering print jobs to output devices, IPS would be optimized for displaying pages to any screen and any platform.
+Adobe made the PDF specification available free of charge in 1993. In the early years PDF was popular mainly in desktop publishing workflows, and competed with several other formats, including DjVu, Envoy, Common Ground Digital Paper, Farallon Replica and even Adobe's own PostScript format.
+PDF was a proprietary format controlled by Adobe until it was released as an open standard on July 1, 2008, and published by the International Organization for Standardization as ISO 32000-1:2008, at which time control of the specification passed to an ISO Committee of volunteer industry experts. In 2008, Adobe published a Public Patent License to ISO 32000-1 granting royalty-free rights for all patents owned by Adobe necessary to make, use, sell, and distribute PDF-compliant implementations.
+PDF 1.7, the sixth edition of the PDF specification that became ISO 32000-1, includes some proprietary technologies defined by Adobe, such as Adobe XML Forms Architecture (XFA) and a JavaScript extension for Acrobat, which are referenced by ISO 32000-1 as normative and indispensable for the full implementation of the ISO 32000-1 specification. These proprietary technologies are not standardized, and their specification is published only on Adobe's website. Many of them are not supported by third-party implementations of PDF.

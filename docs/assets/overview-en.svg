@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="840" viewBox="0 0 1200 840" role="img" aria-labelledby="title desc">
+  <title id="title">docarbiter: one entry point to route Chinese and English document extraction tools</title>
+  <desc id="desc">Before/after comparison, plus the input, probe, route, tool layers, output and audience of docarbiter.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748B"/>
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#059669"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="840" fill="#F8FAFC"/>
+  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', 'Source Han Sans SC', 'WenQuanYi Zen Hei', sans-serif">
+    <text x="40" y="54" font-size="32" font-weight="700" fill="#0F172A">docarbiter</text>
+    <text x="40" y="86" font-size="18" fill="#475569">One entry point to route Chinese and English document extraction tools</text>
+    <text x="1160" y="54" font-size="14" fill="#64748B" text-anchor="end">MIT · thin shells · no upstream code</text>
+
+    <!-- Before -->
+    <rect x="40" y="110" width="550" height="230" rx="16" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="60" y="144" font-size="20" font-weight="700" fill="#DC2626">Without an arbiter</text>
+    <text x="60" y="172" font-size="14" fill="#475569">Many tools, scattered rules; the same task gets a different tool from every user.</text>
+    <g font-size="13" fill="#334155">
+      <rect x="60"  y="190" width="105" height="34" rx="8" fill="#FEF2F2" stroke="#FECACA"/><text x="112" y="212" text-anchor="middle">MinerU</text>
+      <rect x="175" y="190" width="105" height="34" rx="8" fill="#FEF2F2" stroke="#FECACA"/><text x="227" y="212" text-anchor="middle">Docling</text>
+      <rect x="290" y="190" width="105" height="34" rx="8" fill="#FEF2F2" stroke="#FECACA"/><text x="342" y="212" text-anchor="middle">Marker</text>
+      <rect x="405" y="190" width="120" height="34" rx="8" fill="#FEF2F2" stroke="#FECACA"/><text x="465" y="212" text-anchor="middle">PaddleOCR</text>
+      <rect x="60"  y="234" width="105" height="34" rx="8" fill="#FEF2F2" stroke="#FECACA"/><text x="112" y="256" text-anchor="middle">liteparse</text>
+      <rect x="175" y="234" width="105" height="34" rx="8" fill="#FEF2F2" stroke="#FECACA"/><text x="227" y="256" text-anchor="middle">OCRmyPDF</text>
+      <rect x="290" y="234" width="105" height="34" rx="8" fill="#FEF2F2" stroke="#FECACA"/><text x="342" y="256" text-anchor="middle">MarkItDown</text>
+      <rect x="405" y="234" width="120" height="34" rx="8" fill="#FEF2F2" stroke="#FECACA"/><text x="465" y="256" text-anchor="middle">pdfplumber</text>
+    </g>
+    <circle cx="66" cy="295" r="4" fill="#DC2626"/><text x="76" y="300" font-size="14" fill="#DC2626">wrong tool</text>
+    <circle cx="206" cy="295" r="4" fill="#DC2626"/><text x="216" y="300" font-size="14" fill="#DC2626">garbled / out of order</text>
+    <circle cx="416" cy="295" r="4" fill="#DC2626"/><text x="426" y="300" font-size="14" fill="#DC2626">skills collide</text>
+
+    <!-- After -->
+    <rect x="610" y="110" width="550" height="230" rx="16" fill="#FFFFFF" stroke="#A7F3D0"/>
+    <text x="630" y="144" font-size="20" font-weight="700" fill="#059669">With docarbiter</text>
+    <text x="630" y="172" font-size="14" fill="#475569">One entry: probe first, then route; if the result is poor, degrade with a reason.</text>
+    <g font-size="13" fill="#065F46">
+      <rect x="630" y="192" width="92" height="40" rx="8" fill="#ECFDF5" stroke="#A7F3D0"/><text x="676" y="217" text-anchor="middle">Input</text>
+      <rect x="742" y="192" width="92" height="40" rx="8" fill="#ECFDF5" stroke="#A7F3D0"/><text x="788" y="217" text-anchor="middle">Probe</text>
+      <rect x="854" y="192" width="92" height="40" rx="8" fill="#ECFDF5" stroke="#A7F3D0"/><text x="900" y="217" text-anchor="middle">Route</text>
+      <rect x="966" y="192" width="92" height="40" rx="8" fill="#ECFDF5" stroke="#A7F3D0"/><text x="1012" y="217" text-anchor="middle">Verify</text>
+    </g>
+    <g stroke="#059669" stroke-width="1.6" marker-end="url(#arrowGreen)">
+      <line x1="722" y1="212" x2="738" y2="212"/>
+      <line x1="834" y1="212" x2="850" y2="212"/>
+      <line x1="946" y1="212" x2="962" y2="212"/>
+    </g>
+    <circle cx="636" cy="295" r="4" fill="#059669"/><text x="646" y="300" font-size="14" fill="#059669">right tool</text>
+    <circle cx="766" cy="295" r="4" fill="#059669"/><text x="776" y="300" font-size="14" fill="#059669">explainable fallback</text>
+    <circle cx="936" cy="295" r="4" fill="#059669"/><text x="946" y="300" font-size="14" fill="#059669">one entry</text>
+
+    <!-- Pipeline -->
+    <text x="40" y="392" font-size="20" font-weight="700" fill="#0F172A">How it routes</text>
+    <g font-size="13" fill="#334155">
+      <rect x="40"  y="414" width="128" height="58" rx="10" fill="#FFFFFF" stroke="#CBD5E1"/><text x="104" y="439" text-anchor="middle">PDF</text><text x="104" y="458" text-anchor="middle" fill="#64748B">text layer</text>
+      <rect x="184" y="414" width="128" height="58" rx="10" fill="#FFFFFF" stroke="#CBD5E1"/><text x="248" y="439" text-anchor="middle">Scanned PDF</text><text x="248" y="458" text-anchor="middle" fill="#64748B">OCR first</text>
+      <rect x="328" y="414" width="128" height="58" rx="10" fill="#FFFFFF" stroke="#CBD5E1"/><text x="392" y="439" text-anchor="middle">Image</text><text x="392" y="458" text-anchor="middle" fill="#64748B">Chinese OCR</text>
+      <rect x="472" y="414" width="128" height="58" rx="10" fill="#FFFFFF" stroke="#CBD5E1"/><text x="536" y="439" text-anchor="middle">Office</text><text x="536" y="458" text-anchor="middle" fill="#64748B">DOCX / XLSX / PPTX</text>
+    </g>
+    <g stroke="#64748B" stroke-width="1.6" marker-end="url(#arrow)">
+      <line x1="168" y1="443" x2="632" y2="443"/>
+      <line x1="312" y1="443" x2="632" y2="443"/>
+      <line x1="456" y1="443" x2="632" y2="443"/>
+      <line x1="600" y1="443" x2="632" y2="443"/>
+    </g>
+    <rect x="636" y="400" width="230" height="86" rx="14" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.5"/>
+    <text x="751" y="430" font-size="18" font-weight="700" fill="#1D4ED8" text-anchor="middle">docarbiter</text>
+    <text x="751" y="453" font-size="13" fill="#1E40AF" text-anchor="middle">classify · probe · route · degrade</text>
+    <text x="751" y="473" font-size="12" fill="#3B82F6" text-anchor="middle">does not extract</text>
+
+    <g stroke="#64748B" stroke-width="1.6" marker-end="url(#arrow)">
+      <line x1="866" y1="428" x2="896" y2="428"/>
+      <line x1="866" y1="443" x2="896" y2="443"/>
+      <line x1="866" y1="458" x2="896" y2="458"/>
+    </g>
+    <g font-size="13">
+      <rect x="900" y="408" width="260" height="32" rx="8" fill="#ECFDF5" stroke="#A7F3D0"/><text x="914" y="429" fill="#065F46">core: 8 tools (default, CPU)</text>
+      <rect x="900" y="446" width="260" height="32" rx="8" fill="#FFFBEB" stroke="#FDE68A"/><text x="914" y="467" fill="#92400E">extra: 4 + 6 optional (heavy/GPU)</text>
+      <rect x="900" y="484" width="260" height="32" rx="8" fill="#FEF2F2" stroke="#FECACA"/><text x="914" y="505" fill="#991B1B">excluded: AGPL / commercial API</text>
+    </g>
+
+    <rect x="636" y="520" width="230" height="46" rx="10" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="751" y="549" font-size="13" fill="#334155" text-anchor="middle">Output: MD / text / tables / chunks</text>
+    <rect x="900" y="520" width="260" height="46" rx="10" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="1030" y="549" font-size="13" fill="#334155" text-anchor="middle">Poor result: explainable fallback</text>
+    <g stroke="#059669" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrowGreen)">
+      <path d="M 1160 543 C 1184 543 1184 490 1160 490" fill="none"/>
+    </g>
+
+    <!-- Audience -->
+    <text x="40" y="624" font-size="20" font-weight="700" fill="#0F172A">Who it is for</text>
+    <g>
+      <rect x="40" y="648" width="360" height="132" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+      <text x="60" y="680" font-size="16" font-weight="700" fill="#0F172A">Chinese / English document workers</text>
+      <text x="60" y="706" font-size="13" fill="#475569">Papers, reports, scans, tables;</text>
+      <text x="60" y="728" font-size="13" fill="#475569">no time to memorize 12 CLIs and their traps.</text>
+
+      <rect x="420" y="648" width="360" height="132" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+      <text x="440" y="680" font-size="16" font-weight="700" fill="#0F172A">Agent / harness users</text>
+      <text x="440" y="706" font-size="13" fill="#475569">Several look-alike skills installed;</text>
+      <text x="440" y="728" font-size="13" fill="#475569">need one entry to stop random tool choice.</text>
+
+      <rect x="800" y="648" width="360" height="132" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+      <text x="820" y="680" font-size="16" font-weight="700" fill="#0F172A">Tool maintainers</text>
+      <text x="820" y="706" font-size="13" fill="#475569">Add a tool = one thin shell + one registry entry;</text>
+      <text x="820" y="728" font-size="13" fill="#475569">no dispatcher rewrite if the category exists.</text>
+    </g>
+
+    <text x="40" y="812" font-size="12" fill="#94A3B8">Repo: ChemistryBus/docarbiter  ·  Skill: docarbiter  ·  License: MIT (this repo)</text>
+    <text x="1160" y="812" font-size="12" fill="#94A3B8" text-anchor="end">github.com/ChemistryBus/docarbiter</text>
+  </g>
+</svg>

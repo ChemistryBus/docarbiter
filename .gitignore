@@ -1,0 +1,9 @@
+benchmarks/private/
+benchmarks/results/
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
+*.log
+blobs/
+.mineru-service.lock

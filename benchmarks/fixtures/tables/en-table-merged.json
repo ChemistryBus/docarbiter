@@ -1,0 +1,24 @@
+{
+  "rows": [
+    [
+      "Merged header",
+      "",
+      "Note"
+    ],
+    [
+      "Sample size",
+      "24",
+      "half zh, half en"
+    ],
+    [
+      "Chinese accuracy",
+      "98.7%",
+      "merged row"
+    ],
+    [
+      "English accuracy",
+      "97.2%",
+      ""
+    ]
+  ]
+}

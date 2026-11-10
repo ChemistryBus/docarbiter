@@ -1,0 +1,6 @@
+# Development-only dependencies. Not needed to use the docarbiter skill.
+# Quick path for benchmark/fixture scripts; the core install does not need these.
+rapidfuzz==3.14.6
+beautifulsoup4==4.15.0
+python-docx==1.2.0
+pypdf==6.14.2

@@ -1,0 +1,10 @@
+Document Extraction Test (English)
+Paragraph one: this fixture tests an English text layer, curly quotes (“ ” ‘ ’), an em dash — and a range 10–20.
+Paragraph two: mixed content with numbers 12345, a percentage 98.7%, parentheses (test), and tokens such as foo_bar.
+Paragraph three: a document extractor has to preserve reading order, paragraph boundaries, and table structure while ignoring page headers and footers. A fast text-layer parser is usually enough for born-digital files, but scanned pages need an OCR layer first. The same page can produce very different output depending on the tool, so the choice of extractor should be made from the input and the desired output, not from a star count. This paragraph is deliberately long enough to wrap across several lines, which makes paragraph merging and line-break handling visible in the extracted text.
+Item
+Value
+Sample size
+24
+Accuracy
+98.7%

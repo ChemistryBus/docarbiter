@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="840" viewBox="0 0 1200 840" role="img" aria-labelledby="title desc">
+  <title id="title">docarbiter：一个入口，调度中英文文档提取工具</title>
+  <desc id="desc">对比没有调度器时的工具混乱，以及 docarbiter 的输入、探针、路由、工具层、输出和适用人群。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748B"/>
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#059669"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="840" fill="#F8FAFC"/>
+  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', 'Source Han Sans SC', 'WenQuanYi Zen Hei', sans-serif">
+    <text x="40" y="54" font-size="32" font-weight="700" fill="#0F172A">docarbiter</text>
+    <text x="40" y="86" font-size="18" fill="#475569">一个入口，调度中英文文档提取工具</text>
+    <text x="1160" y="54" font-size="14" fill="#64748B" text-anchor="end">MIT · 薄壳分发 · 不含上游代码</text>
+
+    <!-- Before -->
+    <rect x="40" y="110" width="550" height="230" rx="16" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="60" y="144" font-size="20" font-weight="700" fill="#DC2626">没有调度器</text>
+    <text x="60" y="172" font-size="14" fill="#475569">工具很多，规则散落；同一个任务，不同人选出不同工具。</text>
+    <g font-size="13" fill="#334155">
+      <rect x="60"  y="190" width="105" height="34" rx="8" fill="#FEF2F2" stroke="#FECACA"/><text x="112" y="212" text-anchor="middle">MinerU</text>
+      <rect x="175" y="190" width="105" height="34" rx="8" fill="#FEF2F2" stroke="#FECACA"/><text x="227" y="212" text-anchor="middle">Docling</text>
+      <rect x="290" y="190" width="105" height="34" rx="8" fill="#FEF2F2" stroke="#FECACA"/><text x="342" y="212" text-anchor="middle">Marker</text>
+      <rect x="405" y="190" width="120" height="34" rx="8" fill="#FEF2F2" stroke="#FECACA"/><text x="465" y="212" text-anchor="middle">PaddleOCR</text>
+      <rect x="60"  y="234" width="105" height="34" rx="8" fill="#FEF2F2" stroke="#FECACA"/><text x="112" y="256" text-anchor="middle">liteparse</text>
+      <rect x="175" y="234" width="105" height="34" rx="8" fill="#FEF2F2" stroke="#FECACA"/><text x="227" y="256" text-anchor="middle">OCRmyPDF</text>
+      <rect x="290" y="234" width="105" height="34" rx="8" fill="#FEF2F2" stroke="#FECACA"/><text x="342" y="256" text-anchor="middle">MarkItDown</text>
+      <rect x="405" y="234" width="120" height="34" rx="8" fill="#FEF2F2" stroke="#FECACA"/><text x="465" y="256" text-anchor="middle">pdfplumber</text>
+    </g>
+    <circle cx="66" cy="295" r="4" fill="#DC2626"/><text x="76" y="300" font-size="14" fill="#DC2626">装错工具</text>
+    <circle cx="206" cy="295" r="4" fill="#DC2626"/><text x="216" y="300" font-size="14" fill="#DC2626">中文乱码 / 英文乱序</text>
+    <circle cx="406" cy="295" r="4" fill="#DC2626"/><text x="416" y="300" font-size="14" fill="#DC2626">同类技能打架</text>
+
+    <!-- After -->
+    <rect x="610" y="110" width="550" height="230" rx="16" fill="#FFFFFF" stroke="#A7F3D0"/>
+    <text x="630" y="144" font-size="20" font-weight="700" fill="#059669">docarbiter 之后</text>
+    <text x="630" y="172" font-size="14" fill="#475569">一个入口：先探针，再路由；结果不满意，按降级链换。</text>
+    <g font-size="13" fill="#065F46">
+      <rect x="630" y="192" width="92" height="40" rx="8" fill="#ECFDF5" stroke="#A7F3D0"/><text x="676" y="217" text-anchor="middle">输入</text>
+      <rect x="742" y="192" width="92" height="40" rx="8" fill="#ECFDF5" stroke="#A7F3D0"/><text x="788" y="217" text-anchor="middle">探针</text>
+      <rect x="854" y="192" width="92" height="40" rx="8" fill="#ECFDF5" stroke="#A7F3D0"/><text x="900" y="217" text-anchor="middle">路由</text>
+      <rect x="966" y="192" width="92" height="40" rx="8" fill="#ECFDF5" stroke="#A7F3D0"/><text x="1012" y="217" text-anchor="middle">抽检</text>
+    </g>
+    <g stroke="#059669" stroke-width="1.6" marker-end="url(#arrowGreen)">
+      <line x1="722" y1="212" x2="738" y2="212"/>
+      <line x1="834" y1="212" x2="850" y2="212"/>
+      <line x1="946" y1="212" x2="962" y2="212"/>
+    </g>
+    <circle cx="636" cy="295" r="4" fill="#059669"/><text x="646" y="300" font-size="14" fill="#059669">选对工具</text>
+    <circle cx="766" cy="295" r="4" fill="#059669"/><text x="776" y="300" font-size="14" fill="#059669">可解释降级</text>
+    <circle cx="916" cy="295" r="4" fill="#059669"/><text x="926" y="300" font-size="14" fill="#059669">单一入口</text>
+
+    <!-- Pipeline -->
+    <text x="40" y="392" font-size="20" font-weight="700" fill="#0F172A">它怎么调度</text>
+    <g font-size="13" fill="#334155">
+      <rect x="40"  y="414" width="128" height="58" rx="10" fill="#FFFFFF" stroke="#CBD5E1"/><text x="104" y="439" text-anchor="middle">PDF</text><text x="104" y="458" text-anchor="middle" fill="#64748B">文字层</text>
+      <rect x="184" y="414" width="128" height="58" rx="10" fill="#FFFFFF" stroke="#CBD5E1"/><text x="248" y="439" text-anchor="middle">扫描 PDF</text><text x="248" y="458" text-anchor="middle" fill="#64748B">OCR 先加层</text>
+      <rect x="328" y="414" width="128" height="58" rx="10" fill="#FFFFFF" stroke="#CBD5E1"/><text x="392" y="439" text-anchor="middle">图片 / 截图</text><text x="392" y="458" text-anchor="middle" fill="#64748B">中文 OCR</text>
+      <rect x="472" y="414" width="128" height="58" rx="10" fill="#FFFFFF" stroke="#CBD5E1"/><text x="536" y="439" text-anchor="middle">Office</text><text x="536" y="458" text-anchor="middle" fill="#64748B">DOCX / XLSX / PPTX</text>
+    </g>
+    <g stroke="#64748B" stroke-width="1.6" marker-end="url(#arrow)">
+      <line x1="168" y1="443" x2="632" y2="443"/>
+      <line x1="312" y1="443" x2="632" y2="443"/>
+      <line x1="456" y1="443" x2="632" y2="443"/>
+      <line x1="600" y1="443" x2="632" y2="443"/>
+    </g>
+    <rect x="636" y="400" width="230" height="86" rx="14" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.5"/>
+    <text x="751" y="430" font-size="18" font-weight="700" fill="#1D4ED8" text-anchor="middle">docarbiter</text>
+    <text x="751" y="453" font-size="13" fill="#1E40AF" text-anchor="middle">分类 · 探针 · 路由 · 降级</text>
+    <text x="751" y="473" font-size="12" fill="#3B82F6" text-anchor="middle">不自己提取</text>
+
+    <g stroke="#64748B" stroke-width="1.6" marker-end="url(#arrow)">
+      <line x1="866" y1="428" x2="896" y2="428"/>
+      <line x1="866" y1="443" x2="896" y2="443"/>
+      <line x1="866" y1="458" x2="896" y2="458"/>
+    </g>
+    <g font-size="13">
+      <rect x="900" y="408" width="260" height="32" rx="8" fill="#ECFDF5" stroke="#A7F3D0"/><text x="914" y="429" fill="#065F46">core：8 个（默认安装，CPU）</text>
+      <rect x="900" y="446" width="260" height="32" rx="8" fill="#FFFBEB" stroke="#FDE68A"/><text x="914" y="467" fill="#92400E">extra：4 个 + 6 个可选（重/GPU）</text>
+      <rect x="900" y="484" width="260" height="32" rx="8" fill="#FEF2F2" stroke="#FECACA"/><text x="914" y="505" fill="#991B1B">excluded：AGPL / 商业云 API</text>
+    </g>
+
+    <rect x="636" y="520" width="230" height="46" rx="10" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="751" y="549" font-size="13" fill="#334155" text-anchor="middle">输出：MD / 文本 / 表格 / chunks</text>
+    <rect x="900" y="520" width="260" height="46" rx="10" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="1030" y="549" font-size="13" fill="#334155" text-anchor="middle">不满意：降级链（可解释）</text>
+    <g stroke="#059669" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrowGreen)">
+      <path d="M 1160 543 C 1184 543 1184 490 1160 490" fill="none"/>
+    </g>
+
+    <!-- Audience -->
+    <text x="40" y="624" font-size="20" font-weight="700" fill="#0F172A">适用于谁</text>
+    <g>
+      <rect x="40" y="648" width="360" height="132" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+      <text x="60" y="680" font-size="16" font-weight="700" fill="#0F172A">中文 / 英文文档工作者</text>
+      <text x="60" y="706" font-size="13" fill="#475569">论文、报告、扫描件、表格；</text>
+      <text x="60" y="728" font-size="13" fill="#475569">不想记 12 个工具的命令和坑。</text>
+
+      <rect x="420" y="648" width="360" height="132" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+      <text x="440" y="680" font-size="16" font-weight="700" fill="#0F172A">Agent / harness 用户</text>
+      <text x="440" y="706" font-size="13" fill="#475569">装了多个同类技能；</text>
+      <text x="440" y="728" font-size="13" fill="#475569">需要唯一入口，避免随机挑工具。</text>
+
+      <rect x="800" y="648" width="360" height="132" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+      <text x="820" y="680" font-size="16" font-weight="700" fill="#0F172A">工具维护者</text>
+      <text x="820" y="706" font-size="13" fill="#475569">新增工具 = 一个薄壳 + 一条 registry 记录；</text>
+      <text x="820" y="728" font-size="13" fill="#475569">只要类别不变，调度器不用改。</text>
+    </g>
+
+    <text x="40" y="812" font-size="12" fill="#94A3B8">仓库：ChemistryBus/docarbiter  ·  技能：docarbiter  ·  许可证：MIT（仓库自身）</text>
+    <text x="1160" y="812" font-size="12" fill="#94A3B8" text-anchor="end">github.com/ChemistryBus/docarbiter</text>
+  </g>
+</svg>
