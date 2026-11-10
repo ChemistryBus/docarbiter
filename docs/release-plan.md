@@ -1,7 +1,8 @@
 # GitHub 发布计划（已执行）
 
 > 目标：把当前仓库作为 **首个公开预览版** 发布到 GitHub。
-> 2026-11-10：已发布 **v0.1.0**（`main` 初始提交 `5e1f9fd`，CI `validate` 绿，Release 已创建）。
+> 2026-11-10：已发布 **v0.1.0 — First Public Preview**（`main` 初始提交 `5e1f9fd`，CI `validate` 绿，Release 已创建）。
+> 2026-11-11：发布 **v0.1.1 — Harness Compatibility Patch**（安装兼容、wrapper 备份、更新机制、harness 文档）。
 > 本地验证、隐私修复、干净 venv 和提交预演均已完成。
 
 ## 0. 发布范围（建议）

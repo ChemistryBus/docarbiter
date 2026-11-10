@@ -4,10 +4,11 @@
 
 <p align="center"><strong>中英文文档提取的唯一路由入口。</strong></p>
 <p align="center">先探测 PDF，再选工具；工具不行时，给出可解释的降级链。</p>
+<p align="center"><strong>v0.1.1 — Harness Compatibility Patch</strong></p>
 
 <p align="center">
   <a href="https://github.com/ChemistryBus/docarbiter/actions/workflows/validate.yml"><img src="https://github.com/ChemistryBus/docarbiter/actions/workflows/validate.yml/badge.svg" alt="validate"></a>
-  <a href="https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.0"><img src="https://img.shields.io/github/v/release/ChemistryBus/docarbiter?color=blue" alt="release"></a>
+  <a href="https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.1"><img src="https://img.shields.io/github/v/release/ChemistryBus/docarbiter?color=blue" alt="release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT"></a>
   <img src="https://img.shields.io/badge/python-3.10--3.12-blue" alt="Python 3.10-3.12">
 </p>
@@ -153,7 +154,7 @@ python3 -I scripts/route.py file.pdf --goal table-structure --json
 | 实测坑与失败模式 | [docs/gotchas.md](docs/gotchas.md) |
 | Harness 接入 | [docs/harness-integration.md](docs/harness-integration.md) |
 | 更新技能 | [docs/updating.md](docs/updating.md) |
-| Release notes | [v0.1.0](https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.0) · [docs/release-notes-v0.1.0.md](docs/release-notes-v0.1.0.md) |
+| Release notes | [v0.1.1](https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.1) · [docs/release-notes-v0.1.1.md](docs/release-notes-v0.1.1.md) |
 
 ## 许可
 

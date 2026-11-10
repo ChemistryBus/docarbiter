@@ -159,6 +159,7 @@ def main() -> int:
         "docs/install-routed-tools.md",
         "docs/updating.md",
         "docs/release-notes-v0.1.0.md",
+        "docs/release-notes-v0.1.1.md",
         "docs/release-checklist.md",
         "docs/assets/overview-zh.svg",
         "docs/assets/overview-en.svg",

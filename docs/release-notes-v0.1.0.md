@@ -1,4 +1,4 @@
-# v0.1.0 — 首个公开预览
+# v0.1.0 — First Public Preview
 
 `docarbiter` 是一个中英文优先的**文档提取仲裁器**：它不自己造提取器，而是在 MinerU、Docling、liteparse、MarkItDown、RapidOCR、OCRmyPDF、pdfplumber、pdftotext 等工具之间，按“输入类型 / 文字层 / 语言 / 目标产出”做路由，并给出失败后的降级链。
 

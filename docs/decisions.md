@@ -282,5 +282,6 @@ GitHub 的许可证识别为 NOASSERTION，实际 `LICENSE` 是 BSD-3-Clause 风
 
 ### 发布状态
 
-- 已发布 **v0.1.0**：https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.0；`main` 初始提交 `5e1f9fd`，CI `validate` 绿。
+- 已发布 **v0.1.0 — First Public Preview**：https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.0；`main` 初始提交 `5e1f9fd`，CI `validate` 绿。
+- 已发布 **v0.1.1 — Harness Compatibility Patch**：安装器支持整目录软链与 wrapper 备份，新增 bootstrap/update 文档，记录 Codex 容量限制。
 - 下一步：ZCode / Codex / MiniMax 发布后配置与测试；真实双栏全文 CER；真实表逐单元格 CER；扩展层（PaddleOCR / Marker / Unstructured / olmOCR）按可行性安装与测试；继续按 `docs/release-checklist.md` 迭代。
