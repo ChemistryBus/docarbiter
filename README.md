@@ -110,7 +110,7 @@ Full licenses, install commands, and exclusion reasons: [docs/tool-registry.md](
 | Real high-frequency tables | Structure + spot checks; Docling / MinerU / pdfplumber split by table type |
 | P0 routing policy (22 documents with answer keys) | `router:text` 100% success / median CER 0.0000 / 4.73 s; fixed MinerU 100% / 0.0115 / 61.98 s |
 | Harness trigger | Claude Code and DSH tested; ZCode / Codex / MiniMax configured after release |
-| CI | GitHub Actions `validate` green; Linux covered by CI, Windows unverified |
+| CI | GitHub Actions `validate` green on Ubuntu + macOS; Windows unverified |
 
 Known limits are explicit: true vertical text, full-body two-column CER, per-cell CER on real tables, and symbol-glyph fidelity are not solved. The README keeps the summary; the evidence lives in [docs/policy.md](docs/policy.md), [docs/benchmarks.md](docs/benchmarks.md), and [docs/gotchas.md](docs/gotchas.md).
 
