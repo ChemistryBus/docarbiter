@@ -115,6 +115,8 @@ python3 -I scripts/route.py file.pdf --goal table-structure --json
 ./scripts/doctor.sh --check-conflicts
 ```
 
+> **安装器边界：** 本项目不会克隆别人的技能仓库。`--profile core` 只通过 `pip` / `brew` / `apt` 安装锁定版本的 Python 包和系统依赖；上游工具首次运行时可能自行下载模型权重。`--skills-only` 不装任何工具。`skills/_tools/` 下的 12 个薄壳是自撰的命令/定位说明，不是上游仓库的副本。
+
 其他 harness 用同一个命令指定技能目录：
 
 ```bash
