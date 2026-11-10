@@ -131,7 +131,7 @@ python3 -I scripts/route.py file.pdf --goal table-structure --json
 
 > **安装器边界：** 本项目不会克隆别人的技能仓库。`--profile core` 只通过 `pip` / `brew` / `apt` 安装锁定版本的 Python 包和系统依赖；上游工具首次运行时可能自行下载模型权重。`--skills-only` 不装任何工具。`skills/_tools/` 下的 12 个薄壳是自撰的命令/定位说明，不是上游仓库的副本。
 
-逐个工具的上游链接、许可证和可直接复制的安装命令：**[docs/install-routed-tools.md](docs/install-routed-tools.md)**。
+逐个工具的上游链接、许可证和可直接复制的安装命令：**[docs/install-routed-tools.md](docs/install-routed-tools.md)**。`~/.local/bin` 里已有的同名 wrapper 会先备份为 `.bak.<timestamp>` 再替换。
 
 其他 harness 用同一个命令指定技能目录：
 

@@ -133,7 +133,7 @@ Known limits are explicit: true vertical text, full-body two-column CER, per-cel
 
 > **Installer scope:** this project does not clone third-party skill repositories. `--profile core` installs pinned Python packages and system dependencies through `pip` / `brew` / `apt`; the upstream tools may download their own model weights on first run. `--skills-only` installs no tools. The 12 tool shells under `skills/_tools/` are original command/positioning notes, not copies of upstream repositories.
 
-Per-tool upstream links, licenses, and copy-paste install commands: **[docs/install-routed-tools.md](docs/install-routed-tools.md)**.
+Per-tool upstream links, licenses, and copy-paste install commands: **[docs/install-routed-tools.md](docs/install-routed-tools.md)**. Existing `~/.local/bin` wrappers are backed up as `.bak.<timestamp>` before replacement.
 
 Other harnesses use the same command with their skill directory:
 

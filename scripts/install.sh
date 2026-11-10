@@ -132,8 +132,15 @@ BIN_DIR="${HOME}/.local/bin"
 mkdir -p "$BIN_DIR"
 for w in "$REPO_ROOT"/scripts/wrappers/*.sh; do
   [ -f "$w" ] || continue
-  install -m 0755 "$w" "$BIN_DIR/$(basename "$w" .sh)"
-  echo "[install] wrapper: $BIN_DIR/$(basename "$w" .sh)"
+  name="$(basename "$w" .sh)"
+  dest="$BIN_DIR/$name"
+  if [ -e "$dest" ] && ! cmp -s "$w" "$dest"; then
+    backup="$dest.bak.$(date +%Y%m%d%H%M%S)"
+    cp -p "$dest" "$backup"
+    echo "[install] backup wrapper: $backup"
+  fi
+  install -m 0755 "$w" "$dest"
+  echo "[install] wrapper: $dest"
 done
 case ":$PATH:" in
   *":$BIN_DIR:"*) ;;
