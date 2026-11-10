@@ -3,6 +3,8 @@
 # Never installs, deletes, or edits anything.
 set -u
 
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+
 CHECK_CONFLICTS=0
 for a in "$@"; do
   case "$a" in
@@ -17,7 +19,9 @@ for a in "$@"; do
   - Tesseract 中文语言包
   - MinerU 模型目录
   - 当前目录是否有 MinerU blobs/ 或锁文件
-  - ~/.claude/skills 等目录里的重名技能与双路由器
+  - ~/.agents / ~/.claude / ~/.codex 等目录里的重名技能与双路由器
+  - 各 harness 的 docarbiter 形态、是否同源、版本是否落后
+  - 可发现技能数（catalog 容量提示）
 
 退出码: 0 = core 完整；1 = core 缺项
 USAGE
@@ -140,9 +144,17 @@ else
 fi
 
 echo
-echo "-- skill conflicts --"
+echo "-- skill conflicts and drift --"
+realpath_py() { python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$1"; }
+skill_version() { sed -n 's/^version:[[:space:]]*//p' "$1" 2>/dev/null | head -1; }
+
+repo_skill_dir="$REPO_ROOT/skills/docarbiter"
+repo_skill_file="$repo_skill_dir/SKILL.md"
+repo_version="$(skill_version "$repo_skill_file")"
+
 skill_dirs=()
-for d in "$HOME/.claude/skills" "$HOME/.codex/skills" "$HOME/.zcode/skills" "$HOME/.dsh/skills"; do
+# ~/.agents/skills is the shared global root for pi-agent harnesses.
+for d in "$HOME/.agents/skills" "$HOME/.claude/skills" "$HOME/.codex/skills" "$HOME/.zcode/skills" "$HOME/.dsh/skills"; do
   [ -d "$d" ] && skill_dirs+=("$d")
 done
 
@@ -151,17 +163,63 @@ if [ ${#skill_dirs[@]} -eq 0 ]; then
 else
   routers=""
   for d in "${skill_dirs[@]}"; do
+    label="$(basename "$(dirname "$d")")"
     found=""
     for name in docarbiter doc-extract; do
       [ -f "$d/$name/SKILL.md" ] && found="$found $name"
     done
     if [ -n "$found" ]; then
-      row "$(basename "$(dirname "$d")")" "router" "$found"
+      row "$label" "router" "$found"
       case "$found" in *docarbiter*) routers="$routers docarbiter" ;; esac
       case "$found" in *doc-extract*) routers="$routers doc-extract" ;; esac
     else
-      row "$(basename "$(dirname "$d")")" "ok" "无路由器"
+      row "$label" "ok" "无路由器"
     fi
+
+    # Shape + source + version drift for the installed docarbiter copy.
+    target="$d/docarbiter"
+    target_file="$target/SKILL.md"
+    if [ -e "$target_file" ]; then
+      shape="unknown"
+      same="unknown"
+      if [ -L "$target" ]; then
+        shape="dir-symlink"
+        if [ "$(realpath_py "$target")" = "$(realpath_py "$repo_skill_dir")" ]; then same="yes"; else same="no"; fi
+      elif [ -L "$target_file" ]; then
+        shape="file-symlink"
+        if [ "$(realpath_py "$target_file")" = "$(realpath_py "$repo_skill_file")" ]; then same="yes"; else same="no"; fi
+      elif [ -f "$target_file" ]; then
+        shape="real-copy"
+        if cmp -s "$target_file" "$repo_skill_file"; then same="yes"; else same="no"; fi
+      fi
+      target_version="$(skill_version "$target_file")"
+      content_same="no"
+      cmp -s "$target_file" "$repo_skill_file" && content_same="yes"
+      drift="OK"
+      if [ -z "$target_version" ] && [ "$shape" = "real-copy" ]; then
+        drift="DRIFT"
+      elif [ -n "$target_version" ] && [ -n "$repo_version" ] && [ "$target_version" != "$repo_version" ]; then
+        drift="STALE"
+      elif [ "$same" != "yes" ] && [ "$content_same" != "yes" ]; then
+        # Another clone (or a copy) whose content differs from this checkout.
+        drift="DIFFERS"
+      elif [ "$same" != "yes" ]; then
+        # A different clone of the same project with identical content.
+        drift="OTHER-CLONE"
+      fi
+      row "$label:docarbiter" "$drift" "shape=$shape same_source=$same content_same=$content_same version=${target_version:-?} repo=${repo_version:-?}"
+      case "$drift" in STALE|DRIFT|DIFFERS) warn=$((warn + 1)) ;; esac
+    fi
+
+    # Catalog budget: harnesses may hide or shorten descriptions above a budget.
+    nskills="$(find -L "$d" -maxdepth 2 -name SKILL.md 2>/dev/null | wc -l | tr -d ' ')"
+    if [ "$nskills" -gt 200 ]; then
+      row "$label:catalog" "WARN" "$nskills discoverable skills; catalog budget may hide/shorten descriptions"
+      warn=$((warn + 1))
+    else
+      row "$label:catalog" "OK" "$nskills discoverable skills"
+    fi
+
     if [ "$CHECK_CONFLICTS" = "1" ]; then
       for t in mineru liteparse docling markitdown rapidocr ocrmypdf pdfplumber pdftotext paddleocr marker unstructured olmocr; do
         if [ -f "$d/$t/SKILL.md" ] && [ -f "$d/docarbiter/SKILL.md" ]; then
