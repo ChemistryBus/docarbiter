@@ -16,6 +16,7 @@ for a in "$@"; do
   - Python 包版本
   - Tesseract 中文语言包
   - MinerU 模型目录
+  - 当前目录是否有 MinerU blobs/ 或锁文件
   - ~/.claude/skills 等目录里的重名技能与双路由器
 
 退出码: 0 = core 完整；1 = core 缺项
@@ -126,6 +127,16 @@ if [ -d "$HOME/.mineru/models" ]; then
   row "~/.mineru/models" "OK" "$(du -sh "$HOME/.mineru/models" 2>/dev/null | awk '{print $1}')"
 else
   row "~/.mineru/models" "MISSING" "首次运行 mineru 会下载（约 860MB）"
+fi
+
+echo
+echo "-- workspace junk --"
+if [ -d "$PWD/blobs" ] || [ -f "$PWD/.mineru-service.lock" ]; then
+  row "MinerU CWD junk" "WARN" "当前目录有 blobs/ 或锁文件；删掉，并在 ~/.mineru 里启动服务"
+  warn=$((warn + 1))
+else
+  row "MinerU CWD junk" "OK" "无 blobs/ 或锁文件"
+  ok=$((ok + 1))
 fi
 
 echo

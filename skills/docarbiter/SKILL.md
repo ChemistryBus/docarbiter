@@ -229,7 +229,7 @@ skills/_tools/olmocr.md
 
 ## Scaling the Collection
 
-上面的路由表是**主路径**，不是全部工具。`registry.json` 是工具事实的来源（id / tier / languages / input_types / output_types / best_for / avoid_when / install / upstream）。加工具时：
+上面的路由表是**主路径**，不是全部工具。`registry.json` 是工具事实的来源（id / tier / languages / input_types / output_types / best_for / avoid_when / install / upstream）。用户需要安装某个被路由的工具时，先读 `docs/install-routed-tools.md`（逐工具上游链接、许可证、可直接复制的命令），不要凭记忆猜安装命令。加工具时：
 
 1. 在 `registry.json` 加一条记录；
 2. 需要薄壳就加 `skills/_tools/<id>.md`；

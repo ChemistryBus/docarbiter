@@ -7,7 +7,11 @@ on:
 
 jobs:
   validate:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -20,8 +24,12 @@ jobs:
           HOME=/tmp/docarbiter-ci-home bash ./scripts/install.sh \
             --skills-only --skills-dir /tmp/docarbiter-ci-home/.claude/skills
           test -L /tmp/docarbiter-ci-home/.claude/skills/docarbiter/SKILL.md
-      - name: Install poppler for the router self-test
+      - name: Install poppler (Linux)
+        if: runner.os == 'Linux'
         run: sudo apt-get update -qq && sudo apt-get install -y poppler-utils
+      - name: Install poppler (macOS)
+        if: runner.os == 'macOS'
+        run: brew list poppler >/dev/null 2>&1 || brew install poppler
       - name: Validate skill frontmatter and notices
         run: python3 -I scripts/validate.py
       - name: Router self-test

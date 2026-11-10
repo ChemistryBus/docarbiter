@@ -107,6 +107,30 @@ Which tool should I use? Only route it and give one copyable command; do not ext
 
 判断标准：**出现 docarbiter + 路由 MinerU** 才算触发通过；只是“回答看起来对”不算，因为旧路由器也可能答对。
 
+### 给 agent 的完整话术（可直接粘）
+
+```text
+请先判断这个任务该用哪个文档提取工具：
+我有个中文扫描版 PDF，想提取成带页码的 Markdown。
+只告诉我路由判断和一条可复制命令，不要实际提取。
+完成后另起一段，报告你实际调用了哪个技能/工具（如果界面能看到名字），
+以及最终选择的工具；如果没有调用任何技能，也明确说“没有调用技能”。
+```
+
+### 固定回传模板
+
+```text
+Harness: ZCode / Codex / MiniMax
+版本/模型:
+安装方式: install.sh --skills-only --skills-dir ...
+旧 doc-extract: 已移走 / 仍在 / 不确定
+界面显示的技能名: docarbiter / doc-extract / 内置 pdf / 没显示
+完整回答:
+错误或异常:
+```
+
+返回时不要只写“成功了”；把完整回答和技能名一起贴回来。没有技能名时，至少贴完整回答，并说明界面是否显示工具调用。
+
 ## 7. 本机当前状态（2026-11-10）
 
 | Harness | 当前路由器 | 旧路由位置 | 备注 |
