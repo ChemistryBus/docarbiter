@@ -28,7 +28,7 @@ ln -sfn "$PWD/skills/docarbiter" "$DIR/docarbiter"
 |---|---|---|---|
 | Claude Code | `~/.claude/skills` | — | 已切换；旧路由备份停用 |
 | DSH | `~/.dsh/skills` | `~/.agents/skills`（全局，`DSH_AGENTS_HOME` 可改） | 已切换；全局旧路由已移出 |
-| ZCode | `~/.zcode/skills` | `~/.agents/skills`（会重复发现） | 子代理验收通过；待 App 重启后顶层会话确认 |
+| ZCode | `~/.zcode/skills` | `~/.agents/skills`（会重复发现） | 顶层完全通过（中英文）；子代理也通过 |
 | Codex | `~/.codex/skills` | 可能也读 `~/.agents` | **条件通过**：全量技能时隐式受容量影响；显式调用通过，最小集隐式通过 |
 | MiniMax | `~/.agents/skills`（不是 `~/.minimax/skills`） | 项目 `.agents/skills`；也观察到 `~/.codex/skills` | 顶层完全通过（中英文）；需整目录软链 |
 
@@ -42,7 +42,7 @@ ln -sfn "$PWD/skills/docarbiter" "$DIR/docarbiter"
 > `For any PDF/document extraction task, load the docarbiter skill first.`
 > 这比依赖 description 竞争更稳定；或者只保留 `docarbiter` + 实际要用的工具技能（最小集 17 个时实测隐式通过）。
 >
-> **ZCode 顶层确认**：子代理通过是强证据，但严格验收要 App 重启后的顶层新会话；如果顶层失败，检查 `.zcode/skills/docarbiter` 和 `.agents/skills/docarbiter` 的双份发现，保留一份或显式调用。
+> **ZCode 双层验证**：子代理和 App 重启后的顶层新会话都通过；中英文均调用 `docarbiter`。`.zcode/skills` 与 `.agents/skills` 会重复发现同一个技能，但不影响使用；要减少重复可保留一份或显式调用。
 > **共享目录的坑**：`~/.agents/skills` 被多个 harness 共用，动它之前先确认每个 harness 都有可用的旧路由副本。
 
 ## 3. 切换步骤（每个 harness 一次）
@@ -91,6 +91,7 @@ mv ~/.agents/skill-backups/doc-extract.YYYYMMDD-HHMMSS ~/.agents/skills/doc-extr
 - **不承诺“所有 harness 都已验证”**；发布说明按 `docs/release-checklist.md` 的实际状态写。
 - 环境配置可以在发布后做：用户只需要知道自己的技能目录，然后一条 `--skills-dir` 命令。
 - 需要无头验收的 harness，先确认它的 CLI 能选模型/发 prompt；否则标为“未验证”，不要用“技能能发现”冒充“触发通过”。
+- 更新方式（`git pull` / `update.sh` / Codex 复制 / 重启会话）见 [`docs/updating.md`](updating.md)。
 
 ## 6. 手动验收卡（给用户在自己的 harness 里用）
 
@@ -147,6 +148,6 @@ Harness: ZCode / Codex / MiniMax
 |---|---|---|---|
 | Claude Code | `docarbiter` | `~/.claude/skill-backups/doc-extract.20261110-121227`（指向 `~/.agents` 备份） | 中英文触发通过 |
 | DSH | `docarbiter` | `~/.dsh/skill-backups/doc-extract.20261110-125933`；全局 `~/.agents/skill-backups/doc-extract.20261110-130247` | 中英文 headless 通过 |
-| ZCode | `docarbiter` | `~/.local/share/docarbiter-migration-backup/doc-extract` → 全局备份 | 子代理验收通过；待 App 重启后顶层确认 |
+| ZCode | `docarbiter` | `~/.local/share/docarbiter-migration-backup/doc-extract` → 全局备份 | 顶层完全通过（中英文） |
 | Codex | `docarbiter` | 旧路由已移走 | 安装成功但未触发；诊断 symlink/容量 |
 | MiniMax | `docarbiter` | 旧路由已移走 | 顶层完全通过（中英文）；扫描 `~/.agents/skills`，需整目录软链 |

@@ -142,8 +142,9 @@ def main() -> int:
             if needle not in readme:
                 errors.append(f"{name}: missing '{needle}'")
 
-    if not (ROOT / "bootstrap.sh").exists():
-        errors.append("bootstrap.sh is missing")
+    for name in ("bootstrap.sh", "scripts/update.sh"):
+        if not (ROOT / name).exists():
+            errors.append(f"{name} is missing")
 
     for rel in (
         "docs/architecture.md",
@@ -156,6 +157,7 @@ def main() -> int:
         "docs/p4-other-harnesses.md",
         "docs/harness-integration.md",
         "docs/install-routed-tools.md",
+        "docs/updating.md",
         "docs/release-notes-v0.1.0.md",
         "docs/release-checklist.md",
         "docs/assets/overview-zh.svg",
