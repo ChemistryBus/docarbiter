@@ -27,6 +27,22 @@ There is no shortage of PDF extractors. The hard part is knowing **which one to 
 
 ## Quick start
 
+**No CLI? Let your agent install it.** Paste this into Claude Code / Codex / ZCode / MiniMax:
+
+```text
+请先问我是否允许在本机安装 docarbiter。得到允许后执行：
+curl -fsSL https://raw.githubusercontent.com/ChemistryBus/docarbiter/main/bootstrap.sh | bash
+如果当前 harness 里已有 doc-extract，先把它备份到技能目录之外，再安装 docarbiter。
+安装完成后运行 ./scripts/doctor.sh --check-conflicts，并告诉我缺哪些工具。
+不要上传或读取我的文档内容。
+```
+
+The bootstrap only clones this repository and runs `scripts/install.sh`; it does not clone
+third-party skill repositories. Read it first if you prefer:
+[`bootstrap.sh`](bootstrap.sh).
+
+Manual install:
+
 ```bash
 git clone https://github.com/ChemistryBus/docarbiter.git
 cd docarbiter

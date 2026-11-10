@@ -238,6 +238,17 @@ skills/_tools/olmocr.md
 
 不要默认把每个工具注册成顶层技能；那会回到「一锅粥」。
 
+## Installing Routed Tools
+
+用户说“帮我装/这个工具没装”时，按下面做，不要静默失败：
+
+1. **先征得同意**：说明要装什么、从哪里装、大概多大；用户同意后再执行。
+2. 核心工具：`./scripts/install.sh --profile core`（或让用户跑 `bootstrap.sh`）。
+3. 只缺某一个工具：先读 `docs/install-routed-tools.md`，给出该工具的上游链接和命令，再问是否安装。
+4. **不要未经同意 `git clone` 第三方技能仓库**；本仓库的安装器只通过 `pip` / `brew` / `apt` 装包。
+5. 安装后跑 `./scripts/doctor.sh --check-conflicts`，把缺失项和 fallback 告诉用户。
+6. 不把用户文档上传到云端；不因安装失败就假装提取成功。
+
 ## Guardrails
 
 1. **不要对已有可用文字层的 PDF 做 OCR。** 实测顺序相似度会从 97% 掉到 40%；中文双栏同样会被打乱。

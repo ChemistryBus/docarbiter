@@ -6,8 +6,11 @@
 ## One command
 
 ```bash
-# Core: the 8 tools used by the default routes
+# From a clone: core tools used by the default routes
 ./scripts/install.sh --profile core
+
+# Or bootstrap from GitHub (clone + install)
+curl -fsSL https://raw.githubusercontent.com/ChemistryBus/docarbiter/main/bootstrap.sh | bash
 
 # Check what is missing
 ./scripts/doctor.sh --check-conflicts

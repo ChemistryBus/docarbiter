@@ -27,6 +27,20 @@
 
 ## 快速开始
 
+**不想用命令行？直接把下面这段交给 agent。** 粘贴到 Claude Code / Codex / ZCode / MiniMax：
+
+```text
+请先问我是否允许在本机安装 docarbiter。得到允许后执行：
+curl -fsSL https://raw.githubusercontent.com/ChemistryBus/docarbiter/main/bootstrap.sh | bash
+如果当前 harness 里已有 doc-extract，先把它备份到技能目录之外，再安装 docarbiter。
+安装完成后运行 ./scripts/doctor.sh --check-conflicts，并告诉我缺哪些工具。
+不要上传或读取我的文档内容。
+```
+
+`bootstrap.sh` 只克隆本仓库并调用 `scripts/install.sh`，不会克隆第三方的技能仓库。想先检查可读 [`bootstrap.sh`](bootstrap.sh)。
+
+手动安装：
+
 ```bash
 git clone https://github.com/ChemistryBus/docarbiter.git
 cd docarbiter
