@@ -110,6 +110,8 @@ Full licenses, install commands, and exclusion reasons: [docs/tool-registry.md](
 | Core text layer / scans / CID / two-column | Tested; see [docs/benchmarks.md](docs/benchmarks.md) |
 | Real high-frequency tables | Structure + spot checks; Docling / MinerU / pdfplumber split by table type |
 | P0 routing policy (22 documents with answer keys) | `router:text` 100% success / median CER 0.0000 / 4.73 s; fixed MinerU 100% / 0.0115 / 61.98 s |
+| Router commands | Availability and the generated command share one entry point; spaces, quotes, `$`, and CJK paths covered by the self-test |
+| Page structure | MinerU page markers checked for full and selected exports; blank page preserved (`scripts/check_pagemarkers.py`) |
 | Harness trigger | Claude Code, DSH, ZCode and MiniMax tested; Codex conditional (large skill catalog) |
 | CI | GitHub Actions `validate` green on Ubuntu + macOS; Windows unverified |
 

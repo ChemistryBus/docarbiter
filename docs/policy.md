@@ -1,98 +1,98 @@
-# 调度策略评估（P0–P3）
+# Routing strategy evaluation (P0–P3)
 
-> 语料：22 个有独立答案 key 的文档（11 篇合成 + 5 个 edge + BERT + 4 篇真实 CC BY-SA）。
-> 指标：CER（字符错误率）、成功率、总耗时。**没有答案 key 的真实工作区 PDF 不计入 CER。**
-> 明细：`benchmarks/private/policy.md` / `policy.json`（gitignored）。
+> Corpus: 22 documents with independent answer keys (11 synthetic + 5 edge + BERT + 4 real CC BY-SA).
+> Metrics: CER (character error rate), success rate, total runtime. **Real workspace PDFs without an answer key are not counted in CER.**
+> Details: `benchmarks/private/policy.md` / `policy.json` (gitignored).
 
-## P0：固定工具 vs 路由 vs oracle
+## P0: fixed tools vs routing vs oracle
 
-| 策略 | n | 成功 | 中位 CER | 最差 CER | 总耗时 |
+| Strategy | n | Success | Median CER | Worst CER | Total runtime |
 |---|---:|---:|---:|---:|---:|
-| 固定 pdftotext | 22 | 86.4% | 0.0000 | 0.7810 | 0.80s |
-| 固定 liteparse | 22 | 86.4% | 0.0073 | 0.9048 | 3.93s |
-| 固定 markitdown | 22 | 86.4% | 0.0000 | 7.8911 | 20.04s |
-| 固定 pdfplumber | 13 | 92.3% | 0.0005 | 7.8911 | 0.66s |
-| 固定 MinerU | 22 | **100%** | 0.0115 | 0.2952 | 61.98s |
-| 固定 Docling | 22 | 95.5% | 0.0108 | 1.0198 | 219.42s |
+| Fixed pdftotext | 22 | 86.4% | 0.0000 | 0.7810 | 0.80s |
+| Fixed liteparse | 22 | 86.4% | 0.0073 | 0.9048 | 3.93s |
+| Fixed markitdown | 22 | 86.4% | 0.0000 | 7.8911 | 20.04s |
+| Fixed pdfplumber | 13 | 92.3% | 0.0005 | 7.8911 | 0.66s |
+| Fixed MinerU | 22 | **100%** | 0.0115 | 0.2952 | 61.98s |
+| Fixed Docling | 22 | 95.5% | 0.0108 | 1.0198 | 219.42s |
 | **router:quality** | 22 | **100%** | 0.0079 | **0.2952** | 60.04s |
 | **router:speed** | 22 | **100%** | 0.0063 | 0.9048 | **7.06s** |
 | **router:text** | 22 | **100%** | **0.0000** | 0.7810 | **4.73s** |
 | verify:quality | 22 | 100% | 0.0079 | 0.3478 | 59.31s |
-| oracle（理论上限） | 22 | 100% | 0.0000 | 0.2667 | 47.17s |
+| oracle (theoretical upper bound) | 22 | 100% | 0.0000 | 0.2667 | 47.17s |
 
-### 怎么读这张表
+### How to read this table
 
-- **固定工具不是万能的**：pdftotext / liteparse / markitdown 都在扫描件/CID 上失败，成功率只有 86.4%；pdfplumber 在 CID/双栏上会崩；Docling 慢但成功率高。
-- **router:text**：干净文字层走 pdftotext，扫描/CID 走 MinerU，简单网格表格走 pdfplumber。**成功率 100%、中位 CER 0、4.73s**——比固定 MinerU 快 **13 倍**，中位 CER 更低，但最差页（真竖排）0.781，比 MinerU 的 0.295 差。
-- **router:speed**：文字层走 liteparse，扫描/CID 走 MinerU，简单网格表格走 pdfplumber。100% 成功、7.06s、中位 CER 0.0063；比固定 MinerU 快 **8.8 倍**，中位 CER 更低；最差仍是真竖排 0.9048。
-- **router:quality**：文字层/扫描/CID 走 MinerU，简单网格表格走 pdfplumber。100% 成功、中位 0.0079、最差 0.2952、60s——基本追平固定 MinerU，略快。
-- **oracle**：每个文档选 CER 最低的工具，理论上限。路由不能超过 oracle；差距主要来自真竖排和少量工具选择。
+- **Fixed tools are not universal**: pdftotext / liteparse / markitdown all fail on scans/CID, with a success rate of only 86.4%; pdfplumber breaks on CID/two-column; Docling is slow but has a high success rate.
+- **router:text**: clean text layers go to pdftotext, scans/CID go to MinerU, simple grid tables go to pdfplumber. **100% success, median CER 0, 4.73s** — **13×** faster than fixed MinerU, with a lower median CER, but its worst page (true vertical writing) is 0.781, worse than MinerU's 0.295.
+- **router:speed**: text layers go to liteparse, scans/CID go to MinerU, simple grid tables go to pdfplumber. 100% success, 7.06s, median CER 0.0063; **8.8×** faster than fixed MinerU, with a lower median CER; the worst is still true vertical writing at 0.9048.
+- **router:quality**: text layers/scans/CID go to MinerU, simple grid tables go to pdfplumber. 100% success, median 0.0079, worst 0.2952, 60s — essentially on par with fixed MinerU, slightly faster.
+- **oracle**: picks the tool with the lowest CER for each document; this is the theoretical upper bound. Routing cannot exceed oracle; the gap comes mainly from true vertical writing and a few tool choices.
 
-### 结论
+### Conclusion
 
-1. **效率**：能提高，而且数据明确。`router:text` 4.73s vs 固定 MinerU 61.98s；`router:speed` 7.06s。
-2. **精度**：
-   - 在**混合语料**上，路由可以做到 100% 成功、中位 CER 不差于最强固定工具；`router:text` 的中位 CER 是 0，优于固定 MinerU 的 0.0115。
-   - 但**不能超过 oracle**，也不能保证每个文档都超过最强单工具；最差页（真竖排）路由仍会差。
-   - 精度提升来自「不选错工具」和「失败时换工具」，不是算法更强。
-3. **不能吹的点**：不能说「比 MinerU 更准」；正确说法是「在混合语料上成功率更高、速度更快、中位 CER 不差；最差页仍受工具上限限制」。
+1. **Efficiency**: it can be improved, and the data is clear. `router:text` 4.73s vs fixed MinerU 61.98s; `router:speed` 7.06s.
+2. **Accuracy**:
+   - On a **mixed corpus**, routing can achieve 100% success with a median CER no worse than the strongest fixed tool; `router:text` has a median CER of 0, better than fixed MinerU's 0.0115.
+   - But it **cannot exceed oracle**, nor can it guarantee beating the strongest single tool on every document; the worst page (true vertical writing) is still worse under routing.
+   - The accuracy gain comes from "not choosing the wrong tool" and "switching tools on failure", not from a stronger algorithm.
+3. **What not to claim**: do not say "more accurate than MinerU"; the correct claim is "on a mixed corpus it has a higher success rate, is faster, and has a median CER that is no worse; the worst page is still bounded by the tools' limits".
 
-> P0 里的 `table` 是**简单网格快路径**（pdfplumber），用于保持与已有 22 文档结果可比。真实复杂表格用单独的 `table-structure`（Docling），见 P2；两者不要混在一起比较。
+> `table` in P0 is the **simple grid fast path** (pdfplumber), kept so results remain comparable with the existing 22-document run. Real complex tables use the separate `table-structure` route (Docling), see P2; do not compare the two together.
 
-## P1：verify 模式（负结果）
+## P1: verify mode (negative result)
 
-当前 `verify:quality` 只用运行时可见信号（status / chars_pred / ctrl_ratio）决定是否换工具：
+The current `verify:quality` uses only runtime-visible signals (status / chars_pred / ctrl_ratio) to decide whether to switch tools:
 
-- 中位 CER 0.0079，没有改善；
-- 最差 0.3478，比 `router:quality` 的 0.2952 更差；
-- 在 `zh-vertical-sim` 上从 MinerU 0.1304 切到 liteparse 0.3478，属于**错误切换**。
+- median CER 0.0079, no improvement;
+- worst 0.3478, worse than `router:quality`'s 0.2952;
+- on `zh-vertical-sim` it switches from MinerU 0.1304 to liteparse 0.3478, which is a **wrong switch**.
 
-结论：**当前 verify 启发式不合格，不发布。** 要做 verify，需要输出级比较（字符袋/bigram/覆盖率）和更好的切换信号，而不是只看字符数/控制字符。
+Conclusion: **the current verify heuristic is not acceptable and is not released.** A useful verify needs output-level comparison (bag of characters/bigrams/coverage) and better switching signals, not just character counts/control characters.
 
-## P2：真实高频表格（composition 不做，改为分流）
+## P2: real high-frequency tables (no composition; partitioned routing instead)
 
-2026-11-10 用本机真实高频表做了补充测试（只读、不上传、不保存正文）：
+On 2026-11-10 we ran supplementary tests with real high-frequency tables from this machine (read-only, not uploaded, no body text saved):
 
-| 真实文档（页） | 期望结构 | pdfplumber `lines` | pdfplumber `text` | MinerU | Docling |
+| Real document (page) | Expected structure | pdfplumber `lines` | pdfplumber `text` | MinerU | Docling |
 |---|---|---|---|---|---|
-| WS/T 578.1—2017 p8 | 21 数据行 × 13 列，3 层表头 | 27×13；表头压平，合并语义丢失 | 50×13；破 | 27×13；`rowspan/colspan` 正确 | 21×13；三层表头展开为“男性PAL - 轻(I) - MJ/d” |
-| GB 28050—2025 p6 | 28 数据行 × 4 列，多行单元格 | 29×4；单元格阅读顺序乱 | 76×6；破 | 29×4；7 处多行单元格字符交错 | 29×4；抽检正确 |
-| DRIs 2023 p65 | 2 张符号表：15×6、14×6 | 0 表 | 69×9；不可用 | 15×6 + 14×6；中文名正确，●/○ 变为“空/O” | 名称有错（no-OCR）；开 OCR 后名称正确，●→`.`、○→`O` |
-| GB 2760—2024 p13 | 26 数据行 × 4 列 | 27×4；抽检正确 | 84×3；破 | 27×4；4 处多行单元格字符交错 | 27×4；抽检正确 |
-| 中国食物成分表 第6版第一册 p246 | 65 条目，双栏书表 | 0 表 | 45×4；不可用 | 6 列；65 条；前 3 行错位 | 开 OCR 后 7 列，大部分行对；底部 3 行错位；no-OCR 不可用 |
+| WS/T 578.1—2017 p8 | 21 data rows × 13 columns, 3-level header | 27×13; header flattened, merge semantics lost | 50×13; broken | 27×13; `rowspan/colspan` correct | 21×13; three-level header expanded to the Chinese sample "男性PAL - 轻(I) - MJ/d" |
+| GB 28050—2025 p6 | 28 data rows × 4 columns, multi-line cells | 29×4; cell reading order scrambled | 76×6; broken | 29×4; characters interleaved in 7 multi-line cells | 29×4; spot-check correct |
+| DRIs 2023 p65 | 2 symbol tables: 15×6, 14×6 | 0 tables | 69×9; unusable | 15×6 + 14×6; Chinese names correct, ●/○ become "empty/O" | Names wrong (no-OCR); with OCR on, names correct, ●→`.`, ○→`O` |
+| GB 2760—2024 p13 | 26 data rows × 4 columns | 27×4; spot-check correct | 84×3; broken | 27×4; characters interleaved in 4 multi-line cells | 27×4; spot-check correct |
+| China Food Composition Tables, 6th ed., Vol. 1, p246 | 65 entries, two-column book table | 0 tables | 45×4; unusable | 6 columns; 65 entries; first 3 rows misaligned | With OCR on, 7 columns, most rows correct; bottom 3 rows misaligned; no-OCR unusable |
 
-结论：
+Conclusion:
 
-1. **复杂合并表头/多行单元格 → Docling。** WS/T 578.1、GB 28050、GB 2760 的结构和阅读顺序最好；这是当前真实表格的默认质量路径（`--goal table-structure`）。
-2. **坏文字层/符号表/扫描 → MinerU。** DRIs 2023 第 65 页的文字层本身把 ● 变成 `.`、○ 变成 `。`；MinerU 能恢复中文名，并把 ●/○ 区分为“空/O”，但**不保留原符号**，必须抽检。
-3. **pdfplumber 只做简单网格/坐标。** 它快（单页 <0.5s），但真实书表/标准表的多行单元格会乱序；`text` 策略能救无框线，却会把 29×4 吹成 76×6。
-4. **composition 没有证据支持，不做。** 没有出现“MinerU 丢结构 + pdfplumber 单元格好”的同一份真实表；Docling 已经同时给出结构和可读单元格。再加一层组合只会增加复杂度和新的失败点。
-5. **密集双栏书表仍不保证。** 中国食物成分表 p246 的 65 条双栏表，Docling OCR 和 MinerU 都在页首/页尾出现行错位；这类表必须人工抽检，不能声明“全表准确”。
-6. **路由是文件级，不是页级。** `route.py` 只看前 3 页；DRIs 2023 前 3 页文字层可用，但第 65 页符号表文字层是坏的。对书/标准要先定位目标页，再用 `pdftotext -f PAGE -l PAGE` 或 pdfplumber 做页级探针。
+1. **Complex merged headers/multi-line cells → Docling.** WS/T 578.1, GB 28050, and GB 2760 have the best structure and reading order; this is the current default quality path for real tables (`--goal table-structure`).
+2. **Bad text layers/symbol tables/scans → MinerU.** The DRIs 2023 page 65 text layer itself turns ● into `.` and ○ into `。`; MinerU recovers the Chinese names and distinguishes ●/○ as "empty/O", but **does not preserve the original symbols**, so spot-checking is mandatory.
+3. **pdfplumber is only for simple grids/coordinates.** It is fast (single page <0.5s), but multi-line cells in real book tables/standards tables come out scrambled; the `text` strategy rescues borderless tables but inflates 29×4 into 76×6.
+4. **composition has no supporting evidence; do not do it.** No single real table showed "MinerU drops structure + pdfplumber has good cells"; Docling already provides both structure and readable cells. Adding another composition layer only adds complexity and new failure points.
+5. **Dense two-column book tables are still not guaranteed.** On the 65-entry two-column table on p246 of the China Food Composition Tables, both Docling OCR and MinerU show row misalignment at the top/bottom of the page; such tables must be manually spot-checked, and "the whole table is accurate" cannot be claimed.
+6. **Routing is file-level, not page-level.** `route.py` only looks at the first 3 pages; for DRIs 2023 the first 3 pages have a usable text layer, but the page 65 symbol table's text layer is bad. For books/standards, first locate the target page, then use `pdftotext -f PAGE -l PAGE` or pdfplumber as a page-level probe.
 
-耗时（本机 M2 Pro，模型已热）：pdfplumber 单页 <0.5s；MinerU 单页约 2.5s；Docling no-OCR 约 3–5s/页，OCR 约 10–12s/页。
+Runtime (this machine, M2 Pro, models warm): pdfplumber <0.5s per page; MinerU about 2.5s per page; Docling about 3–5s/page with no-OCR, about 10–12s/page with OCR.
 
-## P3：默认策略建议
+## P3: recommended defaults
 
-| 用户目标 | 默认策略 | 理由 |
+| User goal | Default strategy | Rationale |
 |---|---|---|
-| 只要正文/引用文本准确 | **router:text** | 100% 成功、中位 CER 0、4.73s；扫描/CID 自动走 MinerU |
-| 要成稿/标题/段落结构 | **router:quality** | 100% 成功、最差 0.2952、60s；接近 MinerU，表格更好 |
-| 快速浏览/检索 | **router:speed** | 100% 成功、7.06s；中位 0.0063，但真竖排最差 |
-| 真竖排 | **人工** | 所有工具都差，oracle 也只有 0.2667 |
-| 简单有框线网格 / 要 CSV 或坐标 | **pdfplumber** | 单页 <0.5s；合并表头/多行单元格会乱序 |
-| 复杂表格：合并表头 / 多行单元格 / 书表 | **docling**（`--goal table-structure`） | 实测 WS/T、GB 28050、GB 2760 结构最好；3–5s/页，OCR 10–12s/页 |
-| 扫描 / 坏文字层 / 符号表 | **mineru** | OCR + 表格；符号不保留原字形，必须抽检 |
-| 中文无框线表格 | pdfplumber `text` 策略 + 人工抽检 | Docling 实测 0 表；text 策略会伤合并单元格 |
-| verify | **关闭** | P1 负结果，切换信号不够可靠 |
+| Only accurate body/citation text needed | **router:text** | 100% success, median CER 0, 4.73s; scans/CID automatically go to MinerU |
+| Finished manuscript/heading/paragraph structure needed | **router:quality** | 100% success, worst 0.2952, 60s; close to MinerU, better tables |
+| Quick browsing/retrieval | **router:speed** | 100% success, 7.06s; median 0.0063, but worst on true vertical writing |
+| True vertical writing | **manual** | All tools are poor; even oracle is only 0.2667 |
+| Simple bordered grids / CSV or coordinates needed | **pdfplumber** | <0.5s per page; merged headers/multi-line cells come out scrambled |
+| Complex tables: merged headers / multi-line cells / book tables | **docling** (`--goal table-structure`) | Measured: best structure on WS/T, GB 28050, GB 2760; 3–5s/page, OCR 10–12s/page |
+| Scans / bad text layers / symbol tables | **mineru** | OCR + tables; symbols do not retain original glyphs, must spot-check |
+| Chinese borderless tables | pdfplumber `text` strategy + manual spot-check | Docling measured 0 tables; the text strategy damages merged cells |
+| verify | **off** | P1 negative result; switching signals are not reliable enough |
 
-**定位一句话**：
+**One-line positioning**:
 
-> 这个项目不是「比所有提取器更准」；它是「在混合文档上，让正确的工具工作，避免固定单工具的灾难性失败，并把速度提上来」。
+> This project is not "more accurate than every extractor"; it is "on mixed documents, make the right tool do the work, avoid the catastrophic failure of a single fixed tool, and bring the speed up".
 
-### 可对外声明的边界
+### Boundaries we can state publicly
 
-- 可以声明：混合语料上成功率、速度、中位 CER 优于固定单工具（附环境/版本/语料）。
-- 可以声明：在测试的 5 份真实高频表上，Docling 对复杂合并表头的结构与阅读顺序最好；MinerU 对坏文字层/符号表最好；pdfplumber 对简单网格最快。
-- 不可以声明：每个文档都超过最强单工具；所有表格都准确；真竖排/任意无框线表格保证准确；符号表保留原字形；没有答案 key 的真实 PDF 的“精度”。
-- 真实工作区 PDF 没有独立答案 key，只能报告 coverage / bag / 一致性，不能叫 accuracy。
+- Can state: on a mixed corpus, success rate, speed, and median CER are better than a fixed single tool (with environment/version/corpus).
+- Can state: on the 5 tested real high-frequency tables, Docling has the best structure and reading order for complex merged headers; MinerU is best for bad text layers/symbol tables; pdfplumber is fastest for simple grids.
+- Cannot state: every document beats the strongest single tool; all tables are accurate; true vertical writing/arbitrary borderless tables are guaranteed accurate; symbol tables preserve original glyphs; "accuracy" on real PDFs without an answer key.
+- Real workspace PDFs have no independent answer key, so we can only report coverage / bag / consistency, not accuracy.

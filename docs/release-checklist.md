@@ -1,197 +1,200 @@
-# 发布前检查清单
+# Pre-Release Checklist
 
-> 状态：**已发布 v0.1.1 — Harness Compatibility Patch**（2026-11-11）。`v0.1.0` 是首个公开版；`main` 已包含安装兼容与 harness 文档修正。
-> 发布计划与执行记录见 [`docs/release-plan.md`](release-plan.md)。
-> 当前进度（2026-11-10）：11 篇双语合成样本 + 4 篇真实 CC BY-SA 维基样本 + CID/繁体/交错双栏/真竖排边缘样本 + 6 个文字层工具 + 2 条 OCR 路径 + 干净 venv 安装 + 工作区 8,444 个真实 PDF 只读抽样（48+24 样本、4 文件 smoke）+ P0 policy benchmark（22 个有答案文档）+ 5 份真实高频表（WS/T 578.1、GB 28050、DRIs 2023、GB 2760、中国食物成分表）已完成；P1 verify 负结果不发布、P2 真实表分流完成（Docling/MinerU/pdfplumber）、P3 默认策略已定、Claude Code P4 真实触发完成（旧 doc-extract 已备份停用）、DSH headless 触发通过并永久切换（全局 .agents 旧路由已备份）、ZCode / MiniMax 顶层完全通过、Codex 条件通过（全量技能容量限制）；真竖排全量、真实双栏全文 CER、真实表逐单元格 CER、扩展层工具尚未完成。
-> 本清单的目标：把「能跑」变成「可复现、可解释、可维护」。
+> Status: **v0.1.1 — Harness Compatibility Patch released** (2026-11-11). `v0.1.0` was the first public release; `main` now includes install-compatibility and harness documentation fixes.
+> See [`docs/release-plan.md`](release-plan.md) for the release plan and execution log.
+> Current progress (2026-11-10): 11 bilingual synthetic samples + 4 real CC BY-SA Wikipedia samples + CID/traditional-Chinese/interleaved two-column/true vertical-writing edge samples + 6 text-layer tools + 2 OCR paths + clean venv install + read-only sampling of 8,444 real PDFs in the workspace (48+24 samples, 4-file smoke) + P0 policy benchmark (22 documents with answer keys) + 5 real high-frequency tables (WS/T 578.1, GB 28050, DRIs 2023, GB 2760, China Food Composition Tables) are complete; P1 verify negative results are not published, P2 real-table routing is complete (Docling/MinerU/pdfplumber), P3 default policy is set, Claude Code P4 real triggering is complete (old doc-extract backed up and disabled), DSH headless triggering passed and was permanently switched (global .agents old route backed up), ZCode / MiniMax top-level fully passed, Codex conditionally passed (full skill-set capacity limit); full true-vertical writing, real two-column full-text CER, real-table per-cell CER, and extension-layer tools are not yet complete.
+> The goal of this checklist: turn "it runs" into "reproducible, explainable, maintainable."
 
-## 0. 发布门槛（先定）
+## 0. Release gates (decide first)
 
-- [x] 版本号：`v0.1.1 — Harness Compatibility Patch`（v0.1.0 为 First Public Preview）
-- [ ] 支持范围写清楚：macOS arm64 实测；Linux x86_64 待验证；Windows 未验证
-- [ ] Python 版本：3.10 / 3.11 / 3.12；3.11.11 实测
-- [ ] 默认安装 profile：`core`；`extra` / `full` 标注「未逐项实测」
-- [ ] 不发布任何 AGPL / Proprietary 工具代码或模型
-- [x] `README.md`（英文，GitHub 默认）与 `README.zh-CN.md`（中文）内容一致，顶部可切换
-- [ ] 所有「待测」项在发布说明里可见，不藏
+- [x] Version: `v0.1.1 — Harness Compatibility Patch` (v0.1.0 was the First Public Preview)
+- [ ] Support scope documented clearly: tested on macOS arm64; Linux x86_64 pending verification; Windows not verified
+- [ ] Python versions: 3.10 / 3.11 / 3.12; 3.11.11 tested
+- [ ] Default install profile: `core`; `extra` / `full` marked "not individually tested"
+- [ ] No AGPL / Proprietary tool code or models are distributed
+- [x] `README.md` (English, GitHub default) and `README.zh-CN.md` (Chinese) have identical content, switchable at the top
+- [ ] All "pending test" items are visible in the release notes, not hidden
 
-## 1. 干净环境安装
+## 1. Clean-environment install
 
-- [x] macOS arm64 干净 venv：`/tmp/docarbiter-release-venv`，Python 3.11（2026-11-10 重跑）
-- [x] `./scripts/install.sh --profile core --no-skills` 成功（core 7 包对版：MinerU 4.1.7 / Docling 2.149.0 / liteparse 2.18.0 / MarkItDown 0.1.9 / RapidOCR 3.10.0 / OCRmyPDF 17.12.1 / pdfplumber 0.11.10）
-- [x] `install.sh` 不升级已装 Homebrew formula（poppler 等 `skip (no upgrade)`）
-- [x] 隔离 HOME + `install.sh --skills-only`：wrapper + symlink 创建成功
-- [x] `doctor.sh` 在隔离 HOME 退出码 0，core 无 MISSING（MinerU 模型未下载属预期）
-- [x] `install.sh --force` 备份 + symlink；无 `--force` 时跳过并警告
-- [ ] `./scripts/install.sh --profile extra` 的失败项逐条记录（不要求全绿）
-- [ ] Linux x86_64（Docker/VM）跑同一套；记录差异
-- [ ] Windows / WSL 至少记录「未验证」或已知问题
-- [ ] 路径含空格、中文、括号时，wrapper 与 `bench.py` 仍可用
-- [ ] 无网络环境：给出预下载模型/离线安装说明（至少 MinerU / Docling）
+- [x] macOS arm64 clean venv: `/tmp/docarbiter-release-venv`, Python 3.11 (rerun 2026-11-10)
+- [x] `./scripts/install.sh --profile core --no-skills` succeeded (core 7 packages version-matched: MinerU 4.1.7 / Docling 2.149.0 / liteparse 2.18.0 / MarkItDown 0.1.9 / RapidOCR 3.10.0 / OCRmyPDF 17.12.1 / pdfplumber 0.11.10)
+- [x] `install.sh` does not upgrade already-installed Homebrew formulae (`skip (no upgrade)` for poppler etc.)
+- [x] Isolated HOME + `install.sh --skills-only`: wrapper + symlink created successfully
+- [x] `doctor.sh` exits 0 under isolated HOME, no MISSING in core (MinerU model not downloaded is expected)
+- [x] `install.sh --force` backs up + symlinks; without `--force` it skips with a warning
+- [ ] Record each failure of `./scripts/install.sh --profile extra` individually (not required to be all green)
+- [ ] Run the same set on Linux x86_64 (Docker/VM); record differences
+- [ ] For Windows / WSL, at least record "not verified" or known issues
+- [ ] With paths containing spaces, Chinese characters, or parentheses, the wrapper and `bench.py` still work
+- [ ] For offline environments: provide model pre-download / offline install instructions (at least MinerU / Docling)
 
-> 2026-11-10 干净安装时 PyPI 直连很慢，使用清华镜像完成；版本仍由 `requirements-core.lock` 固定，镜像只影响下载速度。发布流程不依赖镜像。
+> During the 2026-11-10 clean install, direct PyPI access was very slow, so the Tsinghua mirror was used; versions are still pinned by `requirements-core.lock`, and the mirror only affects download speed. The release process does not depend on the mirror.
 
-## 2. 中英文语料
+## 2. Chinese and English corpora
 
-### 中文
+### Chinese
 
-- [ ] 正常文字层 PDF
-- [ ] CID 子集字体 / 无 ToUnicode
-- [ ] 扫描件（300dpi / 150dpi 各一）
-- [x] 双栏交错（合成，内容流逐行交错；markitdown 未复现失败，pdfplumber 失败）
-- [x] 真实 CC BY 双栏论文 abstract CER（BERT, ACL N19-1423；markitdown/pdfplumber 73%）
-- [ ] 真实双栏论文全文 CER（不只 abstract）
-- [x] 有框线 / 合并单元格 cell accuracy（pdfplumber 1.000；合并语义仍需人工抽检）
-- [x] 无框线表格：default 0 表；text 策略 1.000/0.917，但合并掉到 0.667/0.583；需按页选策略并抽检
-- [x] 真实高频表结构与抽检（WS/T 578.1、GB 28050、DRIs 2023、GB 2760、中国食物成分表；Docling/MinerU/pdfplumber 分流）
-- [ ] 真实表逐单元格 CER（当前只有结构与抽检，不能对外叫 accuracy）
-- [ ] 符号表（●/○）保真：当前 MinerU/Docling 都只保留二元状态，不保留原字形
-- [x] 繁体（`zh-traditional`）
-- [ ] 繁简混排
-- [ ] 真竖排（vertical writing mode、从右到左换列；当前只有一字一行模拟）
-- [x] 脚注 / 图注（合成）
+- [ ] Normal text-layer PDF
+- [ ] CID subset fonts / no ToUnicode
+- [ ] Scanned documents (one at 300dpi, one at 150dpi)
+- [x] Interleaved two-column (synthetic, content stream interleaved line by line; markitdown failure not reproduced, pdfplumber fails)
+- [x] Real CC BY two-column paper abstract CER (BERT, ACL N19-1423; markitdown/pdfplumber 73%)
+- [ ] Real two-column paper full-text CER (not just abstract)
+- [x] Ruled / merged-cell cell accuracy (pdfplumber 1.000; merge semantics still need manual spot checks)
+- [x] Borderless tables: default detects 0 tables; text strategy 1.000/0.917, but merged cells drop to 0.667/0.583; strategy must be chosen per page with spot checks
+- [x] Real high-frequency table structure and spot checks (WS/T 578.1, GB 28050, DRIs 2023, GB 2760, China Food Composition Tables; routed to Docling/MinerU/pdfplumber)
+- [ ] Real-table per-cell CER (currently only structure and spot checks; cannot be called accuracy externally)
+- [ ] Symbol tables (●/○) fidelity: currently both MinerU/Docling preserve only binary state, not the original glyphs
+- [x] Traditional Chinese (`zh-traditional`)
+- [ ] Mixed traditional and simplified Chinese
+- [ ] True vertical writing (vertical writing mode, columns right to left; currently only a one-character-per-line simulation)
+- [x] Footnotes / figure captions (synthetic)
 
-### 英文
+### English
 
-- [ ] 正常文字层 PDF
-- [ ] 双栏论文
-- [ ] 表格页
-- [ ] 连字符换行 / 引号 / em dash
-- [ ] 扫描件
-- [ ] 页眉页脚干扰
+- [ ] Normal text-layer PDF
+- [ ] Two-column papers
+- [ ] Table pages
+- [ ] Hyphenated line breaks / quotation marks / em dashes
+- [ ] Scanned documents
+- [ ] Header/footer interference
 
-### 答案与指标
+### Answer keys and metrics
 
-- [ ] 每份样本有独立答案（源文本 / 人工校对 / CC BY-SA 源文本）
-- [ ] **没有**用 `pdftotext` 输出当答案
-- [ ] CER 归一化规则固定（NFC、去空白、保留标点）
-- [ ] 报告每页 CER、median、IQR、**最差页**
-- [ ] 冷启动与热启动分开
-- [ ] 记录工具版本、语料 commit、机器
+- [ ] Each sample has an independent answer key (source text / manual proofreading / CC BY-SA source text)
+- [ ] **No** `pdftotext` output is used as the answer key
+- [ ] CER normalization rules fixed (NFC, whitespace removed, punctuation retained)
+- [ ] Report per-page CER, median, IQR, **worst page**
+- [ ] Cold start and warm start kept separate
+- [ ] Record tool versions, corpus commit, machine
 
-## 3. 工具覆盖
+## 3. Tool coverage
 
-### core（默认 8 个）
+### core (8 by default)
 
-- [ ] MinerU：中英文各 ≥ 2 份样本
-- [ ] Docling：Office / HTML / PDF / chunks / LaTeX
-- [ ] liteparse：文字层 PDF；标点归一化行为已记录
-- [ ] MarkItDown：单栏；双栏失败未复现（合成），真实双栏待测；扫描件不支持
-- [ ] RapidOCR：中文图片 / 截图
-- [ ] OCRmyPDF：扫描件 → 可搜索 PDF → MinerU
-- [ ] pdfplumber：表格 / 坐标；交错双栏 60%–68%（已记录）
-- [ ] pdftotext：基线 / 文字层探针
+- [ ] MinerU: ≥ 2 samples each for Chinese and English
+- [ ] Docling: Office / HTML / PDF / chunks / LaTeX
+- [ ] liteparse: text-layer PDFs; punctuation-normalization behavior documented
+- [ ] MarkItDown: single-column; two-column failure not reproduced (synthetic), real two-column pending test; scanned documents unsupported
+- [ ] RapidOCR: Chinese images / screenshots
+- [ ] OCRmyPDF: scanned document → searchable PDF → MinerU
+- [ ] pdfplumber: tables / coordinates; interleaved two-column 60%–68% (documented)
+- [ ] pdftotext: baseline / text-layer probe
 
 ### extra / optional
 
-- [ ] PaddleOCR：中文 OCR / PP-Structure
-- [ ] Marker：GPU / CPU 各一次；中文 CER
-- [ ] Unstructured：多格式分区；中文语言码
-- [ ] olmOCR：GPU；中文 CER
-- [ ] Surya / Camelot / Tesseract / qpdf / pypdf / pdfminer.six：至少 smoke test
-- [ ] 未装/失败的工具在 `doctor.sh` 里标 optional，不阻塞 core
+- [ ] PaddleOCR: Chinese OCR / PP-Structure
+- [ ] Marker: once each on GPU / CPU; Chinese CER
+- [ ] Unstructured: multi-format partitioning; Chinese language code
+- [ ] olmOCR: GPU; Chinese CER
+- [ ] Surya / Camelot / Tesseract / qpdf / pypdf / pdfminer.six: at least a smoke test
+- [ ] Tools that are not installed / fail are marked optional in `doctor.sh` and do not block core
 
-## 4. 调度器测试
+## 4. Router tests
 
-- [ ] 中文文字层 PDF → 期望 `liteparse` / `mineru`
-- [ ] 中文扫描件 → 期望 `ocrmypdf` → `mineru`
-- [ ] 英文双栏 PDF → 期望 `mineru` / `docling`，不是 `markitdown`
-- [ ] 简单网格表格 → 期望 `pdfplumber`（`--goal table`）
-- [ ] 复杂合并表头/多行单元格 → 期望 `docling`（`--goal table-structure`）
-- [ ] 扫描/坏文字层表格 → 期望 `mineru`
-- [ ] Office → 期望 `docling`
-- [ ] 图片 → 期望 `rapidocr`
-- [ ] 用户明确指定工具 → 不经过调度器
-- [ ] 工具缺失 → 给安装命令 + 降级方案，不静默失败
-- [ ] 结果不满意 → 降级链可解释
-- [ ] 不把敏感文档默认发到云 API
+- [ ] Chinese text-layer PDF → expect `liteparse` / `mineru`
+- [ ] Chinese scanned document → expect `ocrmypdf` → `mineru`
+- [ ] English two-column PDF → expect `mineru` / `docling`, not `markitdown`
+- [ ] Simple grid table → expect `pdfplumber` (`--goal table`)
+- [ ] Complex merged headers/multi-row cells → expect `docling` (`--goal table-structure`)
+- [ ] Scanned / bad text-layer tables → expect `mineru`
+- [ ] Office → expect `docling`
+- [ ] Images → expect `rapidocr`
+- [ ] User explicitly specifies a tool → bypasses the router
+- [ ] Tool missing → provide install command + fallback plan, no silent failure
+- [ ] Unsatisfactory result → fallback chain is explainable
+- [ ] Sensitive documents are not sent to cloud APIs by default
 
-## 5. Harness 兼容
+## 5. Harness compatibility
 
-本机四个 harness：Claude Code / Codex / zcode / DSH。
+Four harnesses on this machine: Claude Code / Codex / zcode / DSH.
 
-- [x] `docarbiter` 在 Claude Code 被正确发现（2026-11-10，`docs/p4-claude-code.md`）
-- [x] Claude Code 上 description 能触发中文/英文「提取 PDF」「转 Markdown」「该用哪个工具」（Haiku，中立目录）
-- [x] Claude Code 不同时激活旧的 `doc-extract`（已备份停用；其他 harness 未动）
-- [x] DSH 已永久切换：旧 `doc-extract` 备份停用，中文/英文 headless 只触发 `docarbiter`（2026-11-10）
-- [x] DSH 同时处理了全局 `~/.agents/skills/doc-extract`；Codex / ZCode 的旧路由副本保留，未被破坏
-- [x] ZCode 顶层完全通过：中英文隐式触发 `docarbiter` → MinerU
-- [x] Codex 条件通过：显式调用通过；最小技能集隐式通过；全量 620 技能时隐式受容量影响
-- [x] MiniMax 顶层完全通过：中英文隐式触发 `docarbiter` → MinerU；扫描 `.agents/skills`，需整目录软链
-- [ ] `install.sh --skill-mode auto|dir|file` 在 Claude/DSH/ZCode 已有安装上升级验证（当前只验证新目录）
-- [ ] `--profile full` 注册 12 个工具技能后，无重名冲突
-- [x] `doctor.sh --check-conflicts` 能检测同名技能与双路由（隔离 HOME + 本机已跑）
-- [x] 旧 `doc-extract` 的共存 / 替换 / 回滚步骤已在 Claude Code / DSH 验证（`docs/migration.md`）
-- [x] README 已说明「harness 原生调度 vs docarbiter」（见 `docs/harness-routing.md`）
-- [x] 不自动删除用户旧路由器；替换必须用户确认（本次已确认，只移动 symlink）
-- [x] 卸载/回滚步骤写进文档（`docs/p4-claude-code.md`、`docs/migration.md`）
+- [x] `docarbiter` is discovered correctly in Claude Code (2026-11-10, `docs/p4-claude-code.md`)
+- [x] In Claude Code, the description triggers on Chinese/English prompts "extract PDF", "convert to Markdown", "which tool should I use" (Haiku, neutral directory)
+- [x] Claude Code does not also activate the old `doc-extract` (backed up and disabled; other harnesses untouched)
+- [x] DSH permanently switched: old `doc-extract` backed up and disabled; Chinese/English headless prompts trigger only `docarbiter` (2026-11-10)
+- [x] DSH also handled the global `~/.agents/skills/doc-extract`; the old-route copies for Codex / ZCode are preserved and not broken
+- [x] ZCode top-level fully passed: Chinese/English implicit triggering of `docarbiter` → MinerU
+- [x] Codex conditionally passed: explicit invocation passes; implicit passes with a minimal skill set; implicit is affected by capacity with all 620 skills
+- [x] MiniMax top-level fully passed: Chinese/English implicit triggering of `docarbiter` → MinerU; scans `.agents/skills`, requires a whole-directory symlink
+- [ ] Upgrade verification of `install.sh --skill-mode auto|dir|file` on existing Claude/DSH/ZCode installs (currently only new directories are verified)
+- [ ] After `--profile full` registers 12 tool skills, no name conflicts
+- [x] `doctor.sh --check-conflicts` detects same-name skills and dual routing (run in isolated HOME + on this machine)
+- [x] Coexistence / replacement / rollback steps for the old `doc-extract` have been verified on Claude Code / DSH (`docs/migration.md`)
+- [x] README explains "harness-native routing vs docarbiter" (see `docs/harness-routing.md`)
+- [x] User's old router is not deleted automatically; replacement requires user confirmation (confirmed this time; only symlinks were moved)
+- [x] Uninstall/rollback steps are documented (`docs/p4-claude-code.md`, `docs/migration.md`)
 
-## 6. 合规审计
+## 6. Compliance audit
 
-- [x] `THIRD_PARTY_NOTICES.md` 覆盖所有安装的工具（validate 检查 18 个）
-- [x] MinerU 附加条款英文 + 中文原文都在
-- [x] `skills/` 下没有 `pdf` / `pymupdf` / `pdf-extract-kit`
-- [x] `install.sh` 不自动装 AGPL（只给链接/说明）
-- [x] 商业云 API 不在默认路径
-- [x] `README` 顶部有「不含上游代码」声明
-- [x] 许可证分组与 `registry.json` 一致
-- [x] 模型权重来源（RapidOCR / MinerU / Marker / Surya / olmOCR）有说明
-- [x] 如果未来做在线服务，MinerU 标识义务已写进 README
+- [x] `THIRD_PARTY_NOTICES.md` covers all installed tools (validate checks 18)
+- [x] MinerU additional terms present in both English and the original Chinese
+- [x] No `pdf` / `pymupdf` / `pdf-extract-kit` under `skills/`
+- [x] `install.sh` does not auto-install AGPL tools (links/instructions only)
+- [x] Commercial cloud APIs are not on the default path
+- [x] README has a "no upstream code included" statement at the top
+- [x] License grouping matches `registry.json`
+- [x] Model weight provenance (RapidOCR / MinerU / Marker / Surya / olmOCR) is documented
+- [x] If an online service is offered in future, the MinerU attribution obligation is already in the README
 
-## 7. 安全与隐私
+## 7. Security and privacy
 
-- [x] 不硬编码密钥 / token（2026-11-10 扫描无命中）
-- [ ] 默认不把文件上传到云
-- [ ] `bench.py` 用 `python3 -I`，不被 cwd 的 `json.py` 之类劫持
-- [ ] 不执行 PDF 里的脚本 / 不打开外部链接
-- [x] 用户自有文件放 `benchmarks/private/`，`.gitignore` 生效
-- [x] 日志不打印文档正文片段（或明确说明会打印）
-- [x] 全仓无个人绝对路径 `/Users/<name>`；脚本用 `--root` / `DOCARBITER_WORKSPACE`
-- [x] `.gitignore` 覆盖 `benchmarks/private/`、`blobs/`、`.mineru-service.lock`
+- [x] No hardcoded secrets / tokens (2026-11-10 scan found none)
+- [ ] Files are not uploaded to the cloud by default
+- [ ] `bench.py` uses `python3 -I`, not hijacked by `json.py` etc. in the cwd
+- [ ] Scripts in PDFs are not executed / external links are not opened
+- [x] User-owned files go in `benchmarks/private/`; `.gitignore` takes effect
+- [x] Logs do not print document body excerpts (or this is explicitly stated)
+- [x] No personal absolute paths `/Users/<name>` anywhere in the repo; scripts use `--root` / `DOCARBITER_WORKSPACE`
+- [x] `.gitignore` covers `benchmarks/private/`, `blobs/`, `.mineru-service.lock`
 
-## 8. 文档
+## 8. Documentation
 
-- [x] `README.md` 英文：问题、快速开始、路由、工具、验证、安装、许可
-- [x] `README.zh-CN.md` 中文：与英文一致，图片为中文版
-- [ ] 配图：`docs/assets/overview-zh.svg` / `overview-en.svg` 在 GitHub 正常渲染
-- [ ] 快速开始 5 分钟内可跑通
-- [ ] 常见失败（缺工具 / 没 GPU / 网络失败）有排查路径
-- [ ] `docs/architecture.md` 解释「工具很多也能调度」
-- [ ] `docs/gotchas.md` 每条可复现
-- [ ] `docs/benchmarks.md` 有「不要信我的数字」声明
-- [ ] `docs/licensing-faq.md` 回答 MinerU / AGPL / GPL
-- [ ] 截图或图里不出现真实用户文档内容
+- [x] `README.md` English: problem, quick start, routing, tools, verification, install, license
+- [x] `README.zh-CN.md` Chinese: consistent with English, images in Chinese
+- [ ] Images: `docs/assets/overview-zh.svg` / `overview-en.svg` render correctly on GitHub
+- [ ] Quick start works within 5 minutes
+- [ ] Common failures (missing tool / no GPU / network failure) have troubleshooting paths
+- [ ] `docs/architecture.md` explains "many tools can still be routed"
+- [ ] Every entry in `docs/gotchas.md` is reproducible
+- [ ] `docs/benchmarks.md` has a "don't trust my numbers" disclaimer
+- [ ] `docs/licensing-faq.md` answers MinerU / AGPL / GPL questions
+- [ ] Screenshots and images contain no real user document content
 
-## 9. CI 与仓库卫生
+## 9. CI and repository hygiene
 
-- [x] `python3 -I scripts/validate.py` 通过
-- [x] `python3 -I scripts/route.py --selftest` 通过（14/14，含空 PDF / 损坏 PDF / 空格+中文路径）
-- [x] 所有 shell `bash -n` 通过
-- [x] 所有 Python `py_compile` 通过
-- [ ] CI 在 push / PR 上跑 validate + route selftest（workflow 已写好，待远端）
-- [x] CI 增加 `install.sh --skills-only` 隔离 HOME 冒烟测试（能抓 set -u 问题）
-- [x] 没有 `__pycache__` / `.DS_Store` / 大文件（仓库 3.1MB）
-- [ ] `registry.json` 与 `skills/_tools/` 一致
-- [ ] `requirements-core.lock` 与实测版本一致
-- [ ] `requirements-extra.lock` 标注「未逐项实测」
+- [x] `python3 -I scripts/validate.py` passes
+- [x] `python3 -I scripts/route.py --selftest` passes (all checks, including empty PDF / corrupted PDF / paths with spaces + Chinese; 24 at the time of writing)
+- [x] All shell scripts pass `bash -n`
+- [x] All Python files pass `py_compile`
+- [x] `scripts/check_pagemarkers.py` passes with MinerU and skips cleanly without it
+- [ ] `doctor.sh` drift check is clean (only `OTHER-CLONE` notes are acceptable)
+- [ ] English docs contain no Chinese prose except labeled Chinese samples and verbatim CLI output
+- [ ] CI runs validate + route selftest on push / PR (workflow written, pending remote run)
+- [x] CI adds an `install.sh --skills-only` isolated-HOME smoke test (catches `set -u` issues)
+- [x] No `__pycache__` / `.DS_Store` / large files (repo is 3.1MB)
+- [ ] `registry.json` matches `skills/_tools/`
+- [ ] `requirements-core.lock` matches tested versions
+- [ ] `requirements-extra.lock` marked "not individually tested"
 
-## 10. 发布机制
+## 10. Release mechanics
 
-- [ ] 用户明确同意后才 `git init` / commit / push
-- [ ] 远端仓库名确认（`ChemistryBus/docarbiter`）
-- [ ] 默认分支 `main`
-- [x] tag `v0.1.1`；release notes 列已知限制
-- [ ] 发布说明里写：macOS 实测、Linux/Windows 未验证、extra 未逐项实测
-- [ ] 发布说明里写：不收录 Anthropic `pdf`、PyMuPDF、PDF-Extract-Kit
-- [ ] 发布后跑一次 `doctor.sh` + 两页 demo，确认远端版本可复现
+- [ ] `git init` / commit / push only after explicit user consent
+- [ ] Remote repository name confirmed (`ChemistryBus/docarbiter`)
+- [ ] Default branch `main`
+- [x] Tag `v0.1.1`; release notes list known limitations
+- [ ] Release notes state: macOS tested, Linux/Windows not verified, extra not individually tested
+- [ ] Release notes state: Anthropic `pdf`, PyMuPDF, PDF-Extract-Kit are not included
+- [ ] After release, run `doctor.sh` + a two-page demo once to confirm the remote version is reproducible
 
-## 11. 签收
+## 11. Sign-off
 
-| 项目 | 负责人 | 日期 | 结果 |
+| Item | Owner | Date | Result |
 |---|---|---|---|
-| 中文语料 / CER | | | |
-| 英文语料 / CER | | | |
-| 许可审计 | | | |
-| Harness 兼容 | | | |
-| 文档 / 图 | | | |
-| 发布确认 | | | |
+| Chinese corpus / CER | | | |
+| English corpus / CER | | | |
+| License audit | | | |
+| Harness compatibility | | | |
+| Documentation / figures | | | |
+| Release confirmation | | | |

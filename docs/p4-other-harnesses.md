@@ -1,151 +1,151 @@
-# P4：Codex / ZCode / DSH 触发验收（2026-11-10）
+# P4: Codex / ZCode / DSH Trigger Acceptance (2026-11-10)
 
-> 范围：DSH 已永久切换；ZCode / Codex / MiniMax 做技能发现/入口检查。
-> 结论先说（2026-11-10 晚）：**DSH 完全通过；MiniMax 顶层完全通过（中英文）；ZCode 顶层完全通过（中英文）；Codex 条件通过（显式/最小集可用，全量技能容量限制）。**
-> Claude Code 的单测见 [`docs/p4-claude-code.md`](p4-claude-code.md)。
+> Scope: DSH is permanently switched; ZCode / Codex / MiniMax get skill-discovery/entry checks.
+> Bottom line first (evening of 2026-11-10): **DSH fully passed; MiniMax top-level fully passed (Chinese and English); ZCode top-level fully passed (Chinese and English); Codex conditionally passed (explicit/minimal-set usable, full skill set limited by capacity).**
+> See [`docs/p4-claude-code.md`](p4-claude-code.md) for the Claude Code test.
 
-## 结果矩阵
+## Results matrix
 
-| Harness | 技能目录 | 旧 doc-extract | 发现 docarbiter | 隐式触发 | 结论 |
+| Harness | Skill directory | Old doc-extract | docarbiter discovered | Implicit trigger | Conclusion |
 |---|---|---|---|---|---|
-| Claude Code | `~/.claude/skills` | 已备份停用 | 是 | 中/英文通过 | 已完成（见 p4-claude-code） |
-| DSH | `~/.dsh/skills` + `~/.agents/skills` | 已备份停用 | 是 | 中文/英文通过 | **已永久切换**（旧路由可回滚） |
-| ZCode | `~/.zcode/skills` + `~/.agents/skills` | 已移走 → `~/.local/share/docarbiter-migration-backup/` | 是 | **完全通过** | 顶层新会话，中英文均 docarbiter → MinerU |
-| Codex | `~/.codex/skills` | 已移走 | 是（symlink 和普通文件都识别） | **条件通过** | 全量 620 技能时隐式失败；最小集 17 技能时隐式通过；显式调用通过 |
-| MiniMax | `~/.agents/skills` + `~/.codex/skills`（观察） | 已移走 | 是 | **完全通过** | 顶层新会话，中英文均 docarbiter → MinerU；整目录软链可用 |
+| Claude Code | `~/.claude/skills` | Backed up and disabled | Yes | Chinese/English pass | Complete (see p4-claude-code) |
+| DSH | `~/.dsh/skills` + `~/.agents/skills` | Backed up and disabled | Yes | Chinese/English pass | **Permanently switched** (old route can be rolled back) |
+| ZCode | `~/.zcode/skills` + `~/.agents/skills` | Moved away → `~/.local/share/docarbiter-migration-backup/` | Yes | **Fully passed** | Top-level new session; both Chinese and English route docarbiter → MinerU |
+| Codex | `~/.codex/skills` | Moved away | Yes (recognizes both symlinks and regular files) | **Conditionally passed** | Implicit fails with all 620 skills; implicit passes with a 17-skill minimal set; explicit invocation passes |
+| MiniMax | `~/.agents/skills` + `~/.codex/skills` (observed) | Moved away | Yes | **Fully passed** | Top-level new session; both Chinese and English route docarbiter → MinerU; whole-directory symlink works |
 
-## 晚间复测（ZCode / MiniMax / Codex）
+## Evening retest (ZCode / MiniMax / Codex)
 
-- **ZCode（完全通过）**：重启 App 后的顶层新会话，中文和英文都调用 `docarbiter`，路由 MinerU；旧 `doc-extract` 已移走。
-- **MiniMax（完全通过）**：重启后的顶层新会话，中文和英文隐式提示都调用 `docarbiter`，路由 MinerU；旧路由器已移走。关键发现：MiniMax 扫描 `~/.agents/skills`，也观察到了 `~/.codex/skills`；它跳过“目录 + SKILL.md 文件软链”，只识别实体文件或**整目录软链**。
-- **Codex（条件通过）**：`~/.codex/skills/docarbiter/SKILL.md` 已安装、旧 `doc-extract` 已移走。诊断结论：symlink 可识别；全量环境 619–620 个技能，其中 371–380 个未进入模型可见列表、描述被移除，隐式提示绕过 `docarbiter`；最小技能集（17 个，只保留 `docarbiter` + `mineru`）隐式提示实际读取 `docarbiter` 并路由 MinerU；显式说“使用 docarbiter”在全量环境也通过。**结论：安装正确，隐式触发受 Codex 技能容量影响。**
-- **安装器修复**：`install.sh` 现在对 `~/.agents/skills`、`~/.codex/skills`、`~/.minimax/skills` 自动用整目录软链；Claude/DSH/ZCode 保持文件软链。可用 `--skill-mode dir|file` 强制。已有 `~/.local/bin` wrapper 会先备份为 `.bak.<timestamp>`。
+- **ZCode (fully passed)**: In a top-level new session after restarting the app, both Chinese and English call `docarbiter`, routing to MinerU; old `doc-extract` moved away.
+- **MiniMax (fully passed)**: In a top-level new session after restart, both Chinese and English implicit prompts call `docarbiter`, routing to MinerU; the old router moved away. Key finding: MiniMax scans `~/.agents/skills` and also watches `~/.codex/skills`; it skips "directory + SKILL.md file symlinks" and recognizes only real files or **whole-directory symlinks**.
+- **Codex (conditionally passed)**: `~/.codex/skills/docarbiter/SKILL.md` installed, old `doc-extract` moved away. Diagnosis: symlinks are recognized; in the full environment with 619–620 skills, 371–380 do not enter the model-visible list and their descriptions are removed, so implicit prompts bypass `docarbiter`; with a minimal skill set (17 skills, keeping only `docarbiter` + `mineru`) implicit prompts actually read `docarbiter` and route to MinerU; explicitly saying "use docarbiter" also passes in the full environment. **Conclusion: the install is correct; implicit triggering is affected by Codex skill capacity.**
+- **Installer fix**: `install.sh` now automatically uses whole-directory symlinks for `~/.agents/skills`, `~/.codex/skills`, and `~/.minimax/skills`; Claude/DSH/ZCode keep file symlinks. Use `--skill-mode dir|file` to force. Existing `~/.local/bin` wrappers are first backed up as `.bak.<timestamp>`.
 
-## DSH：实测通过
+## DSH: tested and passing
 
-### 1) 旧路由在场
+### 1) Old route present
 
-安装 `~/.dsh/skills/docarbiter/SKILL.md` 后，用：
+After installing `~/.dsh/skills/docarbiter/SKILL.md`, use this Chinese sample prompt:
 
 ```bash
 cd /tmp/p4-dsh
 dsh --profile headless "我有个中文扫描版 PDF，想提取成带页码的 Markdown。应该用哪个工具？只路由，不提取。"
 ```
 
-DSH 的 session 日志显示它**同时调用了两个 skill**：
+The DSH session log shows it **called two skills at the same time**:
 
 ```
 skill {"name":"docarbiter"}
 skill {"name":"doc-extract"}
 ```
 
-最终路由仍正确（MinerU），但这是双路由共存：上下文被两份决策表同时占用，行为不可审计。
+The final route is still correct (MinerU), but this is dual-route coexistence: the context is occupied by two decision tables at once, and the behavior is not auditable.
 
-### 2) 旧路由临时停用
+### 2) Old route temporarily disabled
 
-把 `~/.dsh/skills/doc-extract` 移到 `~/.dsh/skill-backups/` 后，同一提示只调用：
+After moving `~/.dsh/skills/doc-extract` to `~/.dsh/skill-backups/`, the same prompt calls only:
 
 ```
 skill {"name":"docarbiter"}
 bash  {"command":"for t in mineru-doc ...; do command -v $t; done"}
 ```
 
-中文和英文都正确路由到 **MinerU**，并检查了本机工具可用性。
+Both Chinese and English route correctly to **MinerU**, and local tool availability was checked.
 
-### 3) 永久切换（已完成）
+### 3) Permanent switch (done)
 
-DSH 不只读 `~/.dsh/skills`，还读 `~/.agents/skills`。只移 `~/.dsh/skills/doc-extract` 不够，英文提示仍会从全局目录加载旧路由。永久切换做了三件事：
+DSH reads not only `~/.dsh/skills` but also `~/.agents/skills`. Moving only `~/.dsh/skills/doc-extract` is not enough; English prompts still load the old route from the global directory. The permanent switch did three things:
 
-1. `~/.dsh/skills/doc-extract` → `~/.dsh/skill-backups/doc-extract.20261110-125933`；
-2. 全局 `~/.agents/skills/doc-extract` → `~/.agents/skill-backups/doc-extract.20261110-130247`；
-3. Codex / ZCode 自己的旧路由 symlink 改指向该全局备份，避免把它们弄坏。
+1. `~/.dsh/skills/doc-extract` → `~/.dsh/skill-backups/doc-extract.20261110-125933`;
+2. Global `~/.agents/skills/doc-extract` → `~/.agents/skill-backups/doc-extract.20261110-130247`;
+3. The Codex / ZCode old-route symlinks were repointed to that global backup so as not to break them.
 
-切换后重新跑中文、英文：
+After the switch, rerun Chinese and English:
 
 ```
 skill {"name":"docarbiter"}
 bash  {"command":"command -v mineru-doc ..."}
 ```
 
-两次都只调用 `docarbiter`，没有 `doc-extract`；路由 MinerU。**DSH 当前是 docarbiter 单入口。**
+Both runs call only `docarbiter`, never `doc-extract`, and route to MinerU. **DSH is currently single-entry docarbiter.**
 
-回滚：
+Rollback:
 
 ```bash
 mv ~/.dsh/skill-backups/doc-extract.20261110-125933 ~/.dsh/skills/doc-extract
 mv ~/.agents/skill-backups/doc-extract.20261110-130247 ~/.agents/skills/doc-extract
-# 再把 Codex / ZCode 的 doc-extract symlink 指回 ~/.agents/skills/doc-extract
+# Then point the Codex / ZCode doc-extract symlinks back to ~/.agents/skills/doc-extract
 ```
 
-## ZCode：发现通过，触发被模型选择卡住
+## ZCode: discovery passes, triggering blocked by model selection
 
-ZCode app 的 CLI 在 bundle 内，不在 PATH：
+The ZCode app's CLI is inside the bundle, not on PATH:
 
 ```bash
 node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs --help
 ```
 
-`skills list` 能发现安装到 `~/.zcode/skills/docarbiter` 的技能：
+`skills list` discovers the skill installed at `~/.zcode/skills/docarbiter`:
 
 ```
 - docarbiter (user/zcode)
   ~/.zcode/skills/docarbiter/SKILL.md
 ```
 
-但 `--prompt` 报：
+But `--prompt` reports:
 
 ```
 Error: Select a model before sending a message
 ```
 
-CLI 帮助里没有 `--model`；模型选择在 TUI / 桌面端配置里。尝试 `/model GLM-5.2` 作为 prompt 前缀仍报同一错误。**本轮没有完成 ZCode 隐式触发，不把它算通过。**
+The CLI help has no `--model`; model selection lives in the TUI / desktop configuration. Trying `/model GLM-5.2` as a prompt prefix still reports the same error. **ZCode implicit triggering was not completed this round and is not counted as passing.**
 
-ZCode 同时扫描 `~/.zcode/skills` 和 `~/.agents/skills`。DSH 切换时已把全局 `~/.agents/skills/doc-extract` 移走，并让 `~/.zcode/skills/doc-extract` 指向备份；所以 ZCode 现在只有 `user/zcode` 这一份旧路由。将来切换 ZCode 只需要备份 `~/.zcode/skills/doc-extract`，再装 docarbiter。
+ZCode scans both `~/.zcode/skills` and `~/.agents/skills`. During the DSH switch, the global `~/.agents/skills/doc-extract` was moved away and `~/.zcode/skills/doc-extract` was pointed at the backup; so ZCode now has only the `user/zcode` old route. Switching ZCode in future only requires backing up `~/.zcode/skills/doc-extract` and installing docarbiter.
 
-## Codex：条件通过（技能容量限制）
+## Codex: conditionally passed (skill capacity limit)
 
-2026-11-10 晚，用 Codex CLI `0.167.0-alpha.3.2` / `gpt-6-astra` 在两个环境复测：
+On the evening of 2026-11-10, retested with Codex CLI `0.167.0-alpha.3.2` / `gpt-6-astra` in two environments:
 
-| 环境 | 可见技能 | docarbiter 可见 | 隐式触发 | 显式触发 |
+| Environment | Visible skills | docarbiter visible | Implicit trigger | Explicit trigger |
 |---|---:|---|---|---|
-| 全量 | 619–620 | 是 | **失败**（371–380 个技能未进入模型可见列表，描述被移除） | **通过** |
-| 最小集 | 17 | 是 | **通过**（实际读取 `docarbiter/SKILL.md`） | 通过 |
+| Full | 619–620 | Yes | **Failed** (371–380 skills do not enter the model-visible list, descriptions removed) | **Passed** |
+| Minimal set | 17 | Yes | **Passed** (actually reads `docarbiter/SKILL.md`) | Passed |
 
-结论：
+Conclusion:
 
-- **安装和 symlink 都没问题**；Codex 能识别文件 symlink 和普通文件。
-- 全量环境的问题是**技能容量/索引**：大量技能未进入模型可见列表，`docarbiter` 的 description 被裁掉，隐式提示自然绕过它。
-- **显式调用可用**：说“使用 docarbiter 技能”会读取并路由。
-- 要让隐式触发稳定：精简 Codex 技能目录，或使用最小技能集；不要把 600+ 技能和 docarbiter 混在一起后期待它稳定被选中。
+- **Installation and symlinks are fine**; Codex recognizes file symlinks and regular files.
+- The problem in the full environment is **skill capacity/indexing**: many skills do not enter the model-visible list, `docarbiter`'s description is trimmed off, and implicit prompts naturally bypass it.
+- **Explicit invocation works**: saying "use the docarbiter skill" reads it and routes.
+- To make implicit triggering reliable: trim the Codex skill directory, or use a minimal skill set; do not mix 600+ skills with docarbiter and expect it to be selected reliably.
 
-本机当前 `~/.codex/skills/docarbiter/SKILL.md` 是普通文件；旧 `doc-extract` 已移走。
+On this machine, `~/.codex/skills/docarbiter/SKILL.md` is currently a regular file; the old `doc-extract` has been moved away.
 
-## 结论
+## Conclusions
 
-1. **一个 harness 只能留一个文档提取路由器。** Claude Code 已证明旧路由会赢；DSH 证明旧路由会让模型同时加载两份技能。ZCode 也会从两个目录重复发现旧路由。
-2. **DSH 已永久切换。** 旧路由停用、全局 `.agents` 旧路由移出后，中英文都只触发 docarbiter；Codex / ZCode 的旧路由副本保留，未被破坏。
-3. **ZCode 完全通过。** 顶层新会话中英文都调用 docarbiter 并路由 MinerU；CLI 的 `--prompt` 仍需默认模型，但 App 顶层不依赖它。
-4. **Codex 条件通过。** 安装和 symlink 均正确；全量 620 技能时隐式触发被容量挤掉，最小集 17 技能时隐式通过，显式调用通过。使用建议：精简技能目录，或显式说“使用 docarbiter”。
-5. **MiniMax 完全通过。** 顶层中英文都命中 docarbiter；它跳过文件 symlink，必须用整目录软链。
+1. **A harness should keep only one document-extraction router.** Claude Code already proved the old route wins; DSH proved the old route makes the model load two skills at once. ZCode also discovers the old route twice from two directories.
+2. **DSH is permanently switched.** With the old route disabled and the global `.agents` old route moved out, both Chinese and English trigger only docarbiter; the old-route copies for Codex / ZCode are preserved and unbroken.
+3. **ZCode fully passed.** In a top-level new session, both Chinese and English call docarbiter and route to MinerU; the CLI's `--prompt` still needs a default model, but the app top level does not depend on it.
+4. **Codex conditionally passed.** Installation and symlinks are correct; implicit triggering is squeezed out by capacity with all 620 skills, passes with a 17-skill minimal set, and explicit invocation passes. Usage recommendation: trim the skill directory, or explicitly say "use docarbiter".
+5. **MiniMax fully passed.** At the top level both Chinese and English hit docarbiter; it skips file symlinks and requires a whole-directory symlink.
 
-## 复现命令
+## Reproduction commands
 
 ```bash
-# DSH
+# DSH (Chinese sample prompt)
 dsh --profile headless "我有个中文扫描版 PDF，想提取成带页码的 Markdown。该用哪个工具？只路由。"
 
-# ZCode 技能发现
+# ZCode skill discovery
 node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs skills list | grep -A2 docarbiter
 
-# 查看 DSH session 里的实际 tool call
+# Inspect the actual tool calls in the DSH session
 # ~/.dsh/sessions/--private-tmp-p4-dsh-final-zh--/*/session.jsonl.zstd
 # zstd -dc ... | grep '"name":"skill"'
 ```
 
-## 未完成
+## Outstanding
 
-- [x] DSH 永久切换（2026-11-10，旧路由备份可回滚）
-- [x] ZCode 顶层新会话触发（中文/英文 docarbiter → MinerU）
-- [x] Codex 的 symlink/容量诊断（显式通过；最小集隐式通过；全量隐式受容量影响）
-- [x] MiniMax 顶层新会话触发（中文/英文 docarbiter → MinerU）
-- [ ] 三个 harness 的真实文件路由 / 实际提取端到端
+- [x] DSH permanent switch (2026-11-10, old-route backup can roll back)
+- [x] ZCode top-level new-session triggering (Chinese/English docarbiter → MinerU)
+- [x] Codex symlink/capacity diagnosis (explicit passes; minimal-set implicit passes; full-set implicit affected by capacity)
+- [x] MiniMax top-level new-session triggering (Chinese/English docarbiter → MinerU)
+- [ ] Real-file routing / actual end-to-end extraction for the three harnesses

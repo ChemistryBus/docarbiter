@@ -1,16 +1,16 @@
-# 迁移：已有 doc-extract / 单工具技能怎么办
+# Migration: What to Do If You Already Have doc-extract / Single-Tool Skills
 
-> 默认策略：**先共存，验证后再替换；不自动删除任何旧技能。**
-> 2026-11-10：Claude Code 和 DSH 已完成 P4 实测并切换为 `docarbiter`；旧 `doc-extract` 分别备份在 `~/.claude/skill-backups/` 和 `~/.dsh/skill-backups/`。DSH 还会读 `~/.agents/skills`，该全局旧路由也已移到 `~/.agents/skill-backups/`；Codex / ZCode 的旧路由副本保留。MiniMax 未配置。
-> 实测记录见 [`docs/p4-claude-code.md`](p4-claude-code.md)。
+> Default policy: **coexist first, replace only after validation; never auto-delete any old skill.**
+> 2026-11-10: Claude Code and DSH have completed P4 real-world testing and switched to `docarbiter`; the old `doc-extract` is backed up in `~/.claude/skill-backups/` and `~/.dsh/skill-backups/` respectively. DSH also reads `~/.agents/skills`, and that global old router has also been moved to `~/.agents/skill-backups/`; the old router copies for Codex / ZCode are kept. MiniMax is not configured.
+> See [`docs/p4-claude-code.md`](p4-claude-code.md) for the test log.
 
-## 1. 先检测
+## 1. Detect First
 
 ```bash
 ./scripts/doctor.sh --check-conflicts
 ```
 
-会看到类似：
+You will see something like:
 
 ```
 .claude    router    doc-extract
@@ -20,95 +20,95 @@
 legacy-router  note  检测到旧 doc-extract；安装 docarbiter 后建议移除旧的
 ```
 
-如果同时装了 `docarbiter` 和 `doc-extract`，会变成：
+If both `docarbiter` and `doc-extract` are installed, it becomes:
 
 ```
 dual-router  WARN  docarbiter 与旧 doc-extract 同时存在；建议只保留一个
 ```
 
-## 2. 共存（推荐的第一步）
+## 2. Coexist (Recommended First Step)
 
-在**一个** harness 里先试 `docarbiter`，其他 harness 保持旧路由：
+Try `docarbiter` in **one** harness first, keeping the old router in the others:
 
 ```bash
 ./scripts/install.sh --skills-only --skills-dir ~/.claude/skills
 ```
 
-然后在这个 harness 里问：
+Then ask in that harness:
 
-- 「提取这个 PDF，该用哪个工具？」
-- 「这个中文扫描件怎么转 Markdown？」
-- 「两个工具结果不一样，换一个试试。」
+- Chinese sample: 「提取这个 PDF，该用哪个工具？」 ("Which tool should I use to extract this PDF?")
+- Chinese sample: 「这个中文扫描件怎么转 Markdown？」 ("How do I convert this Chinese scan to Markdown?")
+- Chinese sample: 「两个工具结果不一样，换一个试试。」 ("The two tools gave different results; try another one.")
 
-观察它是否按预期路由、是否和旧 `doc-extract` 抢触发。确认后再扩展到其他 harness。
+Watch whether it routes as expected and whether it competes with the old `doc-extract` for triggers. Once confirmed, expand to other harnesses.
 
-> 两个路由器同时存在时，模型可能选错；这是**测试期**，不要同时对外承诺两个入口。
+> When two routers coexist, the model may choose the wrong one; this is the **testing period**, so do not publicly commit to two entry points at the same time.
 
-## 3. 替换（验证通过后）
+## 3. Replace (After Validation Passes)
 
-以一个 harness 为例：
+Using one harness as an example:
 
 ```bash
-# 1) 备份旧路由器（不要直接 rm，也不要留在 skills/ 里，否则仍可能被发现）
+# 1) Back up the old router (do not rm it directly, and do not leave it in skills/, or it may still be discovered)
 mkdir -p ~/.claude/skill-backups
 mv ~/.claude/skills/doc-extract ~/.claude/skill-backups/doc-extract.$(date +%Y%m%d-%H%M%S)
 
-# 2) 安装 docarbiter
+# 2) Install docarbiter
 cd docarbiter
 ./scripts/install.sh --skills-only --skills-dir ~/.claude/skills
 
-# 3) 体检
+# 3) Health check
 ./scripts/doctor.sh --check-conflicts
 
-# 4) 在 /tmp 等中立目录跑真实触发（不要在仓库根目录跑，模型会去读 SKILL.md）
+# 4) Run a real trigger from a neutral directory such as /tmp (do not run from the repo root; the model will read SKILL.md). The -p prompt below is a Chinese sample.
 cd /tmp
 claude -p "我有个中文扫描版 PDF，想提取成带页码的 Markdown。该用哪个工具？只路由。" \
   --model haiku --output-format stream-json --verbose --allowedTools "Skill,Read"
 ```
 
-其他 harness 把 `~/.claude` 换成 `~/.codex` / `~/.zcode` / `~/.dsh`。
+For other harnesses, replace `~/.claude` with `~/.codex` / `~/.zcode` / `~/.dsh`.
 
-### 回滚
+### Rollback
 
 ```bash
 rm -rf ~/.claude/skills/docarbiter
 mv ~/.claude/skill-backups/doc-extract.YYYYMMDD-HHMMSS ~/.claude/skills/doc-extract
 ```
 
-`install.sh` 只在 `--force` 时备份同名目标为 `SKILL.md.bak.<时间>`；回滚时按实际文件名恢复。
+`install.sh` only backs up same-named targets as `SKILL.md.bak.<timestamp>` when `--force` is used; on rollback, restore using the actual file name.
 
-## 4. 单工具技能冲突
+## 4. Single-Tool Skill Conflicts
 
-如果你已经有 `liteparse` / `markitdown` / `docling` / `mineru` 单工具技能：
+If you already have single-tool skills for `liteparse` / `markitdown` / `docling` / `mineru`:
 
-- **默认 `--profile core`**：只注册 `docarbiter`，不注册工具技能，不会和它们同名。
-- **`--profile full`**：会把 12 个工具注册成独立技能；同名时 `install.sh` 会跳过或（`--force`）备份后覆盖。建议先卸载旧的同名技能，或只用 `core`。
-- `doctor.sh --check-conflicts` 会列出「同一 harness 同时有工具技能和 docarbiter」的情况；`--profile full` 下属预期，但要知道自己在做什么。
+- **Default `--profile core`**: registers only `docarbiter`, not the tool skills, so there are no name collisions with them.
+- **`--profile full`**: registers the 12 tools as standalone skills; on a name collision, `install.sh` skips them or (with `--force`) backs them up and overwrites. It is recommended to uninstall the old same-named skills first, or to use only `core`.
+- `doctor.sh --check-conflicts` lists cases where "the same harness has both a tool skill and docarbiter"; under `--profile full` this is expected, but you should know what you are doing.
 
-## 5. 对其他用户
+## 5. For Other Users
 
-这不是你一个人的情况。任何装过文档提取技能的人都会遇到：
+This is not unique to you. Anyone who has installed document-extraction skills will run into:
 
-- 旧的单工具技能（`liteparse` / `markitdown` / `docling`）；
-- 旧的调度技能（`doc-extract` 或别的路由器）；
-- 新装的 `docarbiter`。
+- old single-tool skills (`liteparse` / `markitdown` / `docling`);
+- an old routing skill (`doc-extract` or another router);
+- the newly installed `docarbiter`.
 
-给用户的默认建议：
+Default advice for users:
 
-1. 先跑 `doctor.sh --check-conflicts`；
-2. 先在一个 harness 用 `--skills-only` 试 `docarbiter`；
-3. 确认后再替换旧路由器；
-4. 保留备份，能回滚；
-5. 不要同时对外承诺两个入口。
+1. Run `doctor.sh --check-conflicts` first;
+2. Try `docarbiter` in one harness with `--skills-only` first;
+3. After confirming, replace the old router;
+4. Keep the backup so you can roll back;
+5. Do not publicly commit to two entry points at the same time.
 
-## 6. 发布前提醒
+## 6. Pre-Release Checklist
 
-- [ ] README「安装前须知」已写迁移步骤
-- [ ] Release notes 写清楚「docarbiter 与旧 doc-extract 二选一」
-- [x] `doctor.sh --check-conflicts` 在已有技能环境能跑（2026-11-10）
-- [x] 回滚步骤在 Claude Code 临时验证过一次（移动/恢复 symlink）
-- [x] 不自动删除用户旧技能
+- [ ] The README "Before You Install" section documents the migration steps
+- [ ] The release notes clearly state "choose one of docarbiter or the old doc-extract"
+- [x] `doctor.sh --check-conflicts` runs in an environment that already has skills (2026-11-10)
+- [x] The rollback steps were verified once ad hoc in Claude Code (moving/restoring a symlink)
+- [x] Old user skills are not auto-deleted
 
-> 本机现状（2026-11-10）：Claude Code 和 DSH 只有 `docarbiter`；旧 `doc-extract` 分别备份在 `~/.claude/skill-backups/doc-extract.20261110-121227`、`~/.dsh/skill-backups/doc-extract.20261110-125933`，全局 `~/.agents/skills/doc-extract` 备份在 `~/.agents/skill-backups/doc-extract.20261110-130247`。Codex / ZCode 仍保留旧 `doc-extract`（指向全局备份）；MiniMax 未配置。
+> Current state on this machine (2026-11-10): Claude Code and DSH have only `docarbiter`; the old `doc-extract` is backed up in `~/.claude/skill-backups/doc-extract.20261110-121227` and `~/.dsh/skill-backups/doc-extract.20261110-125933`, and the global `~/.agents/skills/doc-extract` is backed up in `~/.agents/skill-backups/doc-extract.20261110-130247`. Codex / ZCode still keep the old `doc-extract` (pointing to the global backup); MiniMax is not configured.
 >
-> `doctor.sh --check-conflicts` 的 `dual-router` 是跨 harness 汇总警告：`.claude/.dsh` 是 docarbiter，`.codex/.zcode` 是 doc-extract，并不表示单个 harness 内部还有双路由。看冲突时要按 harness 分栏读。
+> The `dual-router` from `doctor.sh --check-conflicts` is a cross-harness aggregate warning: `.claude/.dsh` have docarbiter and `.codex/.zcode` have doc-extract; it does not mean a single harness still has dual routers. Read conflicts by harness column.

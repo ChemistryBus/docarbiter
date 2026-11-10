@@ -1,6 +1,6 @@
 ---
 name: docarbiter
-description: 中英文优先的文档提取仲裁器。当用户要提取中文或英文 PDF、扫描件、图片或 Office 文档的内容，但不确定该用哪个工具，或现有提取结果乱码、乱序、表格错位时使用。它不自己提取，只判断输入格式、语言、文字层是否可用、目标产出，再路由到 mineru / docling / liteparse / markitdown / rapidocr / ocrmypdf / pdfplumber / pdftotext / paddleocr / marker / unstructured / olmocr，并给出降级链。若用户已明确指定某个工具，或只要 PDF 合并/拆分/表单，直接调用对应工具，不使用本技能。
+description: 中英文优先的文档提取仲裁器。当用户要提取中文或英文 PDF、扫描件、图片或 Office 文档的内容，但不确定该用哪个工具，或现有提取结果乱码、乱序、表格错位时使用。它不自己提取，只判断输入格式、语言、文字层是否可用、目标产出，再路由到 mineru / docling / liteparse / markitdown / rapidocr / ocrmypdf / pdfplumber / pdftotext / paddleocr / marker / unstructured / olmocr，并给出降级链。若用户已明确指定某个工具，或只要 PDF 合并/拆分/表单，直接调用对应工具，不使用本技能。 English: Chinese/English-first document-extraction router. Use when the user asks which tool to use for a PDF, scan, image, or Office file, or when extraction output is garbled, misordered, or has broken tables. It does not extract; it probes the input, picks a tool, and gives a fallback chain. Do not use when the user already named a tool, or only needs PDF merge/split/forms.
 license: MIT
 version: 0.1.1
 ---
@@ -33,7 +33,7 @@ version: 0.1.1
 
 ## Communication Rules
 
-- 用中文回复；工具名、命令、文件路径保持英文。
+- 用用户的语言回复（中文或英文）；工具名、命令、文件路径保持原文。
 - 一次最多问一个澄清问题。能推断就推断，并说明推断依据。
 - 不确定的事情说「待验证」，不要编造命令或版本。
 
@@ -85,22 +85,42 @@ ctrl = sum(1 for c in s if unicodedata.category(c) == "Cc" and c not in "\n\r\t\
 cjk = sum(1 for c in s if 0x3400 <= ord(c) <= 0x4DBF
           or 0x4E00 <= ord(c) <= 0x9FFF
           or 0x20000 <= ord(c) <= 0x2FA1F)
-print(f"chars={n} bad={bad} ctrl={ctrl} cjk={cjk} bad_ratio={(bad+ctrl)/max(n,1):.2%}")
+latin = sum(1 for c in s if c.isascii() and c.isalpha())
+language = "zh" if cjk > latin else ("en" if latin > cjk else "mixed")
+print(f"chars={n} bad={bad} ctrl={ctrl} cjk={cjk} latin={latin} "
+      f"language={language} bad_ratio={(bad+ctrl)/max(n,1):.2%}")
 '
 ```
+
+> 这只是前 3 页。短文档（≤20 页）逐页探测；长文档再抽中间 2 页和末尾 2 页，否则「前 3 页是封面/目录」会误判整本。`scripts/route.py` 已实现同样的抽样，并把结果写成 `sampled` / `pages`。空白页和扫描页要分开看：空白页没有 `<0x50` 字符也没有图像；扫描页通常有图像对象（`pdfimages -list` 可确认）。
 
 判读：
 
 | 结果 | 结论 | 下一步 |
 |---|---|---|
-| `chars < 50` 且 `bad_ratio <= 5%` | 扫描件 / 图片型 PDF | `ocrmypdf` 或 MinerU / PaddleOCR / olmOCR |
+| `chars = 0` 且页面无图像 | 空白页 / 加密 / 纯矢量 | 不要跑 OCR；确认文件是否为空、加密或只有轮廓字 |
+| `chars < 50` 且 `bad_ratio <= 5%` 且有图像 | 扫描件 / 图片型 PDF | `ocrmypdf` 或 MinerU / PaddleOCR / olmOCR |
+| `chars < 50` 且 `bad_ratio <= 5%` 且无图像 | 稀疏文字层 | 表格目标可先试 Docling/pdfplumber；正文仍走 MinerU |
 | `bad_ratio > 10%`（尤其 `ctrl` 高） | CID / 无 ToUnicode / 乱码 | **不要信文字层**；走 OCR 或 MinerU |
 | `chars >= 50` 且 `bad_ratio <= 5%` | 文字层可用 | 第 3 步 |
-| 前 3 页是封面/目录 | 样本不代表正文 | 再抽第 4–6 页或中间页复测 |
+| 有的页可用，有的页扫描/空白/乱码 | 混合文档 | MinerU 覆盖文字+扫描；表格目标用 Docling |
+| 前 3 页是封面/目录 | 样本不代表正文 | 再抽中间页和末尾页复测 |
 
-> 中文文档额外看 `cjk`；英文文档看 `bad_ratio` 和 mojibake（`Ã` / `Â` / `â€`）。不要因为 `cjk=0` 就判英文 PDF 有故障。
+> `language` 由 `cjk` 与 `latin` 比较得出：`zh` / `en` / `mixed`。中文文档额外看 `cjk`；英文文档看 `bad_ratio` 和 mojibake（`Ã` / `Â` / `â€`）。不要因为 `cjk=0` 就判英文 PDF 有故障。
 
 ### 第 3 步：要什么产出？
+
+用户说的目标词和 `route.py --goal` 的枚举不是一回事。先按下表归一，不要猜：
+
+| 用户说法（中 / 英） | `--goal` |
+|---|---|
+| 成稿 / 引用 / 页码锚点 / 论文 / manuscript | `manuscript` |
+| 快速读 / 预览 / 检索 / speed / preview | `speed` |
+| 只要纯文字 / plain text | `text` |
+| 表格 / CSV / 单元格坐标 / table | `table` |
+| 复杂表格 / 合并表头 / 书表 / 标准表 / table structure | `table-structure` |
+| RAG / 分块 / chunks / LaTeX | `rag` |
+| 扫描件 OCR / 加文字层 / OCR | `ocr` |
 
 | 目标 | 首选 | 备选 | 说明 |
 |---|---|---|---|
@@ -108,7 +128,7 @@ print(f"chars={n} bad={bad} ctrl={ctrl} cjk={cjk} bad_ratio={(bad+ctrl)/max(n,1)
 | 成稿 / 引用 / 页码锚点 | **mineru** | `docling` | 中英文都可；英文双栏优先 mineru/docling |
 | 只要纯文字 | **pdftotext** | `pdfminer.six` | 最低成本；中英文文字层都可用 |
 | RAG 分块 / LaTeX / doctags | **docling** | — | `--to chunks` / `--to latex` |
-| 简单有框线表格 / 要 CSV 或坐标 | **pdfplumber** | `camelot` | 快；只适合网格清楚、单元格少换行的表 |
+| 简单有框线表格 / 要 CSV 或坐标 | **pdfplumber** | `docling` | 快；只适合网格清楚、单元格少换行的表。`camelot` 是可选安装，默认未装，不要自动路由 |
 | 复杂表格：合并表头 / 多行单元格 / 书表 / 标准表 | **docling** | `pdfplumber` → `mineru` | 实测 WS/T 578.1、GB 28050、GB 2760 结构与阅读顺序最好；慢；书只跑目标页 |
 | 扫描件 / 坏文字层表格 | **mineru** | `paddleocr` PP-Structure | MinerU 直接 OCR + 表格；符号表仍要抽检 |
 | 扫描件高精度 | **ocrmypdf** → **mineru** | `paddleocr` / `olmocr`（GPU） | 先加文字层再结构解析 |
@@ -126,7 +146,8 @@ print(f"chars={n} bad={bad} ctrl={ctrl} cjk={cjk} bad_ratio={(bad+ctrl)/max(n,1)
   ocrmypdf → mineru → paddleocr → olmocr
 
 表格（简单网格 / 坐标）：
-  pdfplumber → camelot → docling → mineru
+  pdfplumber → docling → mineru
+  # camelot 仅在用户明确安装后作为可选替代；默认链不包含它
 
 表格（合并表头 / 多行单元格 / 书表）：
   docling → pdfplumber（Docling 没出表时）→ mineru

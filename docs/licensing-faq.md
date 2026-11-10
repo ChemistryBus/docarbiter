@@ -1,76 +1,76 @@
-# 许可证 FAQ
+# License FAQ
 
-> 本文是通俗说明，不是法律意见。以各上游 `LICENSE` 原文为准。
+> This is a plain-language explanation, not legal advice. The upstream `LICENSE` text of each project prevails.
 
-## Q1：MinerU 是 Apache-2.0 吗？我们能用吗？
+## Q1: Is MinerU Apache-2.0? Can we use it?
 
-**能用。** MinerU 的许可证是 **Apache-2.0 + 附加条款**（包元数据里写作 `LicenseRef-MinerU-Open-Source-License`）。附加条款只在这两种情况下触发：
+**Yes.** MinerU's license is **Apache-2.0 + additional terms** (written in the package metadata as `LicenseRef-MinerU-Open-Source-License`). The additional terms are triggered only in these two cases:
 
-1. 你及关联方合并口径 **MAU > 1 亿**，或 **月收入 > 2000 万美元** → 需要单独商业许可；
-2. 你基于 MinerU 向第三方提供**在线服务** → 必须在产品界面或公开文档显著位置标明「使用了 MinerU」。
+1. You and your affiliates, on a combined basis, have **MAU > 100 million**, or **monthly revenue > $20 million** → a separate commercial license is required;
+2. You provide an **online service** to third parties based on MinerU → you must prominently state "Uses MinerU" in the product UI or public documentation.
 
-本项目：
+This project:
 
-- 不盈利、不提供在线服务；
-- 不重新分发 MinerU 代码或模型；
-- 只在用户本机通过 `mineru-doc` 调用 CLI。
+- is non-profit and does not provide an online service;
+- does not redistribute MinerU code or models;
+- only invokes the CLI on the user's local machine through `mineru-doc`.
 
-因此当前用法不触发附加条款。**如果未来你把本合集做成在线服务**，需要在界面/文档标注 MinerU；如果用户量/收入达到门槛，需要联系 MinerU 团队取得商业许可。
+Therefore the current usage does not trigger the additional terms. **If you turn this collection into an online service in the future**, you will need to mark MinerU in the UI/documentation; if user volume/revenue reaches the thresholds, you will need to contact the MinerU team for a commercial license.
 
-原文（英文 + 中文）见 `THIRD_PARTY_NOTICES.md`。
+See `THIRD_PARTY_NOTICES.md` for the original text (English + Chinese).
 
-## Q2：为什么不收录 PyMuPDF？
+## Q2: Why is PyMuPDF not included?
 
-PyMuPDF 是 **AGPL-3.0 / 商业双许可**。AGPL 的传染性会把整个项目拖入 AGPL，和本仓库的 MIT 不兼容。需要底层 PDF 控制时：
+PyMuPDF is **AGPL-3.0 / commercial dual-licensed**. AGPL's copyleft would drag the whole project into AGPL, which is incompatible with this repository's MIT. When you need low-level PDF control:
 
-- 用 `pdfplumber` / `pdfminer.six` / `pypdf` 覆盖大部分场景；
-- 确实需要 PyMuPDF 的用户，自行安装并自行评估许可；
-- 本仓库只给链接，不安装、不推荐。
+- use `pdfplumber` / `pdfminer.six` / `pypdf`, which cover most scenarios;
+- users who really need PyMuPDF should install it themselves and assess the license themselves;
+- this repository only provides links; it does not install or recommend it.
 
-## Q3：PDF-Extract-Kit 不是很好用吗？为什么不装？
+## Q3: Isn't PDF-Extract-Kit quite good? Why not install it?
 
-它很强（版面/表格/公式），但许可证是 **AGPL-3.0**。同上：只给链接，不自动安装。需要的人自行决定。
+It is powerful (layout/tables/formulas), but its license is **AGPL-3.0**. Same as above: links only, no automatic installation. Those who need it decide for themselves.
 
-## Q4：Poppler / pdftotext 是 GPL，会不会污染我的项目？
+## Q4: Poppler / pdftotext are GPL. Will that contaminate my project?
 
-本仓库**只调用系统 `pdftotext` 二进制**，不修改、不链接、不再分发 Poppler。你的项目如果也只是调用命令行，通常不构成衍生作品。**如果你把 `pdftotext` 二进制打包进发行物**，需要单独评估 GPL 义务。
+This repository **only invokes the system `pdftotext` binary**; it does not modify, link against, or redistribute Poppler. If your project also only calls the command line, it usually does not constitute a derivative work. **If you bundle the `pdftotext` binary into your distribution**, you need to assess GPL obligations separately.
 
-## Q5：OCRmyPDF 是 MPL-2.0，我能改吗？
+## Q5: OCRmyPDF is MPL-2.0. Can I modify it?
 
-可以。MPL-2.0 是**文件级 copyleft**：你修改的 OCRmyPDF 源文件要继续以 MPL-2.0 发布；你项目里的其他文件不受影响。本仓库只调用 CLI，不修改。
+Yes. MPL-2.0 is **file-level copyleft**: OCRmyPDF source files you modify must continue to be released under MPL-2.0; other files in your project are unaffected. This repository only invokes the CLI and does not modify it.
 
-## Q6：RapidOCR 的模型可以直接商用吗？
+## Q6: Can RapidOCR's models be used commercially directly?
 
-RapidOCR 代码是 Apache-2.0；模型权重来自 PaddleOCR / 百度，包内 `MODEL_LICENSES.md` 说明了来源与再分发要求。**本仓库不重新分发模型**；用户安装包后由工具自行下载。要再分发模型或做在线服务，先读上游模型许可。
+The RapidOCR code is Apache-2.0; the model weights come from PaddleOCR / Baidu, and the package's `MODEL_LICENSES.md` states the source and redistribution requirements. **This repository does not redistribute models**; after the user installs the package, the tool downloads them itself. To redistribute models or provide an online service, read the upstream model license first.
 
-## Q7：商业云 API（LlamaParse / Azure / Google / Adobe / Mathpix）为什么不在默认路径？
+## Q7: Why aren't commercial cloud APIs (LlamaParse / Azure / Google / Adobe / Mathpix) on the default path?
 
-三个原因：
+Three reasons:
 
-1. **数据离机**：文档会发送到第三方；
-2. **按页计费**：成本不可控；
-3. **不可复现**：服务端模型会变，今天的分数明天不一定成立。
+1. **Data leaves the machine**: documents are sent to a third party;
+2. **Per-page billing**: costs are uncontrollable;
+3. **Not reproducible**: server-side models change; a score that holds today may not hold tomorrow.
 
-需要时可以在 `docarbiter` 里显式询问用户是否同意上传；默认不调用。
+When needed, `docarbiter` can explicitly ask the user whether they agree to upload; by default it does not call them.
 
-## Q8：本仓库自己的代码是什么许可？
+## Q8: What license does this repository's own code use?
 
-**MIT**。你可以商用、修改、再分发，只需保留版权声明。上游工具仍按各自许可证约束。
+**MIT**. You can use it commercially, modify it, and redistribute it, as long as you retain the copyright notice. Upstream tools are still bound by their own licenses.
 
-## Q9：我只调用这些工具，需要开源我的产品吗？
+## Q9: If I only call these tools, do I need to open-source my product?
 
-一般情况下不需要：
+Generally no:
 
-- MIT / Apache-2.0 / BSD / MPL 工具：调用通常不触发开源义务（MPL 只约束被修改的文件）；
-- GPL 工具（如 Poppler）：只调用命令行通常不构成衍生作品；打包二进制要单独评估；
-- AGPL 工具（PyMuPDF / PDF-Extract-Kit / Ghostscript）：本仓库不安装、不推荐；如果你自行使用并提供网络服务，AGPL 义务可能触发。
+- MIT / Apache-2.0 / BSD / MPL tools: calling them usually does not trigger open-source obligations (MPL only constrains modified files);
+- GPL tools (such as Poppler): merely calling the command line usually does not constitute a derivative work; bundling the binary must be assessed separately;
+- AGPL tools (PyMuPDF / PDF-Extract-Kit / Ghostscript): this repository does not install or recommend them; if you use them yourself and provide a network service, AGPL obligations may be triggered.
 
-拿不准时，问律师，不要问 README。
+If you are unsure, ask a lawyer, not a README.
 
-## Q10：MinerU 附加条款的官方原文在哪？
+## Q10: Where is the official text of MinerU's additional terms?
 
-- 上游仓库：https://github.com/opendatalab/MinerU
-- 本机安装包内的 `LICENSE.md`：`mineru-4.1.7.dist-info/licenses/LICENSE.md`
-- 本仓库：`THIRD_PARTY_NOTICES.md`（已附英文 + 中文原文）
+- Upstream repository: https://github.com/opendatalab/MinerU
+- `LICENSE.md` inside the local installation package: `mineru-4.1.7.dist-info/licenses/LICENSE.md`
+- This repository: `THIRD_PARTY_NOTICES.md` (English + Chinese original text attached)
 
-> 如果上游更新了条款，以你安装版本内的 `LICENSE.md` 为准。
+> If upstream updates the terms, the `LICENSE.md` in the version you installed prevails.

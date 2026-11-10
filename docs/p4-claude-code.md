@@ -1,61 +1,61 @@
-# P4：Claude Code 真实触发验收（2026-11-10）
+# P4: Claude Code Real Trigger Acceptance (2026-11-10)
 
-> 范围：只测 **Claude Code**。Codex / zcode / DSH 未动，仍保留旧 `doc-extract`。
-> 模型：`claude -p --model haiku`，非交互 `stream-json`；这是低成本触发测试，发布前应在 Sonnet / Opus 上复测。
-> 安装：`~/.claude/skills/docarbiter/SKILL.md` 软链到本仓库；旧 `doc-extract` 的 symlink 已移到 `~/.claude/skill-backups/doc-extract.20261110-121227`，源目录 `~/.agents/skills/doc-extract` 未动。
+> Scope: **Claude Code** only. Codex / zcode / DSH untouched, still keeping the old `doc-extract`.
+> Model: `claude -p --model haiku`, non-interactive `stream-json`; this is a low-cost trigger test and should be retested on Sonnet / Opus before release.
+> Install: `~/.claude/skills/docarbiter/SKILL.md` symlinked to this repository; the old `doc-extract` symlink has been moved to `~/.claude/skill-backups/doc-extract.20261110-121227`, and the source directory `~/.agents/skills/doc-extract` is untouched.
 
-## 结果
+## Results
 
-| 测试 | 旧 doc-extract | 实际调用 | 结论 |
+| Test | Old doc-extract | Actual call | Conclusion |
 |---|---|---|---|
-| 技能发现 | 有 | — | 新会话能列出 `docarbiter`，返回 YES |
-| 中文隐式触发 | 有 | `Skill: doc-extract` | **旧路由器赢**，docarbiter 未被调用 |
-| 英文隐式触发 | 有 | `Skill: doc-extract` | **旧路由器赢**，与语言无关 |
-| 中文隐式触发 | 已停用 | `Skill: docarbiter` | 正确路由 `mineru`，给出 `mineru-doc` 命令 |
-| 英文隐式触发（`/tmp` 中立目录） | 已停用 | `Skill: docarbiter` | 正确路由 `mineru`，中英双语描述都能触发 |
-| 中文 + 真实文件路径（`zh-scan.pdf`） | 已停用 | `Skill: docarbiter` + Bash 探针 | 探针 `chars=0 cjk=0` → 正确路由 `mineru`，并检查了 `mineru-doc` / `ocrmypdf` 可用性 |
-| 英文隐式触发（仓库根目录） | 已停用 | 未调用 Skill，直接 Read `SKILL.md` | 路由仍正确，但**不算干净的技能触发**；cwd 在仓库里会让模型改去读文件 |
+| Skill discovery | Present | — | New session can list `docarbiter` and returns YES |
+| Chinese implicit trigger | Present | `Skill: doc-extract` | **Old router wins**, docarbiter not called |
+| English implicit trigger | Present | `Skill: doc-extract` | **Old router wins**, regardless of language |
+| Chinese implicit trigger | Disabled | `Skill: docarbiter` | Correctly routes to `mineru`, gives the `mineru-doc` command |
+| English implicit trigger (`/tmp` neutral directory) | Disabled | `Skill: docarbiter` | Correctly routes to `mineru`; both Chinese and English descriptions trigger |
+| Chinese + real file path (`zh-scan.pdf`) | Disabled | `Skill: docarbiter` + Bash probe | Probe `chars=0 cjk=0` → correctly routes to `mineru`, and checked `mineru-doc` / `ocrmypdf` availability |
+| English implicit trigger (repository root) | Disabled | Did not call Skill; directly Read `SKILL.md` | Routing is still correct, but **not a clean skill trigger**; a cwd inside the repository makes the model switch to reading the file |
 
-## 结论
+## Conclusions
 
-1. **共存不可接受。** 只要旧 `doc-extract` 还在 `~/.claude/skills`，中英文隐式提示都会选旧路由器；docarbiter 的 description 再写也抢不过。
-2. **停用旧路由后，docarbiter 能接管。** 中文、英文在 `/tmp` 中立目录都能触发；给真实文件路径时，它会先跑文字层探针（`chars=0`），再正确路由扫描件 → MinerU，并检查 `mineru-doc` / `ocrmypdf` 是否可用。
-3. **测试要在中立目录做。** 在仓库根目录跑 `claude -p`，模型会先 `ls` / `Read SKILL.md`，看起来“没触发”，其实是被 cwd 里的文件吸引。真实用户项目不会这样，但验收必须避免这个偏差。
-4. **不自动删除旧技能。** 本次只移动 symlink 到 `~/.claude/skill-backups/`，源目录和其他 harness 保留；可随时恢复。
-5. **触发是模型相关行为。** `haiku` 上通过不等于 Sonnet / Opus 上通过；发布前要复测，且不要把“某次触发成功”当成稳定保证。
+1. **Coexistence is unacceptable.** As long as the old `doc-extract` is still in `~/.claude/skills`, implicit prompts in either language choose the old router; no amount of description on docarbiter can win.
+2. **After disabling the old route, docarbiter takes over.** Chinese and English both trigger in the `/tmp` neutral directory; given a real file path, it runs the text-layer probe first (`chars=0`), then correctly routes the scan → MinerU, and checks whether `mineru-doc` / `ocrmypdf` are available.
+3. **Tests must run in a neutral directory.** Running `claude -p` at the repository root makes the model `ls` / `Read SKILL.md` first; it looks like "no trigger" but is actually attraction to files in the cwd. Real user projects will not behave this way, but acceptance testing must avoid this bias.
+4. **Old skills are not deleted automatically.** This time only the symlink was moved to `~/.claude/skill-backups/`; the source directory and other harnesses are preserved and can be restored at any time.
+5. **Triggering is model-dependent behavior.** Passing on `haiku` does not mean passing on Sonnet / Opus; retest before release, and do not treat "one successful trigger" as a stability guarantee.
 
-## 复现
+## Reproduction
 
 ```bash
-# 0) 确认 docarbiter 被发现
+# 0) Confirm docarbiter is discovered (Chinese sample prompt)
 claude -p "当前可用技能里有没有 docarbiter？有就 YES。" \
   --model haiku --output-format json
 
-# 1) 中文隐式触发（应在中立目录跑）
+# 1) Chinese implicit trigger (should run in a neutral directory)
 cd /tmp
 claude -p "我有个中文扫描版 PDF，想提取成带页码的 Markdown。该用哪个工具？只路由，不提取。" \
   --model haiku --output-format stream-json --verbose --allowedTools "Skill,Read"
 
-# 2) 英文隐式触发
+# 2) English implicit trigger
 claude -p "I have a scanned Chinese PDF and need page-anchored Markdown. Which tool? Use your routing skill; route only." \
   --model haiku --output-format stream-json --verbose --allowedTools "Skill"
 
-# 3) 查看是否调用了 Skill
-#    在 stream-json 里找 "name":"Skill" 和 "skill":"docarbiter"
+# 3) Check whether Skill was called
+#    Look for "name":"Skill" and "skill":"docarbiter" in the stream-json
 ```
 
-## 恢复旧路由（Claude Code）
+## Restoring the old route (Claude Code)
 
 ```bash
 mv ~/.claude/skill-backups/doc-extract.20261110-121227 ~/.claude/skills/doc-extract
 ```
 
-恢复后，Claude Code 会重新和 `docarbiter` 抢触发；这是**回滚**，不是推荐状态。
+After restoring, Claude Code will compete with `docarbiter` for triggering again; this is a **rollback**, not a recommended state.
 
-## 未完成
+## Outstanding
 
-- [ ] Sonnet / Opus 上复测中英文触发
-- [x] 真实文件路由（`benchmarks/fixtures/zh-scan.pdf`，只路由，未提取）
-- [ ] 真实文件的实际提取端到端测试（本轮只路由）
-- [ ] Codex / zcode / DSH 的同类测试（本轮未动）
-- [ ] 旧 `doc-extract` 在 Claude Code 的最终去留（当前是备份停用，不是删除）
+- [ ] Retest Chinese/English triggering on Sonnet / Opus
+- [x] Real-file routing (`benchmarks/fixtures/zh-scan.pdf`, routing only, no extraction)
+- [ ] Actual end-to-end extraction test with a real file (this round only routed)
+- [ ] Equivalent tests for Codex / zcode / DSH (untouched this round)
+- [ ] Final disposition of the old `doc-extract` in Claude Code (currently backed up and disabled, not deleted)

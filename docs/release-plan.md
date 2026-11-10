@@ -1,109 +1,109 @@
-# GitHub 发布计划（已执行）
+# GitHub Release Plan (executed)
 
-> 目标：把当前仓库作为 **首个公开预览版** 发布到 GitHub。
-> 2026-11-10：已发布 **v0.1.0 — First Public Preview**（`main` 初始提交 `5e1f9fd`，CI `validate` 绿，Release 已创建）。
-> 2026-11-11：发布 **v0.1.1 — Harness Compatibility Patch**（安装兼容、wrapper 备份、更新机制、harness 文档）。
-> 本地验证、隐私修复、干净 venv 和提交预演均已完成。
+> Goal: publish the current repository to GitHub as the **first public preview**.
+> 2026-11-10: **v0.1.0 — First Public Preview** published (`main` initial commit `5e1f9fd`, CI `validate` green, Release created).
+> 2026-11-11: Published **v0.1.1 — Harness Compatibility Patch** (install compatibility, wrapper backup, update mechanism, harness docs).
+> Local verification, privacy fixes, clean venv, and commit rehearsal are all complete.
 
-## 0. 发布范围（建议）
+## 0. Release scope (recommended)
 
-| 项 | 建议 | 理由 |
+| Item | Recommendation | Rationale |
 |---|---|---|
-| 仓库 | `ChemistryBus/docarbiter` | 已定；短、无重名、和技能同名 |
-| 版本 | `v0.1.0` | 已定；首个公开预览，README 状态已同步 |
-| 默认 profile | `core` | 8 个工具，已实测；`extra/full` 未逐项验证 |
-| 许可 | MIT（本仓库） | 不含上游代码；上游工具由用户自行安装 |
-| 不收录 | PyMuPDF / PDF-Extract-Kit / Anthropic `pdf` 技能 | AGPL 或 Proprietary；已在 notices 说明 |
-| 平台声明 | macOS arm64 实测；Linux CI 待跑；Windows 未验证 | 发布说明必须写清楚 |
-| Harness 声明 | Claude Code / DSH 已测；ZCode / Codex / MiniMax 未完成 | 不把“技能被发现”写成“触发通过” |
+| Repository | `ChemistryBus/docarbiter` | Decided; short, unique, same name as the skill |
+| Version | `v0.1.0` | Decided; first public preview, README status synced |
+| Default profile | `core` | 8 tools, tested; `extra/full` not individually verified |
+| License | MIT (this repository) | No upstream code included; upstream tools are installed by the user |
+| Not included | PyMuPDF / PDF-Extract-Kit / Anthropic `pdf` skill | AGPL or Proprietary; explained in the notices |
+| Platform statement | macOS arm64 tested; Linux CI pending; Windows not verified | Must be stated clearly in the release notes |
+| Harness statement | Claude Code / DSH tested; ZCode / Codex / MiniMax not complete | Do not write "skill discovered" as "triggering passed" |
 
-## 1. 阻塞项（必须先做）
+## 1. Blockers (must be done first)
 
-### 1.1 隐私与可移植性
+### 1.1 Privacy and portability
 
-- [x] `scripts/survey_pdfs.py`：`ROOT_DEFAULT` 改为 `Path.cwd()` / `DOCARBITER_WORKSPACE`，`--dirs` 显式传入
-- [x] `scripts/sample_real.py`：新增 `--root`（默认 `Path.cwd()` / `DOCARBITER_WORKSPACE`）
-- [x] `docs/p4-other-harnesses.md`：个人绝对路径改成 `~/.zcode/...`
-- [x] 全仓 `grep -R '/Users/<username>'` 必须为空（文档示例除外也要改）
-- [ ] 确认 `benchmarks/private/` 不会进 Git；检查 `git status` 里没有私有 PDF / survey JSON / policy cache
-- [x] 清理 `scripts/__pycache__/`、`.DS_Store`、`blobs/`、`.mineru-service.lock`
+- [x] `scripts/survey_pdfs.py`: `ROOT_DEFAULT` changed to `Path.cwd()` / `DOCARBITER_WORKSPACE`, `--dirs` passed explicitly
+- [x] `scripts/sample_real.py`: new `--root` option (defaults to `Path.cwd()` / `DOCARBITER_WORKSPACE`)
+- [x] `docs/p4-other-harnesses.md`: personal absolute paths changed to `~/.zcode/...`
+- [x] Repo-wide `grep -R '/Users/<username>'` must return nothing (documentation examples must be changed too)
+- [ ] Confirm `benchmarks/private/` never enters Git; check `git status` shows no private PDFs / survey JSON / policy cache
+- [x] Clean up `scripts/__pycache__/`, `.DS_Store`, `blobs/`, `.mineru-service.lock`
 
-### 1.2 许可与声明
+### 1.2 Licensing and statements
 
-- [x] `LICENSE`（MIT）存在且年份/作者正确
-- [x] `THIRD_PARTY_NOTICES.md` 覆盖 18 个 registry 工具
-- [x] MinerU 附加条款中英文原文 + 在线服务标识义务写清楚
-- [x] README 顶部有“不含上游代码”声明
-- [x] `skills/` 下没有 `pdf` / `pymupdf` / `pdf-extract-kit`
-- [x] 真实 CC BY-SA fixture 的 `SOURCES.md` 署名完整
+- [x] `LICENSE` (MIT) exists with correct year/author
+- [x] `THIRD_PARTY_NOTICES.md` covers the 18 registry tools
+- [x] MinerU additional terms in both Chinese and English + online-service attribution obligation stated clearly
+- [x] README has a "no upstream code included" statement at the top
+- [x] No `pdf` / `pymupdf` / `pdf-extract-kit` under `skills/`
+- [x] Real CC BY-SA fixture `SOURCES.md` attribution is complete
 
-### 1.3 可复现验证
+### 1.3 Reproducible verification
 
-- [x] `python3 -I scripts/validate.py` 通过
-- [x] `python3 -I scripts/route.py --selftest` 通过（14/14）
-- [x] 所有 shell `bash -n` 通过
-- [x] 所有 Python `py_compile` 通过
-- [x] SVG XML 可解析
-- [x] 干净 venv 跑 `./scripts/install.sh --profile core --no-skills`，再跑 `doctor.sh`（2026-11-10，core 完整；临时 HOME 无 MinerU 模型属预期）
-- [x] 隔离 HOME 跑 `install.sh --skills-only`，确认技能注册与 wrapper
-- [ ] Linux CI（GitHub Actions）实际跑绿；当前 workflow 只是写好了，还没在远端跑过
+- [x] `python3 -I scripts/validate.py` passes
+- [x] `python3 -I scripts/route.py --selftest` passes (all checks; 24 at the time of writing)
+- [x] All shell scripts pass `bash -n`
+- [x] All Python files pass `py_compile`
+- [x] SVG XML is parseable
+- [x] Clean venv runs `./scripts/install.sh --profile core --no-skills`, then `doctor.sh` (2026-11-10, core complete; temporary HOME without MinerU models is expected)
+- [x] Isolated HOME runs `install.sh --skills-only`, confirming skill registration and wrapper
+- [ ] Linux CI (GitHub Actions) actually passes; the workflow is only written, not yet run remotely
 
-### 1.4 Git / GitHub 机制
+### 1.4 Git / GitHub mechanics
 
-- [x] 用户确认 GitHub owner / repo 名 / public 可见性（`ChemistryBus/docarbiter`）
-- [x] 设置仓库本地 git 身份：`ChemistryBus <306856809+ChemistryBus@users.noreply.github.com>`
+- [x] User confirmed GitHub owner / repo name / public visibility (`ChemistryBus/docarbiter`)
+- [x] Local git identity set for the repository: `ChemistryBus <306856809+ChemistryBus@users.noreply.github.com>`
 - [x] `git init -b main`
-- [x] 在 `/tmp/docarbiter-release-preview` 做提交预演：128 个文件、1.6MB、`benchmarks/private` / `__pycache__` / `blobs` 均 0
-- [x] 真实 `git add` 前审查 `git status`：128 文件，私有/缓存 0
-- [x] 首次 commit（conventional commit，f40b18c）
-- [x] 创建远端仓库并 `git push -u origin main`
-- [x] GitHub Actions `validate` 跑绿（25s）
-- [x] 打 tag `v0.1.0`
-- [x] 创建 Release notes
-- [x] 发布后 fresh clone + validate + route selftest 再验一次
+- [x] Commit rehearsal in `/tmp/docarbiter-release-preview`: 128 files, 1.6MB, `benchmarks/private` / `__pycache__` / `blobs` all 0
+- [x] Reviewed `git status` before the real `git add`: 128 files, private/cache 0
+- [x] First commit (conventional commit, f40b18c)
+- [x] Created remote repository and `git push -u origin main`
+- [x] GitHub Actions `validate` passes (25s)
+- [x] Tag `v0.1.0`
+- [x] Create release notes
+- [x] After release, re-verify with fresh clone + validate + route selftest
 
-## 2. 发布说明必须写的边界
+## 2. Boundaries the release notes must state
 
-- 中文/英文都覆盖，但不是“所有 PDF 都准”；真实工作区无答案 key 的文档只做一致性/覆盖率，不叫 accuracy。
-- 固定工具不是万能的；路由提升来自“不选错工具 + 失败换工具”，不是算法更强。
-- 表格：复杂合并表 Docling、坏文字层/符号表 MinerU、简单网格 pdfplumber；密集双栏书表仍可能行错位。
-- 真竖排、真实双栏全文、真实表逐单元格 CER、符号表字形保真仍未完成。
-- `extra/full` 未逐项实测；Windows 未验证；Linux 只以 CI 为准。
-- Harness：Claude Code / DSH 已测；ZCode / Codex / MiniMax 未完成，发布后按 `docs/harness-integration.md` 配。
+- Both Chinese and English are covered, but not "all PDFs are accurate"; documents in real workspaces without answer keys are checked only for consistency/coverage, not called accuracy.
+- A fixed tool is not a silver bullet; the routing gain comes from "not choosing the wrong tool + switching tools on failure", not from a stronger algorithm.
+- Tables: complex merged tables → Docling, bad text layer/symbol tables → MinerU, simple grids → pdfplumber; dense two-column book tables may still have row misalignment.
+- True vertical writing, real two-column full text, real-table per-cell CER, and symbol-table glyph fidelity are still incomplete.
+- `extra/full` not individually tested; Windows not verified; Linux is only covered by CI.
+- Harness: Claude Code / DSH tested; ZCode / Codex / MiniMax not complete; configure after release per `docs/harness-integration.md`.
 
-## 3. 不阻塞发布、但要写进 Known Limitations
+## 3. Not release blockers, but must go into Known Limitations
 
-- Linux x86_64 / Windows 的真实安装体验（CI 只覆盖最小验证）
-- `--profile extra` 的 12 工具逐项 CER
-- Marker / Surya / olmOCR / Camelot 等扩展层
-- 真实双栏论文全文 CER（目前只有 BERT abstract）
-- 真竖排全量、繁简混排
-- 真实表逐单元格 CER；中国食物成分表这类密集双栏表的页首/页尾错位
-- ZCode / Codex / MiniMax 的触发测试
+- Real install experience on Linux x86_64 / Windows (CI covers only minimal verification)
+- Per-tool CER for the 12 tools in `--profile extra`
+- Extension layer such as Marker / Surya / olmOCR / Camelot
+- Real two-column paper full-text CER (currently only the BERT abstract)
+- Full true vertical writing, mixed traditional and simplified Chinese
+- Real-table per-cell CER; first/last page misalignment in dense two-column tables such as the China Food Composition Tables
+- Triggering tests for ZCode / Codex / MiniMax
 
-## 4. 建议执行顺序
+## 4. Recommended execution order
 
-1. **先做 1.1 + 1.2**（隐私/许可），这是公开仓库的硬门槛。
-2. **再做 1.3**（本地验证 + 干净 venv）；失败就修，不带病发布。
-3. **确认 owner/repo/版本**，再 `git init` / commit / push。
-4. **看 GitHub Actions**；绿了再打 tag / Release。
-5. **fresh clone 复验**；最后再对外说“已发布”。
+1. **Do 1.1 + 1.2 first** (privacy/licensing); these are hard gates for a public repository.
+2. **Then 1.3** (local verification + clean venv); fix failures — do not ship broken.
+3. **Confirm owner/repo/version**, then `git init` / commit / push.
+4. **Watch GitHub Actions**; tag / Release only after it is green.
+5. **Re-verify with a fresh clone**; only then announce "released" publicly.
 
-## 5. 需要用户确认的事
+## 5. Items requiring user confirmation
 
-1. ✅ GitHub owner / repo：**ChemistryBus/docarbiter**（已确认）
-2. ✅ 版本：**v0.1.0**（已确认）
-3. P4 内部测试文档是否公开：`docs/p4-claude-code.md` / `docs/p4-other-harnesses.md` 含本机备份路径与 harness 状态。建议**保留但改成 `~` 相对路径**，让用户知道哪些没测；也可以发布前移除。
-4. 发布说明是否明确写“ZCode / Codex / MiniMax 未完成，发布后按文档配置”？建议写，避免过度承诺。
+1. ✅ GitHub owner / repo: **ChemistryBus/docarbiter** (confirmed)
+2. ✅ Version: **v0.1.0** (confirmed)
+3. Whether to publish the internal P4 test docs: `docs/p4-claude-code.md` / `docs/p4-other-harnesses.md` contain local backup paths and harness status. Recommendation: **keep them but change paths to `~`-relative**, so users know what is untested; they can also be removed before release.
+4. Should the release notes explicitly state "ZCode / Codex / MiniMax incomplete, configure after release per the docs"? Recommended, to avoid over-promising.
 
-## 6. 发布门禁
+## 6. Release gate
 
-只有同时满足以下条件才执行 `git push` / tag：
+Only run `git push` / tag when all of the following hold:
 
-- [ ] 全仓无个人绝对路径、无私有文件、无密钥
-- [ ] `validate.py` / `route.py --selftest` / shell / py_compile / SVG 全绿
-- [ ] 干净 venv core 安装 + doctor 通过
-- [ ] GitHub Actions 在默认分支跑绿
-- [ ] README 中英文、LICENSE、THIRD_PARTY_NOTICES 一致
-- [ ] Release notes 含 Known Limitations
-- [ ] 用户明确确认发布
+- [ ] No personal absolute paths, no private files, no secrets anywhere in the repo
+- [ ] All green: `validate.py` / `route.py --selftest` / shell / py_compile / SVG
+- [ ] Clean venv core install + doctor passes
+- [ ] GitHub Actions passes on the default branch
+- [ ] README (both languages), LICENSE, and THIRD_PARTY_NOTICES are consistent
+- [ ] Release notes include Known Limitations
+- [ ] User explicitly confirms the release

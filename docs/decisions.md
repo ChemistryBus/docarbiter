@@ -1,45 +1,45 @@
-# 设计决策与证据
+# Design Decisions and Evidence
 
-> 状态：2026-11-09。本文记录已拍板事项、核实过的外部事实、以及仍待验证的项。
+> Status: 2026-11-11. This document records settled decisions, verified external facts, and items still pending verification.
 
-## 一、已拍板
+## 1. Settled Decisions
 
-| # | 决策 | 结论 |
+| # | Decision | Conclusion |
 |---:|---|---|
-| 1 | 分发方式 | 薄壳拉取。仓库只含自撰说明与安装脚本，不含上游代码 |
-| 2 | Anthropic `pdf` 技能 | 只给链接，不收录（Proprietary） |
-| 3 | PyMuPDF | 排除（AGPL-3.0），只给链接 |
-| 4 | 仓库许可证 | MIT |
-| 5 | 仓库名 | `ChemistryBus/docarbiter`（GitHub 无精确同名仓库） |
-| 6 | 调度器技能名 | **`docarbiter`**（GitHub 用户/仓库、PyPI、npm 均无占用） |
-| 7 | 打包拓扑 | 默认只注册 `docarbiter` 一个技能；工具薄壳放 `skills/_tools/`；`install.sh --profile full` 才注册独立技能 |
-| 8 | 首版范围 | 12 个主选工具 + 6 个可选补充；AGPL 与商业 API 只进「未纳入」表 |
-| 9 | 中文语料 | 合成 PDF + CC BY-SA 中文维基 + 公版 Wikisource；用户自有文件只做本地 smoke test |
-| 10 | 语言覆盖 | **中文 + 英文都保证**；语料、CER、路由、工具说明均覆盖两种语言 |
-| 11 | 集合规模 | 工具集可以继续扩大；`registry.json` 是事实来源，默认只注册一个调度器；新增已有类别的工具不改调度器 |
-| 12 | 发布节奏 | **暂不发布**；先按 `docs/release-checklist.md` 验证；README 中英文 + 配图 |
-| 13 | MinerU 使用 | 本项目非盈利、不提供在线服务、不重新分发代码/模型；当前用法不触发附加条款，原文保留在 notices |
+| 1 | Distribution model | Thin-shell pull. The repository contains only self-authored documentation and install scripts, no upstream code |
+| 2 | Anthropic `pdf` skill | Link only, not included (Proprietary) |
+| 3 | PyMuPDF | Excluded (AGPL-3.0), link only |
+| 4 | Repository license | MIT |
+| 5 | Repository name | `ChemistryBus/docarbiter` (no exact same-name repository on GitHub) |
+| 6 | Dispatcher skill name | **`docarbiter`** (available as GitHub user/repository, on PyPI, and on npm) |
+| 7 | Packaging topology | By default only one skill, `docarbiter`, is registered; tool thin shells live in `skills/_tools/`; only `install.sh --profile full` registers standalone skills |
+| 8 | First-release scope | 12 primary tools + 6 optional supplements; AGPL and commercial APIs appear only in the "not included" table |
+| 9 | Chinese corpus | Synthetic PDFs + CC BY-SA Chinese Wikipedia + public-domain Wikisource; user-owned files are used only for local smoke tests |
+| 10 | Language coverage | **Both Chinese and English are guaranteed**; corpus, CER, routing, and tool docs all cover both languages |
+| 11 | Collection scale | The tool set can keep growing; `registry.json` is the source of truth; by default only one dispatcher is registered; adding a tool in an existing category does not change the dispatcher |
+| 12 | Release cadence | **Do not release yet**; first verify against `docs/release-checklist.md`; README in Chinese and English + illustrations |
+| 13 | Using MinerU | This project is non-profit, provides no online service, and does not redistribute code/models; current usage does not trigger the additional terms; the original text is kept in notices |
 
-## 二、命名证据（2026-11-09）
+## 2. Naming Evidence (2026-11-09)
 
-`docarbiter` 检索结果：
+`docarbiter` search results:
 
-| 位置 | 结果 |
+| Location | Result |
 |---|---|
-| GitHub 用户/组织 `github.com/docarbiter` | 404 |
-| GitHub 仓库 `github.com/docarbiter/docarbiter` | 404 |
-| GitHub 仓库搜索 `docarbiter in:name` | 0 条 |
+| GitHub user/org `github.com/docarbiter` | 404 |
+| GitHub repository `github.com/docarbiter/docarbiter` | 404 |
+| GitHub repository search `docarbiter in:name` | 0 results |
 | PyPI `docarbiter` | 404 |
 | npm `docarbiter` | 404 |
-| Web 搜索 | 无同名项目 |
+| Web search | No project with the same name |
 
-含义：`docarbiter` = document + arbiter（仲裁者）。它不自己提取，只在互相竞争的工具之间裁决，和调度器的职责一致。
+Meaning: `docarbiter` = document + arbiter. It does not extract by itself; it adjudicates among competing tools, which matches the dispatcher's role.
 
-> 注意：GitHub 上已有 `misbahsy/doc-router`（文档 OCR 路由）、`MeZyV/doc_extraction_router`（OpenWebUI 文档解析路由）、`horizon123104/PdfRouter`、`yidingwanglnsy-boop/PDFROUTER`。概念相近，但名字都不同；`doc-router` / `docrouter` / `pdfrouter` **不要用**。
+> Note: GitHub already has `misbahsy/doc-router` (document OCR routing), `MeZyV/doc_extraction_router` (OpenWebUI document parsing routing), `horizon123104/PdfRouter`, and `yidingwanglnsy-boop/PDFROUTER`. The concepts are similar, but all the names differ; do **not** use `doc-router` / `docrouter` / `pdfrouter`.
 
-## 三、本机已验证事实
+## 3. Verified Local Facts
 
-| 工具 | 本机版本 | 许可证（包元数据） | CLI |
+| Tool | Local version | License (package metadata) | CLI |
 |---|---|---|---|
 | liteparse | 2.18.0 | Apache-2.0 | `liteparse-doc` |
 | markitdown | 0.1.9 | MIT | `markitdown` |
@@ -48,16 +48,16 @@
 | rapidocr | 3.10.0 | Apache-2.0 | Python API |
 | ocrmypdf | 17.12.1 | MPL-2.0 | `ocrmypdf` |
 | pdfplumber | 0.11.10 | MIT | Python API |
-| pdftotext (Poppler) | 26.11.0（测量时 26.08.0；干净安装时 Homebrew 升级） | GPL-2.0-only OR GPL-3.0-only | `pdftotext` |
-| pymupdf | 1.28.2 | AGPL-3.0 / 商业双许可 | Python API（不收录） |
+| pdftotext (Poppler) | 26.11.0 (26.08.0 at measurement time; Homebrew upgraded it during a clean install) | GPL-2.0-only OR GPL-3.0-only | `pdftotext` |
+| pymupdf | 1.28.2 | AGPL-3.0 / commercial dual license | Python API (not included) |
 
-## 四、GitHub 快照（star / 许可证，2026-11-09）
+## 4. GitHub Snapshot (stars / license, 2026-11-09)
 
-| 仓库 | ★ | SPDX |
+| Repository | ★ | SPDX |
 |---|---:|---|
 | microsoft/markitdown | 194,491 | MIT |
 | PaddlePaddle/PaddleOCR | 92,460 | Apache-2.0 |
-| opendatalab/MinerU | 83,343 | NOASSERTION（自定义：Apache-2.0 + 附加条款） |
+| opendatalab/MinerU | 83,343 | NOASSERTION (custom: Apache-2.0 + additional terms) |
 | tesseract-ocr/tesseract | 77,417 | Apache-2.0 |
 | docling-project/docling | 70,315 | MIT |
 | datalab-to/marker | 40,822 | Apache-2.0 |
@@ -67,221 +67,245 @@
 | Unstructured-IO/unstructured | 15,701 | Apache-2.0 |
 | run-llama/liteparse | 13,020 | Apache-2.0 |
 | jsvine/pdfplumber | 10,884 | MIT |
-| py-pdf/pypdf | 10,291 | BSD-3-Clause（GitHub 标 NOASSERTION） |
+| py-pdf/pypdf | 10,291 | BSD-3-Clause (GitHub marks NOASSERTION) |
 | opendatalab/PDF-Extract-Kit | 10,075 | AGPL-3.0 |
 | RapidAI/RapidOCR | 8,486 | Apache-2.0 |
 | pdfminer/pdfminer.six | 7,048 | MIT |
 | qpdf/qpdf | 5,563 | Apache-2.0 |
 | camelot-dev/camelot | 3,849 | MIT |
 
-## 五、许可要点
+## 5. Licensing Points
 
 ### MinerU
 
-包元数据为 `LicenseRef-MinerU-Open-Source-License`，正文是 Apache-2.0 + 附加条款。附加条款实际内容：
+The package metadata is `LicenseRef-MinerU-Open-Source-License`; the text is Apache-2.0 + additional terms. The actual content of the additional terms:
 
-- 商业使用默认允许；但合并口径 MAU > 1 亿或月收入 > 2000 万美元时，须另行取得商业许可。
-- 基于 MinerU 向第三方提供**在线服务**时，须在界面或公开文档显著位置标明使用了 MinerU。
-- 违反上述两条，许可自动终止。
+- Commercial use is permitted by default; however, when consolidated MAU > 100 million or monthly revenue > 20 million USD, a separate commercial license must be obtained.
+- When providing an **online service** to third parties based on MinerU, you must prominently state that MinerU is used, in the interface or public documentation.
+- Violating the above two conditions automatically terminates the license.
 
-`THIRD_PARTY_NOTICES.md` 必须附原文（英文 + 中文），不能只写「Apache-2.0 + 附加条款」。
+`THIRD_PARTY_NOTICES.md` must include the original text (English + Chinese); it cannot merely say "Apache-2.0 + additional terms".
 
 ### RapidOCR
 
-Apache-2.0，但模型权重来自 PaddleOCR / 百度，包内另有 `MODEL_LICENSES.md`。分发或再发布时需保留模型来源与版权说明。本仓库只调用，不再分发模型。
+Apache-2.0, but the model weights come from PaddleOCR / Baidu, and the package also contains `MODEL_LICENSES.md`. Distribution or redistribution must retain the model source and copyright notice. This repository only calls it and does not redistribute the models.
 
 ### Poppler / pdftotext
 
-GPL-2.0-only OR GPL-3.0-only。本仓库只通过系统包调用命令行，不修改、不再分发；仓库自身 MIT 不受影响。若把 `pdftotext` 二进制打包进发行物，则需另行评估。
+GPL-2.0-only OR GPL-3.0-only. This repository only invokes the command line through the system package, without modification or redistribution; the repository's own MIT license is unaffected. If the `pdftotext` binary is packaged into a distribution, this must be evaluated separately.
 
 ### pypdf
 
-GitHub 的许可证识别为 NOASSERTION，实际 `LICENSE` 是 BSD-3-Clause 风格（版权头 + 三条款）。以 `THIRD_PARTY_NOTICES.md` 的原文为准。
+GitHub identifies the license as NOASSERTION; the actual `LICENSE` is BSD-3-Clause style (copyright header + three clauses). The original text in `THIRD_PARTY_NOTICES.md` is authoritative.
 
-## 六、对交接文档的修正
+## 6. Corrections to the Handoff Document
 
-### 修正 1：中文评测不能用「顺序相似度 vs pdftotext」
+### Correction 1: Chinese evaluation cannot use "order similarity vs pdftotext"
 
-- 中文没有空格，词级相似度不可用；改用 **CER（字符错误率）**。
-- `pdftotext` 是另一个工具，不是 ground truth；和它一致 ≠ 准确。
+- Chinese has no spaces, so word-level similarity is unusable; use **CER (character error rate)** instead.
+- `pdftotext` is another tool, not ground truth; agreeing with it ≠ accuracy.
 
-### 修正 2：文字层检测阈值不够
+### Correction 2: The text-layer detection threshold is insufficient
 
-「> 200 字符 = 有文字层」会被损坏的 CID 字体骗过：字符数达标但内容是乱码。检测需同时报告：
+"> 200 characters = has a text layer" is fooled by damaged CID fonts: the character count passes but the content is garbled. Detection must report all of:
 
-- 字符数；
-- `U+FFFD` 与私用区字符占比；
-- 中文常用字覆盖率（前 3 页）；
-- 结论：可用 / 疑似乱码 / 扫描件。
+- character count;
+- share of `U+FFFD` and private-use-area characters;
+- coverage of common Chinese characters (first 3 pages);
+- conclusion: usable / suspected garbled / scanned.
 
-### 修正 3：8 个顶层技能会重新制造「一锅粥」
+### Correction 3: 8 top-level skills would recreate "a mess"
 
-已改为默认单入口 `docarbiter` + `--profile full` 可选注册。7+ 个工具说明放 `skills/_tools/`，不参与 harness 的技能发现。
+Changed to a single default entry point `docarbiter` + optional registration via `--profile full`. The 7+ tool docs live in `skills/_tools/` and do not participate in harness skill discovery.
 
-### 修正 4：`install.sh` 必须固定版本
+### Correction 4: `install.sh` must pin versions
 
-薄壳命令按本机版本实测；不固定版本，上游一改参数就会漂移。`requirements.lock` + `doctor.sh` 版本校验。
+Thin-shell commands are tested against local versions; without pinned versions, an upstream parameter change causes drift. `requirements.lock` + `doctor.sh` version checks.
 
-### 修正 5：markitdown 双栏——合成纯文字未复现，真实论文含图会坏
+### Correction 5: markitdown two-column — not reproduced on synthetic plain text, breaks on real papers with figures
 
-- **合成纯文字、内容流逐行交错**：0.1.9 上 markitdown CER **0**；pdftotext / liteparse / MinerU 0；**pdfplumber 60%–68%**。所以「markitdown 一定不处理双栏」在干净样本上没有复现。
-- **真实论文（ResNet, arXiv:1512.03385, 3 页，本地 private）**：markitdown 输出大量 Markdown 表格/坐标轴标签，abstract 被打散；pdfplumber 丢空格、混入坐标轴；MinerU / Docling / liteparse 的 abstract 可读。没有答案 key，不做 CER。
-- 结论：不要两边都过度概括。干净双栏它能过；真实含图双栏会坏。真实双栏优先 MinerU / Docling / liteparse。
+- **Synthetic plain text, content stream interleaved line by line**: on 0.1.9 markitdown CER **0**; pdftotext / liteparse / MinerU 0; **pdfplumber 60%–68%**. So "markitdown never handles two columns" was not reproduced on a clean sample.
+- **Real paper (ResNet, arXiv:1512.03385, 3 pages, local private)**: markitdown outputs many Markdown tables/axis labels, and the abstract is broken up; pdfplumber loses spaces and mixes in axis labels; the abstract from MinerU / Docling / liteparse is readable. No answer key, so no CER.
+- Conclusion: do not overgeneralize in either direction. It passes on clean two-column; it breaks on real two-column with figures. Prefer MinerU / Docling / liteparse for real two-column.
 
-### 修正 6：调度器也要纳入重名/双路由检测
+### Correction 6: The dispatcher must also be included in name-collision/dual-router detection
 
-本机已有 `doc-extract` 在四个 harness 生效。`docarbiter` 与它功能重叠，不是同名冲突；`doctor.sh --check-conflicts` 要同时检测：
+The machine already has `doc-extract` active in four harnesses. `docarbiter` overlaps with it functionally but is not a same-name collision; `doctor.sh --check-conflicts` must detect both:
 
-- 同名工具技能；
-- 两个文档提取路由器同时生效。
+- same-name tool skills;
+- two document-extraction routers active at the same time.
 
-## 七、MinerU 使用结论（2026-11-09）
+## 7. MinerU Usage Conclusion (2026-11-09)
 
-问题：MinerU 是 Apache-2.0 + 附加条款，我们能不能用？
+Question: MinerU is Apache-2.0 + additional terms; can we use it?
 
-结论：**能用。** 附加条款只在两种情况下触发：
+Conclusion: **Yes.** The additional terms are triggered only in two cases:
 
-1. 合并口径 MAU > 1 亿，或月收入 > 2000 万美元 → 需要商业许可；
-2. 基于 MinerU 向第三方提供在线服务 → 需要显著标识。
+1. consolidated MAU > 100 million, or monthly revenue > 20 million USD → a commercial license is required;
+2. providing an online service to third parties based on MinerU → prominent attribution is required.
 
-本项目不盈利、不提供在线服务、不再分发 MinerU 代码或模型，只在用户本机调用 CLI。因此当前用法不触发附加条款。如果未来做在线服务，必须在界面/文档标注 MinerU；达到门槛则联系 MinerU 团队。
+This project is non-profit, provides no online service, and does not redistribute MinerU code or models; it only invokes the CLI on the user's local machine. Current usage therefore does not trigger the additional terms. If an online service is built in the future, MinerU must be credited in the interface/docs; if the thresholds are reached, contact the MinerU team.
 
-原文已附在 `THIRD_PARTY_NOTICES.md`；通俗说明见 `docs/licensing-faq.md`。
+The original text is included in `THIRD_PARTY_NOTICES.md`; a plain-language explanation is in `docs/licensing-faq.md`.
 
-## 八、语言与规模（2026-11-09 增补）
+## 8. Language and Scale (added 2026-11-09)
 
-- **语言**：中文和英文都是第一等公民。中文的 CID/ToUnicode、扫描件、繁简、竖排要测；英文的双栏、连字符、引号/破折号、页眉页脚也要测。只测一种语言的分数不能外推。
-- **规模**：工具可以继续加，但默认只注册 `docarbiter` 一个技能。新增工具 = `registry.json` 一条记录 + 可选薄壳；只有新类别才改调度器。这样 N 个工具不会产生 N² 条交叉引用，也不会出现 N 个顶层技能抢活。
-- **发布**：当前是骨架，不是发布版。发布前必须过 `docs/release-checklist.md`；README 必须有中文和英文两个版本，并配图说明问题与适用人群。
+- **Language**: Chinese and English are both first-class citizens. For Chinese, test CID/ToUnicode, scans, traditional/simplified, and vertical text; for English, also test two-column layout, hyphens, quotes/dashes, and headers/footers. Scores from testing only one language cannot be extrapolated.
+- **Scale**: tools can keep being added, but by default only one skill, `docarbiter`, is registered. A new tool = one record in `registry.json` + an optional thin shell; only a new category changes the dispatcher. This way N tools do not produce N² cross-references, and N top-level skills do not compete for work.
+- **Release**: currently a skeleton, not a release. It must pass `docs/release-checklist.md` before release; the README must have both Chinese and English versions, with illustrations explaining the problem and the target audience.
 
-## 九、仍待验证
+## 9. Still to Be Verified
 
-- [ ] 12 个主选工具的中英文 CER（文字层 / 扫描 / 双栏 / 表格 / 繁简混排）
-- [ ] Marker / Surya / Unstructured / olmOCR 的 CLI 入口与中英文表现
-- [ ] MinerU / Marker / Surya 模型权重的独立许可
-- [ ] `liteparse` 对无 ToUnicode 中文 PDF 的行为
-- [ ] `docling` 默认 OCR 后端与中文模型
-- [ ] MinerU 附加条款的官方英文原文 URL（用于 notices 引用）
-- [ ] 真实 CC BY-SA 文章、CID/无 ToUnicode、繁简/竖排样本
+- [ ] Chinese and English CER for the 12 primary tools (text layer / scan / two-column / tables / mixed traditional-simplified)
+- [ ] CLI entry points and Chinese/English performance for Marker / Surya / Unstructured / olmOCR
+- [ ] Separate licenses for MinerU / Marker / Surya model weights
+- [ ] `liteparse` behavior on Chinese PDFs without ToUnicode
+- [ ] `docling` default OCR backend and Chinese model
+- [ ] Official English URL of the MinerU additional terms (for notices citation)
+- [ ] Real CC BY-SA articles, CID/no-ToUnicode, and traditional-simplified/vertical samples
 
-## 十、本轮新增结论（2026-11-09，v0.3）
+## 10. New Conclusions This Round (2026-11-09, v0.3)
 
-### 语料与指标
+### Corpus and Metrics
 
-- 11 篇双语合成 smoke corpus：文字层 / 双栏 / 表格 / 脚注 / 扫描件 / 英文行末连字符。
-- 所有工具的 **no-punct CER = 0.0000**；`cer_text` 的残差全部来自标点归一化（MinerU 全角冒号/分号→ASCII，liteparse/markitdown 引号/破折号→ASCII）。因此 `bench.py` 同时输出 `cer_text` 与 `cer_nopunct`。
-- 空输出/扫描件：`pdftotext`、`markitdown` 在两份扫描件上 error，`liteparse` empty；MinerU/Docling 能直接 OCR。`bench.py` 增加 coverage < 5% → `empty`，不计入 CER 汇总。
+- 11-document bilingual synthetic smoke corpus: text layer / two-column / tables / footnotes / scans / English end-of-line hyphens.
+- For all tools **no-punct CER = 0.0000**; the residual in `cer_text` comes entirely from punctuation normalization (MinerU full-width colon/semicolon → ASCII, liteparse/markitdown quotes/dashes → ASCII). `bench.py` therefore outputs both `cer_text` and `cer_nopunct`.
+- Empty output/scans: `pdftotext` and `markitdown` error on both scanned documents, `liteparse` empty; MinerU/Docling can OCR directly. `bench.py` adds coverage < 5% → `empty`, excluded from CER aggregation.
 
-### 边缘样本（CID / 繁体 / 交错双栏 / 竖排模拟）
+### Edge Samples (CID / Traditional / Interleaved Two-Column / Simulated Vertical)
 
-- **CID/无 ToUnicode**：pdftotext / liteparse / markitdown / pdfplumber / Docling 全部 garbled；MinerU 能 OCR，CER 4.95%。探针必须加控制字符比例，不能只看字符数。
-- **繁体**：所有工具基本正确；MinerU 1.72% 是标点归一化。
-- **交错双栏**：pdftotext / liteparse / markitdown / MinerU 0；pdfplumber 60%–68%；Docling 2%–3%。修正了「markitdown 双栏失败」的旧说法。
-- **竖排模拟**：pdftotext / markitdown / pdfplumber / Docling 0；liteparse 34.78%、MinerU 13.04%。这是模拟，不是真竖排。
-- 生成脚本：`benchmarks/fixtures/edge/make_edge.py`；CID 依赖 LibreOffice + pypdf，仅用于生成 fixture。
+- **CID/no ToUnicode**: pdftotext / liteparse / markitdown / pdfplumber / Docling all garbled; MinerU can OCR, CER 4.95%. The probe must include the control-character ratio, not just the character count.
+- **Traditional Chinese**: all tools basically correct; MinerU's 1.72% is punctuation normalization.
+- **Interleaved two-column**: pdftotext / liteparse / markitdown / MinerU 0; pdfplumber 60%–68%; Docling 2%–3%. This corrected the earlier claim that "markitdown fails on two-column".
+- **Simulated vertical**: pdftotext / markitdown / pdfplumber / Docling 0; liteparse 34.78%, MinerU 13.04%. This is simulated, not true vertical text.
+- Generation script: `benchmarks/fixtures/edge/make_edge.py`; CID depends on LibreOffice + pypdf and is used only to generate fixtures.
 
-### 真竖排 / 真实双栏 / 表格（2026-11-09）
+### True Vertical / Real Two-Column / Tables (2026-11-09)
 
-- **真竖排**（Chrome `writing-mode: vertical-rl`）：所有工具都差。Docling 26.7%、MinerU 29.5%、markitdown 41.9%、pdftotext 78.1%、liteparse 90.5%、pdfplumber 97.1%。结论：真竖排不要默认任何工具可用，必须人工检查。
-- **真实双栏论文**（ResNet, arXiv:1512.03385, 3 页，本地 `benchmarks/private/`）：MinerU / Docling / liteparse 的 abstract 可读；markitdown 被图表/坐标轴标签打散；pdfplumber 丢单词间空格。没有答案 key，不做 CER。
-- **表格单元格级**（pdfplumber，6 个 fixture）：默认策略下有框线 / 合并 **1.000**；无框线 **0 个表 / 0.000**。`text` 策略能救无框线（**1.000/0.917**），但合并掉到 **0.667/0.583**，英文还会截断（`half z`）。没有通吃设置；实际对同一页跑两种策略并抽检。合并的 1.000 只证明行列对齐，不证明合并语义。
-- 机器约束：仍然是 16GB / 无 GPU；没有安装扩展层。Chrome 只用于生成真竖排 fixture，跑完即退。
+- **True vertical** (Chrome `writing-mode: vertical-rl`): all tools perform poorly. Docling 26.7%, MinerU 29.5%, markitdown 41.9%, pdftotext 78.1%, liteparse 90.5%, pdfplumber 97.1%. Conclusion: do not assume any tool is usable for true vertical text; manual inspection is required.
+- **Real two-column paper** (ResNet, arXiv:1512.03385, 3 pages, local `benchmarks/private/`): the abstract from MinerU / Docling / liteparse is readable; markitdown is broken up by figures/axis labels; pdfplumber loses spaces between words. No answer key, so no CER.
+- **Table cell level** (pdfplumber, 6 fixtures): under the default strategy, bordered / merged **1.000**; borderless **0 tables / 0.000**. The `text` strategy rescues borderless (**1.000/0.917**), but merged drops to **0.667/0.583**, and English is also truncated (`half z`). No one-size-fits-all setting; in practice, run both strategies on the same page and spot-check. The 1.000 for merged only proves row/column alignment, not merge semantics.
+- Machine constraints: still 16GB / no GPU; no extension layer installed. Chrome is used only to generate the true-vertical fixture and exits when done.
 
-### 真实 CC BY 双栏论文 abstract CER（BERT，2026-11-09）
+### Real CC BY Two-Column Paper Abstract CER (BERT, 2026-11-09)
 
-- 来源：BERT, NAACL 2019, ACL Anthology N19-1423，CC BY 4.0；PDF 前 2 页 + HTML abstract 作答案。
-- 结果：MinerU 0.44%；pdftotext / liteparse / Docling 0.65%；**markitdown / pdfplumber 73%**（no-punct 仍 73%，是阅读顺序/混排，不是标点）。
-- 只评 abstract；全文、图、表、参考文献未计分。
+- Source: BERT, NAACL 2019, ACL Anthology N19-1423, CC BY 4.0; the first 2 pages of the PDF + the HTML abstract as the answer key.
+- Results: MinerU 0.44%; pdftotext / liteparse / Docling 0.65%; **markitdown / pdfplumber 73%** (no-punct still 73%; it is reading order/mixed layout, not punctuation).
+- Only the abstract is scored; full text, figures, tables, and references are not scored.
 
-### 真实 CC BY-SA 样本（4 篇）
+### Real CC BY-SA Samples (4 documents)
 
-- 中文/英文维基各 2 篇，截取约 2,200 / 3,200 字符，渲染为 1–2 页文字层 PDF。
-- `no-punct CER` 全部 **0.0000**；`cer_text` 0.02%–2.5%，残差同样是标点（MinerU 最差 2.51%，no-punct 0）。
-- 这四份 fixture 是 **CC BY-SA 4.0**，不是 MIT；署名与来源见 `benchmarks/fixtures/real/SOURCES.md`。
+- 2 Chinese and 2 English Wikipedia articles, excerpted at about 2,200 / 3,200 characters and rendered as 1–2 page text-layer PDFs.
+- `no-punct CER` all **0.0000**; `cer_text` 0.02%–2.5%, with the residual also being punctuation (MinerU worst at 2.51%, no-punct 0).
+- These four fixtures are **CC BY-SA 4.0**, not MIT; attribution and sources are in `benchmarks/fixtures/real/SOURCES.md`.
 
-### 机器约束
+### Machine Constraints
 
-- 本机：Apple M2 Pro / 16GB RAM / 10 核 / 119GB 可用磁盘。
-- 没有安装 PaddleOCR、Marker、Unstructured、olmOCR；它们会带来重依赖或 GPU 需求，先用已装 core 8 + RapidOCR/OCRmyPDF 把流程跑通。
-- 所有重工具（MinerU / Docling）单进程顺序跑，`nice -n 10`，不并发。
+- This machine: Apple M2 Pro / 16GB RAM / 10 cores / 119GB free disk.
+- PaddleOCR, Marker, Unstructured, and olmOCR are not installed; they bring heavy dependencies or GPU requirements, so the flow is first validated with the installed core 8 + RapidOCR/OCRmyPDF.
+- All heavy tools (MinerU / Docling) run sequentially in a single process with `nice -n 10`, not concurrently.
 
-### OCR 路径
+### OCR Paths
 
-| 路径 | 中文扫描 CER | 英文扫描 CER |
+| Path | Chinese scan CER | English scan CER |
 |---|---:|---:|
 | RapidOCR | 1.16% | 0.10% |
 | MinerU | 1.59% | 0.20% |
 | Docling | 1.01% | 7.12% |
-| OCRmyPDF（Tesseract chi_sim+eng） | **10.1%** | 0.20% |
+| OCRmyPDF (Tesseract chi_sim+eng) | **10.1%** | 0.20% |
 
-结论：中文扫描不要默认 Tesseract `chi_sim`；优先 RapidOCR / MinerU / Docling。英文扫描 OCRmyPDF 可用。
+Conclusion: do not default to Tesseract `chi_sim` for Chinese scans; prefer RapidOCR / MinerU / Docling. OCRmyPDF is usable for English scans.
 
-### 路由与迁移
+### Routing and Migration
 
-- 新增 `docs/harness-routing.md`：harness 能发现/调用技能，但通常是模型按 description 语义选择，不是确定性领域路由；`docarbiter` 补探针、决策表、降级链。
-- 新增 `docs/migration.md`：旧 `doc-extract` **本轮不动**；默认先共存、验证、再替换；对其他用户给同一套建议（检测 → 单 harness 试用 → 替换 → 回滚）。
-- 用户确认：`docarbiter` 名字可用；本机研发继续；发布前必须验证；README 中英文 + 配图。
+- Added `docs/harness-routing.md`: harnesses can discover/invoke skills, but selection is usually the model choosing by description semantics, not deterministic domain routing; `docarbiter` adds probes, a decision table, and a fallback chain.
+- Added `docs/migration.md`: the old `doc-extract` is **untouched this round**; the default is coexist first, verify, then replace; the same advice is given to other users (detect → trial in a single harness → replace → roll back).
+- User confirmed: the `docarbiter` name is usable; local development continues; verification is required before release; README in Chinese and English + illustrations.
 
-### 工程验收（2026-11-09，v0.9）
+### Engineering Acceptance (2026-11-09, v0.9)
 
-- 新增 `scripts/route.py`：可执行路由，输出 probe / intended / selected / reason / command / fallback。
-- `--selftest` 覆盖：文字层、扫描件、CID、繁体、交错双栏、真实 CC BY、表格；CI 可跑。
-- 用户选择 **A：core-only**，不安装 PaddleOCR / Marker / Unstructured / olmOCR；Camelot 也不装。表格用 core 内分流：简单网格 pdfplumber；复杂合并表 Docling；扫描/坏文字层 MinerU。
+- Added `scripts/route.py`: executable routing, outputting probe / intended / selected / reason / command / fallback.
+- `--selftest` covers: text layer, scans, CID, traditional Chinese, interleaved two-column, real CC BY, tables; runnable in CI.
+- User chose **A: core-only**, not installing PaddleOCR / Marker / Unstructured / olmOCR; Camelot is also not installed. Tables are routed within core: simple grids to pdfplumber; complex merged tables to Docling; scans/bad text layers to MinerU.
 
-### 可靠性验收（2026-11-10）
+### Reliability Acceptance (2026-11-10)
 
-- **干净 HOME + `install.sh --skills-only`**：通过；wrapper 落盘、`docarbiter` symlink 创建成功。
-- **发现并修复 `install.sh` 真 bug**：`set -u` 下 `$resolved，` / `$target（` 被 Bash 当作变量名的一部分（全角标点），触发 `unbound variable`；已改为 `${resolved}` / `${target}`。
-- **`doctor.sh --check-conflicts`**：在临时 HOME 里同时放 `docarbiter` + 假 `doc-extract` + 假 `mineru` 技能，能报 `dual-router` 和 `conflict:mineru`。
-- **`install.sh --force`**：能先备份为 `SKILL.md.bak.<timestamp>` 再建 symlink；不加 `--force` 时跳过并警告。
-- **`route.py --selftest` 13/13**：新增空 PDF、损坏 PDF、含空格/中文路径；全部不崩溃，路由符合预期。
-- 这些测试都在 `/tmp` 隔离 HOME 里做，没有改真实 `~/.claude` / `~/.local` 之外的配置。
-- **完整干净 venv 安装**：`/tmp/docarbiter-clean-venv`，exit 0，core 7 个包全部对版（mineru 4.1.7 / docling 2.149.0 / liteparse 2.18.0 / markitdown 0.1.9 / rapidocr 3.10.0 / ocrmypdf 17.12.1 / pdfplumber 0.11.10）；`doctor.sh` core 14 项 OK。
-- **开发依赖分离**：`rapidfuzz` 不在 core；`bench_abstract.py` 在干净 venv 里自动用 stdlib `difflib` fallback，结果可跑但 alignment score 不可与 rapidfuzz 直接比较。需要稳定对齐时 `pip install -r requirements-dev.lock`。
-- **修复 `install.sh` 升级 Homebrew 依赖的副作用**：已装 formula 现在跳过，`HOMEBREW_NO_AUTO_UPDATE=1`；apt 用 `--no-upgrade`。修复后重跑日志确认 `skip (no upgrade)`，exit 0。
+- **Clean HOME + `install.sh --skills-only`**: passed; the wrapper was written to disk and the `docarbiter` symlink was created successfully.
+- **Found and fixed a real `install.sh` bug**: under `set -u`, `$resolved，` / `$target（` were treated by Bash as part of the variable name (full-width punctuation), triggering `unbound variable`; changed to `${resolved}` / `${target}`.
+- **`doctor.sh --check-conflicts`**: with `docarbiter` + a fake `doc-extract` + a fake `mineru` skill in a temporary HOME, it reports `dual-router` and `conflict:mineru`.
+- **`install.sh --force`**: backs up to `SKILL.md.bak.<timestamp>` before creating the symlink; without `--force` it skips and warns.
+- **`route.py --selftest` 13/13**: added empty PDF, corrupt PDF, and paths with spaces/Chinese; none crashed, and routing matched expectations.
+- These tests were all done in an isolated HOME under `/tmp`, with no changes to real configuration outside `~/.claude` / `~/.local`.
+- **Full clean venv install**: `/tmp/docarbiter-clean-venv`, exit 0, all 7 core packages at the expected versions (mineru 4.1.7 / docling 2.149.0 / liteparse 2.18.0 / markitdown 0.1.9 / rapidocr 3.10.0 / ocrmypdf 17.12.1 / pdfplumber 0.11.10); `doctor.sh` core 14 items OK.
+- **Dev dependencies separated**: `rapidfuzz` is not in core; `bench_abstract.py` automatically falls back to the stdlib `difflib` in a clean venv, so results run but the alignment score is not directly comparable with rapidfuzz. For stable alignment, `pip install -r requirements-dev.lock`.
+- **Fixed the `install.sh` side effect of upgrading Homebrew dependencies**: installed formulas are now skipped, with `HOMEBREW_NO_AUTO_UPDATE=1`; apt uses `--no-upgrade`. After the fix, rerun logs confirmed `skip (no upgrade)`, exit 0.
 
-### P0–P3 策略评估（2026-11-10）
+### P0–P3 Policy Evaluation (2026-11-10)
 
-- **P0 policy benchmark**（22 个有答案文档）：
-  - 固定 MinerU：100% 成功 / 中位 CER 0.0115 / 61.98s；
-  - `router:text`：100% / 0.0000 / 4.73s（比 MinerU 快约 13 倍，中位 CER 更低；最差真竖排 0.781）；
-  - `router:speed`：100% / 0.0063 / 7.06s；
-  - `router:quality`：100% / 0.0079 / 60.04s；
-  - oracle：中位 0 / 最差 0.2667 / 47.17s。
-  - 结论：混合语料上路由能提高成功率/速度/中位 CER；不能超过 oracle，不能保证每篇都超过最强单工具。
-- **P1 verify**：当前启发式负结果（中位 0.0079 无改善，最差 0.3478 比 quality 0.2952 更差，在 zh-vertical-sim 上错误切换）。**不发布**；需要输出级 bag/bigram 比较。
-- **P2 真实高频表格（2026-11-10 补测，替代原“composition 暂缓”）**：用 WS/T 578.1 p8、GB 28050 p6、DRIs 2023 p65、GB 2760 p13、中国食物成分表 p246 五份本机真实表验证。
-  - **复杂合并表头/多行单元格 → Docling**：WS/T 三层表头、GB 28050 多行单元格、GB 2760 大表结构与阅读顺序最好；新增 `--goal table-structure`。
-  - **坏文字层/符号表 → MinerU**：DRIs 2023 的 ●/○ 文字层已坏；MinerU 能恢复中文名并区分“空/O”，但不保留原符号。
-  - **pdfplumber 只做简单网格/坐标**：单页 <0.5s，但真实书表多行单元格会乱序；`text` 策略会把 29×4 吹成 76×6。
-  - **composition 不做**：没有出现“MinerU 丢结构 + pdfplumber 单元格好”的同一份真实表；Docling 已同时给出结构和可读单元格。密集双栏食物成分表仍有页首/页尾行错位，必须抽检。
-- **P3 默认策略**：正文准确 → `text`；成稿结构 → `quality`；快速浏览 → `speed`；复杂表格 → `table-structure`（Docling）；简单网格 → `table`（pdfplumber）；真竖排人工；verify 关闭。
-- 完整报告：`docs/policy.md`；明细 `benchmarks/private/policy.md`。
+- **P0 policy benchmark** (22 documents with answer keys):
+  - Fixed MinerU: 100% success / median CER 0.0115 / 61.98s;
+  - `router:text`: 100% / 0.0000 / 4.73s (about 13x faster than MinerU, lower median CER; worst true vertical 0.781);
+  - `router:speed`: 100% / 0.0063 / 7.06s;
+  - `router:quality`: 100% / 0.0079 / 60.04s;
+  - oracle: median 0 / worst 0.2667 / 47.17s.
+  - Conclusion: on a mixed corpus, routing improves success rate/speed/median CER; it cannot beat the oracle, and cannot guarantee beating the strongest single tool on every document.
+- **P1 verify**: the current heuristic is a negative result (median 0.0079 with no improvement, worst 0.3478 worse than quality's 0.2952, wrong switch on zh-vertical-sim). **Not released**; output-level bag/bigram comparison is needed.
+- **P2 real high-frequency tables (supplementary test 2026-11-10, replacing the earlier "composition on hold")**: verified with five real local tables — WS/T 578.1 p8, GB 28050 p6, DRIs 2023 p65, GB 2760 p13, and China Food Composition Tables p246.
+  - **Complex merged headers/multi-row cells → Docling**: best structure and reading order for the WS/T three-level header, the GB 28050 multi-row cells, and the large GB 2760 table; added `--goal table-structure`.
+  - **Bad text layer/symbol tables → MinerU**: the ●/○ text layer in DRIs 2023 is broken; MinerU can recover the Chinese names and distinguish "empty/O", but does not preserve the original symbols.
+  - **pdfplumber only for simple grids/coordinates**: <0.5s per page, but multi-row cells in real book tables get out of order; the `text` strategy inflates 29×4 into 76×6.
+  - **No composition**: no single real table showed "MinerU loses structure + pdfplumber has good cells"; Docling already provides both structure and readable cells. Dense two-column food composition tables still have header/footer row misalignment and must be spot-checked.
+- **P3 default policy**: accurate body text → `text`; finished structure → `quality`; quick browsing → `speed`; complex tables → `table-structure` (Docling); simple grids → `table` (pdfplumber); true vertical manual; verify off.
+- Full report: `docs/policy.md`; details `benchmarks/private/policy.md`.
 
-### P4 Claude Code 真实触发（2026-11-10）
+### P4 Claude Code Real Triggering (2026-11-10)
 
-- 安装：`~/.claude/skills/docarbiter/SKILL.md` 软链到本仓库；新会话能发现 `docarbiter`。
-- **共存冲突**：旧 `doc-extract` 还在 `~/.claude/skills` 时，中英文隐式提示都调用 `Skill: doc-extract`，docarbiter 未被选中。这不是描述问题，是“两个路由器只能留一个”。
-- **停用旧路由后**：中文 / 英文在 `/tmp` 中立目录都能触发 `Skill: docarbiter`，正确路由扫描件 → `mineru`，并给出 `mineru-doc` 命令。
-- **测试偏差**：在仓库根目录跑 `claude -p`，英文那次模型直接 `Read SKILL.md` 而没调用 Skill；路由仍正确，但不算干净触发。P4 验收要从中立目录跑。
-- **处理**：经用户确认，只把 Claude Code 的 `doc-extract` symlink 移到 `~/.claude/skill-backups/doc-extract.20261110-121227`；源目录 `~/.agents/skills/doc-extract` 和其他 harness 未动，可恢复。
-- **未完成**：Sonnet / Opus 复测、真实文件端到端提取。
-- **DSH（2026-11-10，已永久切换）**：`dsh --profile headless` 可测；旧 `doc-extract` 在场时会**同时调用 docarbiter 和 doc-extract**。把 `~/.dsh/skills/doc-extract` 移到 `~/.dsh/skill-backups/doc-extract.20261110-125933`，并把全局 `~/.agents/skills/doc-extract` 移到 `~/.agents/skill-backups/doc-extract.20261110-130247` 后，中英文都只调 docarbiter，路由 MinerU。Codex / ZCode 的旧路由 symlink 已改指全局备份，仍可用。
-- **ZCode（2026-11-10）**：`skills list` 能发现 docarbiter；`--prompt` 报 `Select a model before sending a message`，CLI 无 `--model`，需 TUI/桌面端选模型。DSH 切换后 `.agents` 已无旧路由，ZCode 只剩 `~/.zcode/skills/doc-extract` 一份，将来只需备份这一处。
-- **Codex（2026-11-10）**：`command -v codex` 为空，未找到 CLI 可执行文件；`~/.codex/skills/doc-extract` 仍指向全局备份，无法非交互触发。
-- **MiniMax（2026-11-10）**：有 `~/.minimax/skills` 和 `.builtin-skills`，但未找到 CLI/无头入口；本轮未测试，未改动。
-- 完整记录：`docs/p4-claude-code.md`、`docs/p4-other-harnesses.md`、`docs/harness-integration.md`。
+- Install: `~/.claude/skills/docarbiter/SKILL.md` symlinked to this repository; a new session can discover `docarbiter`.
+- **Coexistence conflict**: while the old `doc-extract` was still in `~/.claude/skills`, both Chinese and English implicit prompts invoked `Skill: doc-extract` and docarbiter was not selected. This is not a description problem; it is "only one of two routers can stay".
+- **After disabling the old router**: both Chinese and English in a neutral `/tmp` directory triggered `Skill: docarbiter`, correctly routing scans → `mineru` and giving the `mineru-doc` command.
+- **Test bias**: running `claude -p` from the repository root, the English run had the model directly `Read SKILL.md` instead of invoking the Skill; routing was still correct, but it does not count as clean triggering. P4 acceptance must run from a neutral directory.
+- **Action**: with user confirmation, only the Claude Code `doc-extract` symlink was moved to `~/.claude/skill-backups/doc-extract.20261110-121227`; the source directory `~/.agents/skills/doc-extract` and other harnesses were untouched and can be restored.
+- **Incomplete**: Sonnet / Opus retest, end-to-end extraction on real files.
+- **DSH (2026-11-10, permanently switched)**: `dsh --profile headless` is testable; with the old `doc-extract` present it **invoked both docarbiter and doc-extract**. After moving `~/.dsh/skills/doc-extract` to `~/.dsh/skill-backups/doc-extract.20261110-125933` and the global `~/.agents/skills/doc-extract` to `~/.agents/skill-backups/doc-extract.20261110-130247`, both Chinese and English invoked only docarbiter and routed to MinerU. The old router symlinks for Codex / ZCode now point to the global backup and still work.
+- **ZCode (2026-11-10)**: `skills list` can discover docarbiter; `--prompt` reports `Select a model before sending a message`, and the CLI has no `--model`, so a model must be selected in the TUI/desktop app. After the DSH switch, `.agents` no longer has the old router, and ZCode has only one copy left at `~/.zcode/skills/doc-extract`; in the future only this one place needs backing up.
+- **Codex (2026-11-10)**: `command -v codex` was empty, no CLI executable found; `~/.codex/skills/doc-extract` still points to the global backup and cannot be triggered non-interactively.
+- **MiniMax (2026-11-10)**: has `~/.minimax/skills` and `.builtin-skills`, but no CLI/headless entry point was found; not tested and not changed this round.
+- Full records: `docs/p4-claude-code.md`, `docs/p4-other-harnesses.md`, `docs/harness-integration.md`.
 
-### 工作区真实 PDF 抽样（2026-11-10）
+### Workspace Real PDF Sampling (2026-11-10)
 
-- 工作区 8,466 个 PDF，去重后 8,444 个（114MB）；随机 48 个全部可用文字层（47 en / 1 zh），中文文件名样本 24 个（18 en / 6 zh）。
-- 真实 4 文件 2 页 smoke：三工具都成功；顺序 CER 0.05–0.65，但字符袋差异仅 0.1%–2.6%，多数是阅读顺序/分段差异。
-- **MinerU 真实风险**：某中文文章第 1 页 MinerU 2,299→1,480（少 35%），拉丁 1,257→675，第 2 页几乎一致；疑似丢英文摘要/作者信息。已写入 gotchas 第 18 条。
-- 工作区没有自然覆盖扫描件/CID/竖排；这些仍由合成/边缘 fixture 覆盖。
-- 明细只写 `benchmarks/private/`（gitignored），不保存正文、不上传。
+- The workspace had 8,466 PDFs, 8,444 after deduplication (114MB); all 48 random samples had a usable text layer (47 en / 1 zh), and 24 samples with Chinese filenames (18 en / 6 zh).
+- Real 4-file 2-page smoke: all three tools succeeded; order CER 0.05–0.65, but character-bag difference only 0.1%–2.6%, mostly reading-order/segmentation differences.
+- **MinerU real risk**: on page 1 of a Chinese article, MinerU went 2,299→1,480 (35% fewer), Latin 1,257→675, with page 2 almost identical; suspected loss of the English abstract/author information. Recorded as gotcha 18.
+- The workspace does not naturally cover scans/CID/vertical text; these are still covered by synthetic/edge fixtures.
+- Details are written only to `benchmarks/private/` (gitignored); no body text is saved or uploaded.
 
-### 发布状态
+### Release Status
 
-- 已发布 **v0.1.0 — First Public Preview**：https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.0；`main` 初始提交 `5e1f9fd`，CI `validate` 绿。
-- 已发布 **v0.1.1 — Harness Compatibility Patch**：安装器支持整目录软链与 wrapper 备份，新增 bootstrap/update 文档，记录 Codex 容量限制。
-- 下一步：ZCode / Codex / MiniMax 发布后配置与测试；真实双栏全文 CER；真实表逐单元格 CER；扩展层（PaddleOCR / Marker / Unstructured / olmOCR）按可行性安装与测试；继续按 `docs/release-checklist.md` 迭代。
+- Released **v0.1.0 — First Public Preview**: https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.0; `main` initial commit `5e1f9fd`, CI `validate` green.
+- Released **v0.1.1 — Harness Compatibility Patch**: the installer supports whole-directory symlinks and wrapper backups, added bootstrap/update docs, and documented the Codex capacity limit.
+- Next steps: post-release configuration and testing for ZCode / Codex / MiniMax; full-text CER on real two-column papers; cell-by-cell CER on real tables; install and test the extension layer (PaddleOCR / Marker / Unstructured / olmOCR) as feasible; keep iterating against `docs/release-checklist.md`.
+
+### MiniMax skill visibility (2026-11-11)
+
+MiniMax Code (pi-agent base, App 3.1.12, MiniMax-M3.1-Flash) was tested with three install shapes in the same session:
+
+| Shape | Result |
+|---|---|
+| Real directory + real `SKILL.md` | visible; `skill({name:"docarbiter"})` loads |
+| Directory + symlinked `SKILL.md` | not visible; the scanner skips a symlinked `SKILL.md` |
+| Whole-directory symlink | visible; `skill({name:"docarbiter"})` loads |
+
+- The global skills root is `~/.agents/skills` (project `.agents/skills` is also read when the project is trusted). `~/.minimax/skills` is not scanned: installing there produced `Local skill not found: docarbiter` and no catalog entry.
+- The skill name comes from the frontmatter `name`, not the directory name.
+- A new session re-scans the skill directory; restarting the app is not required.
+- The catalog has a budget: one machine showed 173 visible skills against 536 discoverable skill names, with `Skill descriptions were shortened to fit the catalog budget.` Keep the docarbiter entry or call it explicitly when the catalog is large.
+- If several copies are installed, the `Location:` header of `skill({name})` shows which copy was loaded; MiniMax preferred `~/.codex/skills/docarbiter/SKILL.md` in one test.
+
+Reproduce:
+1. Install the skill in each shape under `~/.agents/skills/docarbiter`.
+2. Start a new session (no app restart required).
+3. Ask: "I have a scanned Chinese PDF and need page-anchored Markdown. Which tool should I use?"
+4. Confirm `skill({name:"docarbiter"})` loads and `Location:` points at the expected copy.
+
+Decision: use a whole-directory symlink for MiniMax; keep exactly one document-extraction router per harness.

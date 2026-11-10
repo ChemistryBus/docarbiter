@@ -108,6 +108,8 @@ python3 -I scripts/route.py file.pdf --goal table-structure --json
 | core 文字层 / 扫描 / CID / 双栏 | 已测；见 [docs/benchmarks.md](docs/benchmarks.md) |
 | 真实高频表 | 结构 + 抽检；Docling / MinerU / pdfplumber 按表型分流 |
 | P0 路由策略（22 个有答案文档） | `router:text` 成功率 100% / 中位 CER 0.0000 / 4.73s；固定 MinerU 100% / 0.0115 / 61.98s |
+| 路由命令 | 可用性检查与生成的命令使用同一入口；空格、引号、`$`、中文路径均由自测覆盖 |
+| 页码结构 | 全页与选页导出的 MinerU 页码标记已回归；空白页保留（`scripts/check_pagemarkers.py`） |
 | Harness 触发 | Claude Code、DSH、ZCode、MiniMax 已测；Codex 条件通过（大技能目录） |
 | CI | GitHub Actions `validate` 通过；Ubuntu + macOS 由 CI 覆盖，Windows 未验证 |
 

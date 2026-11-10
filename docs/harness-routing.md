@@ -1,82 +1,82 @@
-# Harness 原生调度 vs docarbiter
+# Harness-Native Routing vs. docarbiter
 
-> 结论先说：**harness 通常能发现和调用技能，但一般没有「按文档类型 + 语言 + 文字层 + 目标产出」做确定性路由的能力。**
-> 它靠模型读 `description` 做语义选择；同类技能一多，就变成竞争。`docarbiter` 补的是这一层领域路由策略。
+> Bottom line first: **a harness can usually discover and invoke skills, but generally lacks deterministic routing by "document type + language + text layer + target output."**
+> It relies on the model reading `description` to make a semantic choice; once several similar skills exist, this becomes a competition. `docarbiter` fills in this layer of domain routing policy.
 
-## 1. 原生能力大致是什么
+## 1. What Native Capabilities Roughly Are
 
-| 能力 | 典型实现 | 是否确定性 | 说明 |
+| Capability | Typical implementation | Deterministic? | Notes |
 |---|---|---|---|
-| 技能发现 | 扫描技能目录，读 `SKILL.md` / frontmatter | 是 | 发现是确定的；选谁不是 |
-| 技能选择 | 模型读 `description` 后决定 | **否** | 多个描述都匹配时，可能选错、可能问用户 |
-| 显式调用 | `/skill-name`、命令、工具名 | 是 | 用户或脚本指定时才确定 |
-| 子代理 | 独立上下文 + 工具集 | 否 | 子代理自己也会选工具 |
-| 插件命名空间 | `plugin:skill` | 是（命名） | 减少重名，但不解决「选哪个」 |
-| MCP 工具 | tool description / tool search | 否 | 工具多时同样竞争 |
-| Hook | 在工具调用前后注入/拦截 | 是（可编程） | 与 harness 强绑定，不可移植 |
+| Skill discovery | Scan the skills directory, read `SKILL.md` / frontmatter | Yes | Discovery is deterministic; who gets chosen is not |
+| Skill selection | Model reads `description` and decides | **No** | When several descriptions match, it may pick wrong or ask the user |
+| Explicit invocation | `/skill-name`, commands, tool names | Yes | Deterministic only when specified by the user or a script |
+| Subagent | Independent context + tool set | No | The subagent also chooses tools itself |
+| Plugin namespace | `plugin:skill` | Yes (naming) | Reduces name collisions, but does not solve "which one to pick" |
+| MCP tool | tool description / tool search | No | With many tools, the same competition occurs |
+| Hook | Inject/intercept before and after tool calls | Yes (programmable) | Tightly coupled to the harness, not portable |
 
-以 Claude Code 为例：技能通过 `SKILL.md` 的 `description` 被发现，模型根据描述和当前任务选择；没有内置的「PDF 有文字层 → 用 A，没有 → 用 B」规则。Codex、zcode、DSH 的具体实现各版本可能不同，但本机四套都是「技能目录 + 模型选择」的模式，不是领域路由器。
+Take Claude Code as an example: skills are discovered via the `description` in `SKILL.md`, and the model chooses based on the description and the current task; there is no built-in rule such as "PDF has a text layer → use A, no text layer → use B." The specific implementations of Codex, zcode, and DSH may differ by version, but all four on this machine follow the "skills directory + model selection" model, not a domain router.
 
-## 2. 为什么原生选择不够
+## 2. Why Native Selection Is Not Enough
 
-- **不懂文档领域。** 模型不知道 CID 子集字体、ToUnicode、中文 OCR 模型、双栏阅读顺序、合并单元格；这些需要探针和规则。
-- **没有降级链。** 原生选择是一次性的；结果不满意时，模型可能换一个工具，也可能重复同一个。
-- **同类技能竞争。** 三个「PDF 提取」技能的 description 都匹配，选中哪个不可复现。
-- **不可审计。** 很难回答「为什么这次选了 Marker 而不是 MinerU」。
+- **It does not understand the document domain.** The model does not know about CID subset fonts, ToUnicode, Chinese OCR models, two-column reading order, or merged table cells; these require probes and rules.
+- **There is no fallback chain.** Native selection is one-shot; when the result is unsatisfactory, the model may switch to another tool, or may repeat the same one.
+- **Similar skills compete.** When three "PDF extraction" skills all match the description, which one is chosen is not reproducible.
+- **Not auditable.** It is hard to answer "why was Marker chosen this time instead of MinerU?"
 
-## 3. docarbiter 补的是什么
+## 3. What docarbiter Adds
 
 ```
-输入 → 分类（格式/语言） → 探针（文字层是否可用） → 路由（目标产出） → 抽检 → 降级
+Input → classify (format/language) → probe (is the text layer usable?) → route (target output) → spot-check → fallback
 ```
 
-- **规则显式**：决策表写在技能里，可 review、可测试。
-- **领域知识**：文字层探针、CID/乱码判断、中文/英文差异、表格/扫描件分支。
-- **降级链**：失败后按顺序换，并说明为什么换。
-- **跨 harness**：一份技能，四套目录软链；不依赖某个 harness 的 hook。
-- **可审计**：输出里写明「路由到谁、为什么、失败后换谁」。
+- **Explicit rules**: the decision table is written in the skill; it can be reviewed and tested.
+- **Domain knowledge**: text-layer probes, CID/garbled-text detection, Chinese/English differences, table/scan branches.
+- **Fallback chain**: switch in order after a failure, and explain why the switch was made.
+- **Cross-harness**: one skill, symlinked into four directories; does not depend on any harness's hooks.
+- **Auditable**: the output states "who it routed to, why, and who to switch to after failure."
 
-## 4. 能不能让 harness 确定性地调用 docarbiter？
+## 4. Can a Harness Invoke docarbiter Deterministically?
 
-可以，但方式因 harness 而异：
+Yes, but the method varies by harness:
 
-- **显式调用**：用户说「用 docarbiter」，或建一个 `/docarbiter` slash command 包装。
-- **Hook**：在 harness 支持的前提下，用 `PreToolUse` 注入路由提示；缺点是绑定 harness、可移植性差。
-- **默认语义触发**：靠 `description` 里的「提取 PDF / 不确定用哪个 / 结果乱码」等短语；这是当前方式，跨 harness 最稳。
+- **Explicit invocation**: the user says "use docarbiter", or you create a `/docarbiter` slash command wrapper.
+- **Hook**: if the harness supports it, use `PreToolUse` to inject routing hints; the downside is harness coupling and poor portability.
+- **Default semantic triggers**: rely on phrases in `description` such as "提取 PDF" / "不确定用哪个" / "结果乱码" (Chinese trigger phrases); this is the current approach and the most stable across harnesses.
 
-本项目的选择：**默认语义触发 + 可选显式调用**。不把核心逻辑绑在某个 harness 的 hook 上。
+This project's choice: **default semantic triggers + optional explicit invocation**. Core logic is not bound to any harness's hook.
 
-### Claude Code 实测（2026-11-10）
+### Claude Code Real-World Test (2026-11-10)
 
-- 旧 `doc-extract` 和 `docarbiter` 同时存在时，中英文隐式提示都选中了 `doc-extract`；**description 再优化也抢不过一个同类路由器**。
-- 把旧 `doc-extract` 的 symlink 移出 `~/.claude/skills` 后，中文 / 英文在 `/tmp` 中立目录都能触发 `docarbiter`。
-- 测试要在中立目录跑：在仓库根目录，模型可能直接 `Read SKILL.md`，看起来像“没触发”，其实是被 cwd 的文件吸引。
-- 结论：**一个 harness 只保留一个文档提取路由器**；先备份、再停用旧路由、再验收。完整记录见 [`docs/p4-claude-code.md`](p4-claude-code.md)。
+- When the old `doc-extract` and `docarbiter` coexisted, both Chinese and English implicit prompts selected `doc-extract`; **no amount of description optimization can beat a similar router.**
+- After moving the old `doc-extract` symlink out of `~/.claude/skills`, both Chinese and English triggered `docarbiter` from a neutral `/tmp` directory.
+- Tests must run in a neutral directory: in the repository root, the model may directly `Read SKILL.md`, which looks like "not triggered" but is actually being drawn to the file in the cwd.
+- Conclusion: **keep only one document-extraction router per harness**; back up first, then disable the old router, then validate. Full log: [`docs/p4-claude-code.md`](p4-claude-code.md).
 
-### 其他 harness（2026-11-10）
+### Other Harnesses (2026-11-10)
 
-| Harness | 发现 | 隐式触发 | 备注 |
+| Harness | Discovery | Implicit trigger | Notes |
 |---|---|---|---|
-| DSH | 是 | 中文/英文通过（旧路由临时停用） | 旧路由在场时同时加载两个 skill；测试后已恢复旧状态 |
-| ZCode | 是（`skills list`） | 未完成 | `--prompt` 报 `Select a model`；需 TUI/桌面端设默认模型 |
-| Codex | 未测 | 未完成 | 未找到 `codex` CLI 可执行文件 |
+| DSH | Yes | Chinese/English pass (old router temporarily disabled) | With the old router present, both skills were loaded at once; the old state was restored after testing |
+| ZCode | Yes (`skills list`) | Not completed | `--prompt` reports `Select a model`; a default model must be set in the TUI/desktop app |
+| Codex | Not tested | Not completed | No `codex` CLI executable found |
 
-DSH 的结果再次说明：**共存不是“可能选错”，而是可能同时加载两份决策表**，比单选更不可审计。完整记录见 [`docs/p4-other-harnesses.md`](p4-other-harnesses.md)。
+The DSH result shows again: **coexistence is not "may pick wrong" but may load two decision tables at once**, which is even less auditable than a single choice. Full log: [`docs/p4-other-harnesses.md`](p4-other-harnesses.md).
 
-## 5. 它不做什么
+## 5. What It Does Not Do
 
-- 不替代 harness 的工具调用、权限、沙箱。
-- 不保证模型一定先调用它；只是把「调用后怎么选」写清楚。
-- 不解决所有技能发现问题；同类工具技能仍建议用 `--profile full` 之外的方式管理（见 `docs/migration.md`）。
+- Does not replace the harness's tool invocation, permissions, or sandbox.
+- Does not guarantee the model will invoke it first; it only makes "how to choose after invocation" explicit.
+- Does not solve all skill-discovery problems; similar tool skills should still be managed in ways other than `--profile full` (see `docs/migration.md`).
 
-## 6. 给其他 harness 维护者的建议
+## 6. Advice for Other Harness Maintainers
 
-如果你在自己的 harness 里做原生调度，最少需要：
+If you build native routing in your own harness, you minimally need:
 
-1. 文件类型 / 语言检测；
-2. PDF 文字层探针（字符数 + 替换符 + CJK 覆盖率）；
-3. 目标产出分类（速度 / 成稿 / 表格 / 复杂表格 / RAG / OCR）；
-4. 工具可用性与版本检查；
-5. 降级链与可解释输出。
+1. File type / language detection;
+2. PDF text-layer probe (character count + replacement characters + CJK coverage);
+3. Target-output classification (speed / manuscript / tables / complex tables / RAG / OCR);
+4. Tool availability and version checks;
+5. Fallback chain and explainable output.
 
-这五步就是 `docarbiter` 的核心；可以直接复用 `registry.json` 和 `docs/architecture.md` 的结构。
+These five steps are the core of `docarbiter`; you can directly reuse the structure of `registry.json` and `docs/architecture.md`.

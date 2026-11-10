@@ -1,153 +1,205 @@
-# Harness 接入：一条技能目录命令
+# Harness integration: one skill-directory command
 
-> 目标：发布后不依赖某个 harness 的 hook，也不把配置写死。每个 harness 只做两件事：
-> **把 `docarbiter/SKILL.md` 放进它的技能目录** + **确保只有一个文档提取路由器**。
+> Goal: after release, do not depend on a harness-specific hook and do not hard-code
+> configuration. Each harness only needs two things: **put `docarbiter/SKILL.md` in its
+> skill directory** and **keep exactly one document-extraction router**.
 
-## 1. 通用安装
+## 1. Generic install
 
-优先用仓库脚本，指定目标 harness 的技能目录：
+Prefer the repository script and pass the target harness's skill directory:
 
 ```bash
 ./scripts/install.sh --skills-only --skills-dir ~/.claude/skills
 ```
 
-`--skills-dir` 可以重复；`--profile core` 只注册 `docarbiter`，不会注册 12 个工具技能。
+`--skills-dir` can be repeated; `--profile core` registers `docarbiter` only, not the
+12 tool shells.
 
-如果不想让脚本同时更新 `~/.local/bin` wrapper，只建一个**整目录软链**即可（比“目录 + SKILL.md 软链”兼容）：
+If you do not want the script to update the `~/.local/bin` wrappers as well, create a
+**whole-directory symlink** instead (more compatible than "directory + symlinked SKILL.md"):
 
 ```bash
-DIR="$HOME/.claude/skills"          # 换成目标 harness
+DIR="$HOME/.claude/skills"          # change to the target harness
 ln -sfn "$PWD/skills/docarbiter" "$DIR/docarbiter"
 ```
 
-`install.sh --skill-mode auto` 会对 `~/.agents/skills`、`~/.codex/skills`、`~/.minimax/skills` 用整目录软链；对 Claude Code / DSH / ZCode 保持文件软链。需要强制时用 `--skill-mode dir|file`。
+`install.sh --skill-mode auto` maps known directories as follows:
 
-## 2. 已知 harness 的目录
+| Skill directory | Auto mode | Why |
+|---|---|---|
+| `~/.agents/skills` | `dir` (whole-directory symlink) | shared global root for pi-agent harnesses, including MiniMax Code |
+| `~/.codex/skills` | `copy` (real `SKILL.md`) | Codex is known to work with a real file; `update.sh` refreshes it |
+| `~/.claude/skills`, `~/.dsh/skills`, `~/.zcode/skills` | `file` (symlinked `SKILL.md`) | tested shape for these harnesses |
+| `~/.minimax/skills` | not used | MiniMax Code does not scan it; use `~/.agents/skills` |
+| any other directory | explicit error | pass `--skill-mode dir|file|copy` |
 
-| Harness | 技能目录 | 额外读取 | 状态 |
+After registration, `install.sh` self-checks three things and exits non-zero on failure:
+
+1. `SKILL.md` exists at the target;
+2. frontmatter `name` is `docarbiter`;
+3. the shape matches the selected mode (`dir` = whole-directory symlink, `file` =
+   symlinked `SKILL.md`, `copy` = real directory + real `SKILL.md`).
+
+The failure message includes a copy-paste fix command.
+
+## 2. Known harness directories
+
+| Harness | Skill directory | Also reads | Status |
 |---|---|---|---|
-| Claude Code | `~/.claude/skills` | — | 已切换；旧路由备份停用 |
-| DSH | `~/.dsh/skills` | `~/.agents/skills`（全局，`DSH_AGENTS_HOME` 可改） | 已切换；全局旧路由已移出 |
-| ZCode | `~/.zcode/skills` | `~/.agents/skills`（会重复发现） | 顶层完全通过（中英文）；子代理也通过 |
-| Codex | `~/.codex/skills` | 可能也读 `~/.agents` | **条件通过**：全量技能时隐式受容量影响；显式调用通过，最小集隐式通过 |
-| MiniMax | `~/.agents/skills`（不是 `~/.minimax/skills`） | 项目 `.agents/skills`；也观察到 `~/.codex/skills` | 顶层完全通过（中英文）；需整目录软链 |
+| Claude Code | `~/.claude/skills` | — | full pass; old router backed up and disabled |
+| DSH | `~/.dsh/skills` | `~/.agents/skills` (global; `DSH_AGENTS_HOME` can change it) | full pass; old global router moved out |
+| ZCode | `~/.zcode/skills` | `~/.agents/skills` (duplicate discovery) | full pass (top-level, zh/en); subagents also pass |
+| Codex | `~/.codex/skills` | may also read `~/.agents` | **conditional pass**: explicit call works; a full catalog of 600+ skills can hide descriptions; a minimal set also works implicitly |
+| MiniMax | `~/.agents/skills` (not `~/.minimax/skills`) | project `.agents/skills`; also observed reading `~/.codex/skills` | full pass (top-level, zh/en); needs a whole-directory symlink |
 
-> **术语：条件通过** = 安装正确，且在受限条件（子代理/子会话、最小技能集、显式调用）下通过；但默认的顶层新会话或全量技能环境尚未稳定通过。条件通过可以继续用，但不能在发布说明里写成“全量环境已验证”。
+> **Conditional pass** means the install is correct and works under constrained conditions
+> (subagent/sub-session, minimal skill set, or explicit call), but the default top-level
+> new session with a full catalog is not yet stable. You can keep using it, but release
+> notes must not say "verified in the full environment".
 >
-> **DSH 的坑**：只移 `~/.dsh/skills/doc-extract` 不够，它还会读 `~/.agents/skills`。
-> **ZCode 的坑**：`~/.zcode/skills` 和 `~/.agents/skills` 会各发现一次；切换要同时处理。
-> **MiniMax / Codex 的坑**：MiniMax 跳过“目录 + SKILL.md 文件软链”，只识别实体文件或整目录软链。MiniMax 实测：实体文件 ✅、SKILL.md 软链 ❌、整目录软链 ✅。Codex 能识别两种链接，但全量 600+ 技能时 `docarbiter` 可能因技能容量不可见；此时用显式“使用 docarbiter”，或精简技能目录。
->
-> **Codex 大技能目录的改进**：在全局或项目 `AGENTS.md` 加一句
+> **DSH trap**: removing `~/.dsh/skills/doc-extract` is not enough; DSH also reads
+> `~/.agents/skills`.
+> **ZCode trap**: `~/.zcode/skills` and `~/.agents/skills` each discover the skill once;
+> handle both when switching.
+> **MiniMax trap**: MiniMax skips "directory + symlinked SKILL.md" and only recognizes a
+> real file or a whole-directory symlink. Tested shapes: real file ✅, symlinked
+> `SKILL.md` ❌, whole-directory symlink ✅. A new session re-scans the skill directory;
+> restarting the app is not required. The catalog has a budget: one machine showed 173
+> visible skills against 536 discoverable skill names, with `Skill descriptions were
+> shortened to fit the catalog budget.` Keep the `docarbiter` entry or call it explicitly
+> when the catalog is large. If several copies are installed, the `Location:` header of
+> `skill({name})` shows which copy was loaded.
+> **Codex large-catalog mitigation**: add this line to the global or project `AGENTS.md`:
 > `For any PDF/document extraction task, load the docarbiter skill first.`
-> 这比依赖 description 竞争更稳定；或者只保留 `docarbiter` + 实际要用的工具技能（最小集 17 个时实测隐式通过）。
->
-> **ZCode 双层验证**：子代理和 App 重启后的顶层新会话都通过；中英文均调用 `docarbiter`。`.zcode/skills` 与 `.agents/skills` 会重复发现同一个技能，但不影响使用；要减少重复可保留一份或显式调用。
-> **共享目录的坑**：`~/.agents/skills` 被多个 harness 共用，动它之前先确认每个 harness 都有可用的旧路由副本。
+> This is more stable than competing on description text; alternatively keep only
+> `docarbiter` plus the tool skills you actually use (a minimal set of 17 passed
+> implicitly in one test). Codex works with a real `SKILL.md` copy; refresh it with
+> `install.sh --skill-mode copy` or `update.sh`.
+> **ZCode double discovery**: both the subagent and the top-level new session after an app
+> restart pass; zh and en both call `docarbiter`. `.zcode/skills` and `.agents/skills`
+> discover the same skill twice, which does not affect use; keep one copy or call it
+> explicitly to reduce duplicates.
+> **Shared-directory trap**: `~/.agents/skills` is shared by several harnesses. Before
+> changing it, confirm each harness has a usable copy of the old router.
 
-## 3. 切换步骤（每个 harness 一次）
+## 3. Switch steps (once per harness)
 
 ```bash
-# 0) 先看冲突
+# 0) Check conflicts first
 ./scripts/doctor.sh --check-conflicts
 
-# 1) 备份旧路由器到技能目录之外（不要在 skills/ 里留 .bak，可能仍被发现）
+# 1) Back up the old router outside the skills directory (do not leave .bak inside skills/)
 mkdir -p ~/.claude/skill-backups
 mv ~/.claude/skills/doc-extract ~/.claude/skill-backups/doc-extract.$(date +%Y%m%d-%H%M%S)
 
-# 2) 安装 docarbiter
+# 2) Install docarbiter
 ./scripts/install.sh --skills-only --skills-dir ~/.claude/skills
 
-# 3) 重启 harness 的会话（不是只重开一个聊天，要让技能目录重新扫描）
+# 3) Restart the harness session (not just another chat: the skill directory must be rescanned)
 
-# 4) 在中立目录做隐式触发测试（不要在仓库根目录跑）
+# 4) Test implicit triggering from a neutral directory (not the repository root)
 cd /tmp
-# Claude Code 示例：
-claude -p "我有个中文扫描版 PDF，想提取成带页码的 Markdown。该用哪个工具？只路由。"
+# Claude Code example:
+claude -p "I have a scanned Chinese PDF and need page-anchored Markdown. Which tool should I use? Only route it."
 ```
 
-验收标准：日志/输出里出现 `docarbiter`，且**不再出现** `doc-extract`；路由结果合理；旧路由可回滚。
+Acceptance: the log/output contains `docarbiter` and **no longer** contains `doc-extract`;
+the route is reasonable; the old router can be rolled back.
 
-## 4. 回滚
+## 4. Rollback
 
 ```bash
 rm -rf ~/.claude/skills/docarbiter
 mv ~/.claude/skill-backups/doc-extract.YYYYMMDD-HHMMSS ~/.claude/skills/doc-extract
 ```
 
-DSH 的回滚还要考虑全局 `.agents`：
+DSH rollback also has to handle the global `.agents` directory:
 
 ```bash
-# 恢复 DSH 自己的旧路由
+# Restore DSH's own old router
 mv ~/.dsh/skill-backups/doc-extract.YYYYMMDD-HHMMSS ~/.dsh/skills/doc-extract
-# 如果当时也移了全局旧路由：
+# If the global old router was moved as well:
 mv ~/.agents/skill-backups/doc-extract.YYYYMMDD-HHMMSS ~/.agents/skills/doc-extract
 ```
 
-## 5. 发布策略
+## 5. Release policy
 
-- **不把 harness 名称写死进核心逻辑**；`route.py` 和 `SKILL.md` 不依赖 Claude Code / DSH / ZCode 的私有 API。
-- **不自动删除旧路由**；安装脚本只报告冲突，替换由用户确认。
-- **不承诺“所有 harness 都已验证”**；发布说明按 `docs/release-checklist.md` 的实际状态写。
-- 环境配置可以在发布后做：用户只需要知道自己的技能目录，然后一条 `--skills-dir` 命令。
-- 需要无头验收的 harness，先确认它的 CLI 能选模型/发 prompt；否则标为“未验证”，不要用“技能能发现”冒充“触发通过”。
-- 更新方式（`git pull` / `update.sh` / Codex 复制 / 重启会话）见 [`docs/updating.md`](updating.md)。
+- **Do not hard-code harness names into the core logic**; `route.py` and `SKILL.md` do not
+  depend on private Claude Code / DSH / ZCode APIs.
+- **Do not delete the old router automatically**; the installer only reports conflicts,
+  and the user confirms replacement.
+- **Do not claim "all harnesses verified"**; write release notes according to the actual
+  state in `docs/release-checklist.md`.
+- Environment configuration can happen after release: the user only needs to know their
+  skill directory and run one `--skills-dir` command.
+- For a harness that needs headless acceptance, first confirm its CLI can select a model
+  and send a prompt; otherwise mark it "unverified". Do not substitute "the skill can be
+  discovered" for "triggering passed".
+- Update paths (`git pull` / `update.sh` / Codex copy / restart session) are in
+  [`docs/updating.md`](updating.md).
 
-## 6. 手动验收卡（给用户在自己的 harness 里用）
+## 6. Manual acceptance card (for the user's own harness)
 
-装好技能、重启 harness、新开一个**中立目录**会话后，直接发：
-
-```text
-我有个中文扫描版 PDF，想提取成带页码的 Markdown。
-应该用哪个工具？只告诉我路由判断和一条可复制命令，不要实际提取。
-```
-
-英文：
+Install the skill, restart the harness, open a **neutral-directory** session, then send:
 
 ```text
 I have a scanned Chinese PDF and need page-anchored Markdown.
 Which tool should I use? Only route it and give one copyable command; do not extract anything.
 ```
 
-**返回什么给我**：
-
-1. 完整回答文本（不要截图里截一半）；
-2. 如果 harness 显示工具/技能名，附上是否出现 `docarbiter`、是否出现旧 `doc-extract`；
-3. 它选的工具和命令（预期：扫描件 → MinerU，命令含 `mineru-doc`）；
-4. 如果回答来自内置 `pdf` 技能而不是 docarbiter，也直接说。
-
-判断标准：**出现 docarbiter + 路由 MinerU** 才算触发通过；只是“回答看起来对”不算，因为旧路由器也可能答对。
-
-### 给 agent 的完整话术（可直接粘）
+Chinese sample:
 
 ```text
-请先判断这个任务该用哪个文档提取工具：
 我有个中文扫描版 PDF，想提取成带页码的 Markdown。
-只告诉我路由判断和一条可复制命令，不要实际提取。
-完成后另起一段，报告你实际调用了哪个技能/工具（如果界面能看到名字），
-以及最终选择的工具；如果没有调用任何技能，也明确说“没有调用技能”。
+应该用哪个工具？只告诉我路由判断和一条可复制命令，不要实际提取。
 ```
 
-### 固定回传模板
+**What to send back**:
+
+1. the complete answer text (not a cropped screenshot);
+2. whether the harness shows a tool/skill name, and whether `docarbiter` appears and the
+   old `doc-extract` does not;
+3. the tool and command it chose (expected: scan → MinerU, command contains `mineru-doc`);
+4. if the answer came from a built-in `pdf` skill instead of docarbiter, say so directly.
+
+Acceptance: **`docarbiter` appears + route is MinerU**. An answer that merely looks right
+is not enough, because the old router could also answer correctly.
+
+### Full prompt to paste
+
+```text
+First decide which document-extraction tool this task should use:
+I have a scanned Chinese PDF and need page-anchored Markdown.
+Only give me the routing decision and one copyable command; do not extract anything.
+Then, in a separate paragraph, report which skill/tool you actually invoked (if the UI
+shows the name) and the final tool choice; if you did not invoke a skill, say so explicitly.
+```
+
+### Fixed report template
 
 ```text
 Harness: ZCode / Codex / MiniMax
-版本/模型:
-安装方式: install.sh --skills-only --skills-dir ...
-旧 doc-extract: 已移走 / 仍在 / 不确定
-界面显示的技能名: docarbiter / doc-extract / 内置 pdf / 没显示
-完整回答:
-错误或异常:
+Version/model:
+Install: install.sh --skills-only --skills-dir ...
+Old doc-extract: moved / still present / unsure
+Skill name shown by the UI: docarbiter / doc-extract / built-in pdf / not shown
+Full answer:
+Errors or anomalies:
 ```
 
-返回时不要只写“成功了”；把完整回答和技能名一起贴回来。没有技能名时，至少贴完整回答，并说明界面是否显示工具调用。
+Do not reply with only "it worked"; include the full answer and the skill name. If no skill
+name is shown, at least include the full answer and say whether the UI displayed a tool call.
 
-## 7. 本机当前状态（2026-11-10）
+## 7. Current machine state (2026-11-11)
 
-| Harness | 当前路由器 | 旧路由位置 | 备注 |
+| Harness | Current router shape | Old router location | Notes |
 |---|---|---|---|
-| Claude Code | `docarbiter` | `~/.claude/skill-backups/doc-extract.20261110-121227`（指向 `~/.agents` 备份） | 中英文触发通过 |
-| DSH | `docarbiter` | `~/.dsh/skill-backups/doc-extract.20261110-125933`；全局 `~/.agents/skill-backups/doc-extract.20261110-130247` | 中英文 headless 通过 |
-| ZCode | `docarbiter` | `~/.local/share/docarbiter-migration-backup/doc-extract` → 全局备份 | 顶层完全通过（中英文） |
-| Codex | `docarbiter` | 旧路由已移走 | 安装成功但未触发；诊断 symlink/容量 |
-| MiniMax | `docarbiter` | 旧路由已移走 | 顶层完全通过（中英文）；扫描 `~/.agents/skills`，需整目录软链 |
+| Claude Code | `~/.claude/skills/docarbiter/SKILL.md` → local repo file symlink | `~/.claude/skill-backups/doc-extract.20261110-121227` | 2026-11-11 headless test: `Skill {"skill":"docarbiter"}`, routed MinerU |
+| DSH | `~/.dsh/skills/docarbiter/SKILL.md` → local repo file symlink | `~/.dsh/skill-backups/doc-extract.20261110-125933`; global `~/.agents/skill-backups/doc-extract.20261110-130247` | 2026-11-11 headless test: session log shows `tool-call skill {"name":"docarbiter"}`, routed MinerU |
+| ZCode | `~/.zcode/skills/docarbiter/SKILL.md` → `~/.local/share/docarbiter/...` file symlink | `~/.local/share/docarbiter-migration-backup/doc-extract` → global backup | full pass (top-level, zh/en); 307 discoverable skills in its catalog |
+| MiniMax | `~/.agents/skills/docarbiter` → `~/.local/share/docarbiter/skills/docarbiter` whole-directory symlink | old router moved out | full pass (top-level, zh/en); 97 discoverable skills under `~/.agents` |
+| Codex | `~/.codex/skills/docarbiter/SKILL.md` regular file | old router moved out | conditional; `doctor.sh` currently reports this copy as DRIFT until it is refreshed with `--skill-mode copy` |
+
+`doctor.sh` reports each harness's shape, whether it is the same source as this checkout,
+whether its content matches, and whether its version is behind. It also prints the
+discoverable skill count and warns above the catalog budget.
