@@ -30,7 +30,7 @@ ln -sfn "$PWD/skills/docarbiter" "$DIR/docarbiter"
 | DSH | `~/.dsh/skills` | `~/.agents/skills`（全局，`DSH_AGENTS_HOME` 可改） | 已切换；全局旧路由已移出 |
 | ZCode | `~/.zcode/skills` | `~/.agents/skills`（会重复发现） | 子代理验收通过；待 App 重启后顶层会话确认 |
 | Codex | `~/.codex/skills` | 可能也读 `~/.agents` | **条件通过**：全量技能时隐式受容量影响；显式调用通过，最小集隐式通过 |
-| MiniMax | `~/.agents/skills`（不是 `~/.minimax/skills`） | 项目 `.agents/skills`；`.minimax/skills` 不被扫描 | 子会话验收通过；需整目录软链 |
+| MiniMax | `~/.agents/skills`（不是 `~/.minimax/skills`） | 项目 `.agents/skills`；也观察到 `~/.codex/skills` | 顶层完全通过（中英文）；需整目录软链 |
 
 > **术语：条件通过** = 安装正确，且在受限条件（子代理/子会话、最小技能集、显式调用）下通过；但默认的顶层新会话或全量技能环境尚未稳定通过。条件通过可以继续用，但不能在发布说明里写成“全量环境已验证”。
 >
@@ -149,4 +149,4 @@ Harness: ZCode / Codex / MiniMax
 | DSH | `docarbiter` | `~/.dsh/skill-backups/doc-extract.20261110-125933`；全局 `~/.agents/skill-backups/doc-extract.20261110-130247` | 中英文 headless 通过 |
 | ZCode | `docarbiter` | `~/.local/share/docarbiter-migration-backup/doc-extract` → 全局备份 | 子代理验收通过；待 App 重启后顶层确认 |
 | Codex | `docarbiter` | 旧路由已移走 | 安装成功但未触发；诊断 symlink/容量 |
-| MiniMax | `docarbiter` | 旧路由已移走 | 子会话通过；扫描 `~/.agents/skills`，需整目录软链 |
+| MiniMax | `docarbiter` | 旧路由已移走 | 顶层完全通过（中英文）；扫描 `~/.agents/skills`，需整目录软链 |

@@ -107,7 +107,7 @@ python3 -I scripts/route.py file.pdf --goal table-structure --json
 | core 文字层 / 扫描 / CID / 双栏 | 已测；见 [docs/benchmarks.md](docs/benchmarks.md) |
 | 真实高频表 | 结构 + 抽检；Docling / MinerU / pdfplumber 按表型分流 |
 | P0 路由策略（22 个有答案文档） | `router:text` 成功率 100% / 中位 CER 0.0000 / 4.73s；固定 MinerU 100% / 0.0115 / 61.98s |
-| Harness 触发 | Claude Code、DSH 已测；ZCode / Codex / MiniMax 发布后配置 |
+| Harness 触发 | Claude Code、DSH、MiniMax 已测；ZCode 条件通过（待顶层确认）；Codex 条件通过（大技能目录） |
 | CI | GitHub Actions `validate` 通过；Ubuntu + macOS 由 CI 覆盖，Windows 未验证 |
 
 已知边界写清楚：真竖排、真实双栏全文 CER、真实表逐单元格 CER、符号字形保真都还没解决。README 只放摘要，完整证据在 [docs/policy.md](docs/policy.md)、[docs/benchmarks.md](docs/benchmarks.md) 和 [docs/gotchas.md](docs/gotchas.md)。

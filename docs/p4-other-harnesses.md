@@ -1,7 +1,7 @@
 # P4：Codex / ZCode / DSH 触发验收（2026-11-10）
 
 > 范围：DSH 已永久切换；ZCode / Codex / MiniMax 做技能发现/入口检查。
-> 结论先说（2026-11-10 晚）：**DSH 通过；ZCode 子代理通过、待 App 重启确认；MiniMax 子会话通过；Codex 安装成功但未触发，正在诊断 symlink/技能容量。**
+> 结论先说（2026-11-10 晚）：**DSH 完全通过；MiniMax 顶层完全通过（中英文）；ZCode 子代理通过、待 App 重启顶层确认；Codex 条件通过（显式/最小集可用，全量技能容量限制）。**
 > Claude Code 的单测见 [`docs/p4-claude-code.md`](p4-claude-code.md)。
 
 ## 结果矩阵
@@ -12,12 +12,12 @@
 | DSH | `~/.dsh/skills` + `~/.agents/skills` | 已备份停用 | 是 | 中文/英文通过 | **已永久切换**（旧路由可回滚） |
 | ZCode | `~/.zcode/skills` + `~/.agents/skills` | 已移走 → `~/.local/share/docarbiter-migration-backup/` | 是 | **子代理通过** | 待 App 重启后的顶层会话确认 |
 | Codex | `~/.codex/skills` | 已移走 | 是（symlink 和普通文件都识别） | **条件通过** | 全量 620 技能时隐式失败；最小集 17 技能时隐式通过；显式调用通过 |
-| MiniMax | `~/.agents/skills`（不是 `~/.minimax/skills`） | 已移走 | 是 | **子会话通过** | 扫描器跳过文件 symlink；整目录软链可用 |
+| MiniMax | `~/.agents/skills` + `~/.codex/skills`（观察） | 已移走 | 是 | **完全通过** | 顶层新会话，中英文均 docarbiter → MinerU；整目录软链可用 |
 
 ## 晚间复测（ZCode / MiniMax / Codex）
 
 - **ZCode**：子代理在 `/tmp` 新上下文里调用了 `docarbiter`，路由 MinerU；旧 `doc-extract` 已移走。严格性还差“重启 ZCode App 后的顶层新会话”，目前记为**有条件通过**。
-- **MiniMax**：新子会话调用 `docarbiter`，路由 MinerU；旧路由器已移走。关键发现：MiniMax 扫描 `~/.agents/skills` 和项目 `.agents/skills`，**不扫描 `~/.minimax/skills`**；并且跳过“目录 + SKILL.md 文件软链”，只识别实体文件或**整目录软链**。目前记为**子会话通过**。
+- **MiniMax（完全通过）**：重启后的顶层新会话，中文和英文隐式提示都调用 `docarbiter`，路由 MinerU；旧路由器已移走。关键发现：MiniMax 扫描 `~/.agents/skills`，也观察到了 `~/.codex/skills`；它跳过“目录 + SKILL.md 文件软链”，只识别实体文件或**整目录软链**。
 - **Codex（条件通过）**：`~/.codex/skills/docarbiter/SKILL.md` 已安装、旧 `doc-extract` 已移走。诊断结论：symlink 可识别；全量环境 619–620 个技能，其中 371–380 个未进入模型可见列表、描述被移除，隐式提示绕过 `docarbiter`；最小技能集（17 个，只保留 `docarbiter` + `mineru`）隐式提示实际读取 `docarbiter` 并路由 MinerU；显式说“使用 docarbiter”在全量环境也通过。**结论：安装正确，隐式触发受 Codex 技能容量影响。**
 - **安装器修复**：`install.sh` 现在对 `~/.agents/skills`、`~/.codex/skills`、`~/.minimax/skills` 自动用整目录软链；Claude/DSH/ZCode 保持文件软链。可用 `--skill-mode dir|file` 强制。已有 `~/.local/bin` wrapper 会先备份为 `.bak.<timestamp>`。
 
@@ -126,7 +126,7 @@ ZCode 同时扫描 `~/.zcode/skills` 和 `~/.agents/skills`。DSH 切换时已�
 2. **DSH 已永久切换。** 旧路由停用、全局 `.agents` 旧路由移出后，中英文都只触发 docarbiter；Codex / ZCode 的旧路由副本保留，未被破坏。
 3. **ZCode 子代理通过。** 子代理调用 docarbiter 并路由 MinerU；待 App 重启后的顶层会话确认。CLI 的 `--prompt` 仍需默认模型，但子代理不依赖它。
 4. **Codex 条件通过。** 安装和 symlink 均正确；全量 620 技能时隐式触发被容量挤掉，最小集 17 技能时隐式通过，显式调用通过。使用建议：精简技能目录，或显式说“使用 docarbiter”。
-5. **MiniMax 子会话通过。** 它扫描 `~/.agents/skills`，不扫描 `~/.minimax/skills`；文件 symlink 会被跳过，必须用整目录软链。
+5. **MiniMax 完全通过。** 顶层中英文都命中 docarbiter；它跳过文件 symlink，必须用整目录软链。
 
 ## 复现命令
 
@@ -148,6 +148,5 @@ node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs skills list | grep
 - [x] ZCode 子代理触发（docarbiter → MinerU）
 - [ ] ZCode App 重启后的顶层新会话确认
 - [x] Codex 的 symlink/容量诊断（显式通过；最小集隐式通过；全量隐式受容量影响）
-- [x] MiniMax 子会话触发（docarbiter → MinerU）
-- [ ] MiniMax 顶层新会话确认
+- [x] MiniMax 顶层新会话触发（中文/英文 docarbiter → MinerU）
 - [ ] 三个 harness 的真实文件路由 / 实际提取端到端
