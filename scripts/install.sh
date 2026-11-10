@@ -10,6 +10,7 @@ REGISTER_SKILLS=1
 FORCE=0
 LATEST=0
 SKILLS_ONLY=0
+SKILL_MODE="auto"
 SKILLS_DIRS=()
 
 usage() {
@@ -18,6 +19,8 @@ usage() {
 
   --profile core|extra|full   core=8 个核心工具（默认）；extra=+重型工具；full=全部
   --skills-dir DIR            注册技能的目录，可重复；默认自动检测
+  --skill-mode auto|dir|file  技能注册方式：dir=整目录软链，file=目录+SKILL.md 软链
+                              auto 对 ~/.agents / ~/.codex / ~/.minimax 用 dir，其余用 file
   --no-skills                 只装工具，不注册技能
   --skills-only               只注册技能/装 wrapper，不装工具（用于快速试用）
   --force                     覆盖已存在的同名技能（先备份为 .bak.<时间>）
@@ -35,6 +38,7 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --profile) PROFILE="${2:-}"; shift 2 ;;
     --skills-dir) SKILLS_DIRS+=("${2:-}"); shift 2 ;;
+    --skill-mode) SKILL_MODE="${2:-}"; shift 2 ;;
     --no-skills) REGISTER_SKILLS=0; shift ;;
     --skills-only) SKILLS_ONLY=1; shift ;;
     --force) FORCE=1; shift ;;
@@ -45,6 +49,7 @@ while [ $# -gt 0 ]; do
 done
 
 case "$PROFILE" in core|extra|full) ;; *) echo "profile 必须是 core / extra / full" >&2; exit 2 ;; esac
+case "$SKILL_MODE" in auto|dir|file) ;; *) echo "skill-mode 必须是 auto / dir / file" >&2; exit 2 ;; esac
 
 command -v python3 >/dev/null 2>&1 || { echo "缺少 python3（建议 3.10+）" >&2; exit 1; }
 PY_VER="$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')"
@@ -192,9 +197,45 @@ link_skill() {
   echo "[skills] $name -> $src"
 }
 
+# Some harnesses (MiniMax/Codex) skip a symlinked SKILL.md file but follow a
+# whole-directory symlink. Keep both layouts available.
+link_skill_dir() {
+  local src="$1" name="$2" dir="$3"
+  local target="$dir/$name"
+  mkdir -p "$dir"
+  if [ -L "$target" ]; then
+    local current
+    current="$(readlink "$target" || true)"
+    if [ "$current" = "$src" ]; then
+      echo "[skills] 已安装: $name -> $src"
+      return
+    fi
+  fi
+  if [ -e "$target" ] && [ "$FORCE" != "1" ]; then
+    echo "[warn] 已存在且不是本仓库链接: ${target}（用 --force 覆盖）" >&2
+    return
+  fi
+  if [ -e "$target" ] && [ "$FORCE" = "1" ]; then
+    mv "$target" "$target.bak.$(date +%Y%m%d%H%M%S)"
+  fi
+  ln -sfn "$src" "$target"
+  echo "[skills] $name -> $src (directory symlink)"
+}
+
 for dir in "${SKILLS_DIRS[@]}"; do
   mkdir -p "$dir"
-  link_skill "$REPO_ROOT/skills/docarbiter/SKILL.md" "docarbiter" "$dir"
+  mode="$SKILL_MODE"
+  if [ "$mode" = "auto" ]; then
+    case "$dir" in
+      */.agents/skills|*/.codex/skills|*/.minimax/skills) mode="dir" ;;
+      *) mode="file" ;;
+    esac
+  fi
+  if [ "$mode" = "dir" ]; then
+    link_skill_dir "$REPO_ROOT/skills/docarbiter" "docarbiter" "$dir"
+  else
+    link_skill "$REPO_ROOT/skills/docarbiter/SKILL.md" "docarbiter" "$dir"
+  fi
   if [ "$PROFILE" = "full" ]; then
     for f in "$REPO_ROOT"/skills/_tools/*.md; do
       [ -f "$f" ] || continue

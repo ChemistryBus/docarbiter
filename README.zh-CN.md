@@ -139,7 +139,7 @@ python3 -I scripts/route.py file.pdf --goal table-structure --json
 ./scripts/install.sh --skills-only --skills-dir ~/.dsh/skills
 ./scripts/install.sh --skills-only --skills-dir ~/.zcode/skills
 ./scripts/install.sh --skills-only --skills-dir ~/.codex/skills
-./scripts/install.sh --skills-only --skills-dir ~/.minimax/skills
+./scripts/install.sh --skills-only --skills-dir ~/.agents/skills   # MiniMax / 共享 agents 目录
 ```
 
 **一个 harness 只保留一个文档提取路由器。** 如果 `doc-extract` 和 `docarbiter` 共存，可能选旧路由，也可能两个都加载。迁移和回滚：[docs/migration.md](docs/migration.md)。

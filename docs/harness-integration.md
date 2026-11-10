@@ -13,13 +13,14 @@
 
 `--skills-dir` 可以重复；`--profile core` 只注册 `docarbiter`，不会注册 12 个工具技能。
 
-如果不想让脚本同时更新 `~/.local/bin` wrapper，只建一个软链即可：
+如果不想让脚本同时更新 `~/.local/bin` wrapper，只建一个**整目录软链**即可（比“目录 + SKILL.md 软链”兼容）：
 
 ```bash
 DIR="$HOME/.claude/skills"          # 换成目标 harness
-mkdir -p "$DIR/docarbiter"
-ln -sfn "$PWD/skills/docarbiter/SKILL.md" "$DIR/docarbiter/SKILL.md"
+ln -sfn "$PWD/skills/docarbiter" "$DIR/docarbiter"
 ```
+
+`install.sh --skill-mode auto` 会对 `~/.agents/skills`、`~/.codex/skills`、`~/.minimax/skills` 用整目录软链；对 Claude Code / DSH / ZCode 保持文件软链。需要强制时用 `--skill-mode dir|file`。
 
 ## 2. 已知 harness 的目录
 
@@ -27,12 +28,13 @@ ln -sfn "$PWD/skills/docarbiter/SKILL.md" "$DIR/docarbiter/SKILL.md"
 |---|---|---|---|
 | Claude Code | `~/.claude/skills` | — | 已切换；旧路由备份停用 |
 | DSH | `~/.dsh/skills` | `~/.agents/skills`（全局，`DSH_AGENTS_HOME` 可改） | 已切换；全局旧路由已移出 |
-| ZCode | `~/.zcode/skills` | `~/.agents/skills`（会重复发现） | 旧路由仍在；CLI 需先设默认模型 |
-| Codex | `~/.codex/skills` | 可能也读 `~/.agents` | 旧路由保留；未找到 CLI |
-| MiniMax | `~/.minimax/skills` | 另有 `.builtin-skills` | 未测试；目录已存在 |
+| ZCode | `~/.zcode/skills` | `~/.agents/skills`（会重复发现） | 子代理验收通过；待 App 重启后顶层会话确认 |
+| Codex | `~/.codex/skills` | 可能也读 `~/.agents` | 安装成功但未触发；诊断中 |
+| MiniMax | `~/.agents/skills`（不是 `~/.minimax/skills`） | 项目 `.agents/skills`；`.minimax/skills` 不被扫描 | 子会话验收通过；需整目录软链 |
 
 > **DSH 的坑**：只移 `~/.dsh/skills/doc-extract` 不够，它还会读 `~/.agents/skills`。
 > **ZCode 的坑**：`~/.zcode/skills` 和 `~/.agents/skills` 会各发现一次；切换要同时处理。
+> **MiniMax / Codex 的坑**：它们可能跳过“目录 + SKILL.md 文件软链”，只识别整目录软链或实体文件。MiniMax 实测：实体文件 ✅、SKILL.md 软链 ❌、整目录软链 ✅。
 > **共享目录的坑**：`~/.agents/skills` 被多个 harness 共用，动它之前先确认每个 harness 都有可用的旧路由副本。
 
 ## 3. 切换步骤（每个 harness 一次）
@@ -135,8 +137,8 @@ Harness: ZCode / Codex / MiniMax
 
 | Harness | 当前路由器 | 旧路由位置 | 备注 |
 |---|---|---|---|
-| Claude Code | `docarbiter` | `~/.claude/skill-backups/doc-extract.20261110-121227` | 中英文触发通过 |
+| Claude Code | `docarbiter` | `~/.claude/skill-backups/doc-extract.20261110-121227`（指向 `~/.agents` 备份） | 中英文触发通过 |
 | DSH | `docarbiter` | `~/.dsh/skill-backups/doc-extract.20261110-125933`；全局 `~/.agents/skill-backups/doc-extract.20261110-130247` | 中英文 headless 通过 |
-| ZCode | 旧 `doc-extract` | `~/.zcode/skills/doc-extract` → 全局备份 | 未切换；CLI 需先设模型 |
-| Codex | 旧 `doc-extract` | `~/.codex/skills/doc-extract` → 全局备份 | 未找到 CLI；旧路由仍可用 |
-| MiniMax | 未配置 | `~/.minimax/skills` 无旧路由 | 未测试；需要时按上面命令安装 |
+| ZCode | `docarbiter` | `~/.local/share/docarbiter-migration-backup/doc-extract` → 全局备份 | 子代理验收通过；待 App 重启后顶层确认 |
+| Codex | `docarbiter` | 旧路由已移走 | 安装成功但未触发；诊断 symlink/容量 |
+| MiniMax | `docarbiter` | 旧路由已移走 | 子会话通过；扫描 `~/.agents/skills`，需整目录软链 |

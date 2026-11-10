@@ -24,6 +24,14 @@ jobs:
           HOME=/tmp/docarbiter-ci-home bash ./scripts/install.sh \
             --skills-only --skills-dir /tmp/docarbiter-ci-home/.claude/skills
           test -L /tmp/docarbiter-ci-home/.claude/skills/docarbiter/SKILL.md
+      - name: Skills-only directory-symlink smoke test
+        run: |
+          rm -rf /tmp/docarbiter-ci-home/.agents
+          mkdir -p /tmp/docarbiter-ci-home/.agents/skills
+          HOME=/tmp/docarbiter-ci-home bash ./scripts/install.sh \
+            --skills-only --skills-dir /tmp/docarbiter-ci-home/.agents/skills
+          test -L /tmp/docarbiter-ci-home/.agents/skills/docarbiter
+          test -f /tmp/docarbiter-ci-home/.agents/skills/docarbiter/SKILL.md
       - name: Install poppler (Linux)
         if: runner.os == 'Linux'
         run: sudo apt-get update -qq && sudo apt-get install -y poppler-utils

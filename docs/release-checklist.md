@@ -115,9 +115,10 @@
 - [x] Claude Code 不同时激活旧的 `doc-extract`（已备份停用；其他 harness 未动）
 - [x] DSH 已永久切换：旧 `doc-extract` 备份停用，中文/英文 headless 只触发 `docarbiter`（2026-11-10）
 - [x] DSH 同时处理了全局 `~/.agents/skills/doc-extract`；Codex / ZCode 的旧路由副本保留，未被破坏
-- [ ] ZCode 能发现 `docarbiter`，但 `--prompt` 被 “Select a model” 卡住；需 TUI/桌面端设默认模型
-- [ ] Codex 未找到 CLI 可执行文件，无法做非交互触发
-- [ ] MiniMax 有 `~/.minimax/skills`，未找到无头入口；发布后按 `docs/harness-integration.md` 接
+- [x] ZCode 子代理触发 `docarbiter` → MinerU；待 App 重启后的顶层会话最终确认
+- [ ] Codex：已安装 docarbiter、旧路由已移走，但 378 技能导致不可见；需 symlink/容量诊断
+- [x] MiniMax 子会话触发 `docarbiter` → MinerU；扫描 `.agents/skills`，需整目录软链
+- [ ] `install.sh --skill-mode auto|dir|file` 在 Claude/DSH/ZCode 已有安装上升级验证（当前只验证新目录）
 - [ ] `--profile full` 注册 12 个工具技能后，无重名冲突
 - [x] `doctor.sh --check-conflicts` 能检测同名技能与双路由（隔离 HOME + 本机已跑）
 - [x] 旧 `doc-extract` 的共存 / 替换 / 回滚步骤已在 Claude Code / DSH 验证（`docs/migration.md`）

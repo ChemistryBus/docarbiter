@@ -1,7 +1,7 @@
 # P4：Codex / ZCode / DSH 触发验收（2026-11-10）
 
-> 范围：DSH 已永久切换；ZCode / Codex / MiniMax 只做技能发现/入口检查，不永久改。
-> 结论先说：**DSH 中英文 headless 触发通过并已切换；ZCode 能发现技能但 CLI 缺模型选择；Codex 未找到 CLI 可执行文件；MiniMax 有技能目录、未测试。**
+> 范围：DSH 已永久切换；ZCode / Codex / MiniMax 做技能发现/入口检查。
+> 结论先说（2026-11-10 晚）：**DSH 通过；ZCode 子代理通过、待 App 重启确认；MiniMax 子会话通过；Codex 安装成功但未触发，正在诊断 symlink/技能容量。**
 > Claude Code 的单测见 [`docs/p4-claude-code.md`](p4-claude-code.md)。
 
 ## 结果矩阵
@@ -10,9 +10,16 @@
 |---|---|---|---|---|---|
 | Claude Code | `~/.claude/skills` | 已备份停用 | 是 | 中/英文通过 | 已完成（见 p4-claude-code） |
 | DSH | `~/.dsh/skills` + `~/.agents/skills` | 已备份停用 | 是 | 中文/英文通过 | **已永久切换**（旧路由可回滚） |
-| ZCode | `~/.zcode/skills` + `~/.agents/skills` | `~/.zcode` 仍有 | 是（`skills list`） | **未完成** | CLI `--prompt` 报 `Select a model`；需 TUI/桌面端选模型 |
-| Codex | `~/.codex/skills` | 有（指向备份） | 未测 | 未完成 | 未找到 `codex` CLI 可执行文件 |
-| MiniMax | `~/.minimax/skills` | 无 | 未测 | 未完成 | 目录存在；未找到 CLI/无头入口 |
+| ZCode | `~/.zcode/skills` + `~/.agents/skills` | 已移走 → `~/.local/share/docarbiter-migration-backup/` | 是 | **子代理通过** | 待 App 重启后的顶层会话确认 |
+| Codex | `~/.codex/skills` | 已移走 | 是（文件 symlink） | **未通过** | docarbiter 未进入可见列表；诊断 symlink/378 技能容量 |
+| MiniMax | `~/.agents/skills`（不是 `~/.minimax/skills`） | 已移走 | 是 | **子会话通过** | 扫描器跳过文件 symlink；整目录软链可用 |
+
+## 晚间复测（ZCode / MiniMax / Codex）
+
+- **ZCode**：子代理在 `/tmp` 新上下文里调用了 `docarbiter`，路由 MinerU；旧 `doc-extract` 已移走。严格性还差“重启 ZCode App 后的顶层新会话”，目前记为**有条件通过**。
+- **MiniMax**：新子会话调用 `docarbiter`，路由 MinerU；旧路由器已移走。关键发现：MiniMax 扫描 `~/.agents/skills` 和项目 `.agents/skills`，**不扫描 `~/.minimax/skills`**；并且跳过“目录 + SKILL.md 文件软链”，只识别实体文件或**整目录软链**。目前记为**子会话通过**。
+- **Codex**：`~/.codex/skills/docarbiter/SKILL.md` 已安装、旧 `doc-extract` 已移走，但两个新会话都没有调用 `docarbiter`，且报告 378 个技能超出容量。它读到了 `mineru` / `docling`，说明路由答案对但仲裁器没被选中；正在做“真实文件 / 显式调用 / 最小技能集”诊断。
+- **安装器修复**：`install.sh` 现在对 `~/.agents/skills`、`~/.codex/skills`、`~/.minimax/skills` 自动用整目录软链；Claude/DSH/ZCode 保持文件软链。可用 `--skill-mode dir|file` 强制。已有 `~/.local/bin` wrapper 会先备份为 `.bak.<timestamp>`。
 
 ## DSH：实测通过
 
@@ -110,9 +117,9 @@ find /Applications ~/Applications ~/Library/Application\ Support/Codex -maxdepth
 
 1. **一个 harness 只能留一个文档提取路由器。** Claude Code 已证明旧路由会赢；DSH 证明旧路由会让模型同时加载两份技能。ZCode 也会从两个目录重复发现旧路由。
 2. **DSH 已永久切换。** 旧路由停用、全局 `.agents` 旧路由移出后，中英文都只触发 docarbiter；Codex / ZCode 的旧路由副本保留，未被破坏。
-3. **ZCode 需要先解决模型选择。** 技能发现没问题；CLI `--prompt` 需要 TUI/桌面端设置默认模型，才能做无头触发。切换时只需备份 `~/.zcode/skills/doc-extract`。
-4. **Codex 先解决入口。** 没有 CLI 就无法做非交互验收；旧路由仍保留，不要在未测试的情况下声称兼容。
-5. **MiniMax 暂不写死。** `~/.minimax/skills` 存在，但本轮没找到无头入口；发布后按 `docs/harness-integration.md` 的 `--skills-dir` 方式接。
+3. **ZCode 子代理通过。** 子代理调用 docarbiter 并路由 MinerU；待 App 重启后的顶层会话确认。CLI 的 `--prompt` 仍需默认模型，但子代理不依赖它。
+4. **Codex 卡在发现层。** 安装成功、旧路由已移走，但 378 个技能导致 docarbiter 不可见；需要真实文件/显式调用/最小技能集诊断，不能算通过。
+5. **MiniMax 子会话通过。** 它扫描 `~/.agents/skills`，不扫描 `~/.minimax/skills`；文件 symlink 会被跳过，必须用整目录软链。
 
 ## 复现命令
 
@@ -131,7 +138,9 @@ node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs skills list | grep
 ## 未完成
 
 - [x] DSH 永久切换（2026-11-10，旧路由备份可回滚）
-- [ ] ZCode 设置默认模型后的中英文触发
-- [ ] Codex 的 CLI/桌面入口与中英文触发
-- [ ] MiniMax 的无头入口与触发
+- [x] ZCode 子代理触发（docarbiter → MinerU）
+- [ ] ZCode App 重启后的顶层新会话确认
+- [ ] Codex 的 symlink/容量诊断与中英文触发
+- [x] MiniMax 子会话触发（docarbiter → MinerU）
+- [ ] MiniMax 顶层新会话确认
 - [ ] 三个 harness 的真实文件路由 / 实际提取端到端

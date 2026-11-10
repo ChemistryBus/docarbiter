@@ -141,7 +141,7 @@ Other harnesses use the same command with their skill directory:
 ./scripts/install.sh --skills-only --skills-dir ~/.dsh/skills
 ./scripts/install.sh --skills-only --skills-dir ~/.zcode/skills
 ./scripts/install.sh --skills-only --skills-dir ~/.codex/skills
-./scripts/install.sh --skills-only --skills-dir ~/.minimax/skills
+./scripts/install.sh --skills-only --skills-dir ~/.agents/skills   # MiniMax / shared agents dir
 ```
 
 Keep **exactly one** document-extraction router per harness. If `doc-extract` and `docarbiter` coexist, the harness may pick the old one or load both. Migration and rollback: [docs/migration.md](docs/migration.md).
