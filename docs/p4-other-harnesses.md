@@ -11,14 +11,14 @@
 | Claude Code | `~/.claude/skills` | 已备份停用 | 是 | 中/英文通过 | 已完成（见 p4-claude-code） |
 | DSH | `~/.dsh/skills` + `~/.agents/skills` | 已备份停用 | 是 | 中文/英文通过 | **已永久切换**（旧路由可回滚） |
 | ZCode | `~/.zcode/skills` + `~/.agents/skills` | 已移走 → `~/.local/share/docarbiter-migration-backup/` | 是 | **子代理通过** | 待 App 重启后的顶层会话确认 |
-| Codex | `~/.codex/skills` | 已移走 | 是（文件 symlink） | **未通过** | docarbiter 未进入可见列表；诊断 symlink/378 技能容量 |
+| Codex | `~/.codex/skills` | 已移走 | 是（symlink 和普通文件都识别） | **条件通过** | 全量 620 技能时隐式失败；最小集 17 技能时隐式通过；显式调用通过 |
 | MiniMax | `~/.agents/skills`（不是 `~/.minimax/skills`） | 已移走 | 是 | **子会话通过** | 扫描器跳过文件 symlink；整目录软链可用 |
 
 ## 晚间复测（ZCode / MiniMax / Codex）
 
 - **ZCode**：子代理在 `/tmp` 新上下文里调用了 `docarbiter`，路由 MinerU；旧 `doc-extract` 已移走。严格性还差“重启 ZCode App 后的顶层新会话”，目前记为**有条件通过**。
 - **MiniMax**：新子会话调用 `docarbiter`，路由 MinerU；旧路由器已移走。关键发现：MiniMax 扫描 `~/.agents/skills` 和项目 `.agents/skills`，**不扫描 `~/.minimax/skills`**；并且跳过“目录 + SKILL.md 文件软链”，只识别实体文件或**整目录软链**。目前记为**子会话通过**。
-- **Codex**：`~/.codex/skills/docarbiter/SKILL.md` 已安装、旧 `doc-extract` 已移走，但两个新会话都没有调用 `docarbiter`，且报告 378 个技能超出容量。它读到了 `mineru` / `docling`，说明路由答案对但仲裁器没被选中；正在做“真实文件 / 显式调用 / 最小技能集”诊断。
+- **Codex（条件通过）**：`~/.codex/skills/docarbiter/SKILL.md` 已安装、旧 `doc-extract` 已移走。诊断结论：symlink 可识别；全量环境 619–620 个技能，其中 371–380 个未进入模型可见列表、描述被移除，隐式提示绕过 `docarbiter`；最小技能集（17 个，只保留 `docarbiter` + `mineru`）隐式提示实际读取 `docarbiter` 并路由 MinerU；显式说“使用 docarbiter”在全量环境也通过。**结论：安装正确，隐式触发受 Codex 技能容量影响。**
 - **安装器修复**：`install.sh` 现在对 `~/.agents/skills`、`~/.codex/skills`、`~/.minimax/skills` 自动用整目录软链；Claude/DSH/ZCode 保持文件软链。可用 `--skill-mode dir|file` 强制。已有 `~/.local/bin` wrapper 会先备份为 `.bak.<timestamp>`。
 
 ## DSH：实测通过
@@ -102,23 +102,30 @@ CLI 帮助里没有 `--model`；模型选择在 TUI / 桌面端配置里。尝�
 
 ZCode 同时扫描 `~/.zcode/skills` 和 `~/.agents/skills`。DSH 切换时已把全局 `~/.agents/skills/doc-extract` 移走，并让 `~/.zcode/skills/doc-extract` 指向备份；所以 ZCode 现在只有 `user/zcode` 这一份旧路由。将来切换 ZCode 只需要备份 `~/.zcode/skills/doc-extract`，再装 docarbiter。
 
-## Codex：未找到 CLI
+## Codex：条件通过（技能容量限制）
 
-本机检查：
+2026-11-10 晚，用 Codex CLI `0.167.0-alpha.3.2` / `gpt-6-astra` 在两个环境复测：
 
-```bash
-command -v codex        # 空
-find /Applications ~/Applications ~/Library/Application\ Support/Codex -maxdepth 4 -name codex
-```
+| 环境 | 可见技能 | docarbiter 可见 | 隐式触发 | 显式触发 |
+|---|---:|---|---|---|
+| 全量 | 619–620 | 是 | **失败**（371–380 个技能未进入模型可见列表，描述被移除） | **通过** |
+| 最小集 | 17 | 是 | **通过**（实际读取 `docarbiter/SKILL.md`） | 通过 |
 
-没有找到 `codex` 可执行文件；`~/.codex/skills` 存在，旧 `doc-extract` symlink 现在指向 DSH 切换时留下的全局备份（仍然有效），`~/.codex/config.toml` 也有配置，但无法从命令行发起非交互 prompt。**本轮未测试 Codex 触发**；需要先确认 Codex 的 CLI/桌面入口。
+结论：
+
+- **安装和 symlink 都没问题**；Codex 能识别文件 symlink 和普通文件。
+- 全量环境的问题是**技能容量/索引**：大量技能未进入模型可见列表，`docarbiter` 的 description 被裁掉，隐式提示自然绕过它。
+- **显式调用可用**：说“使用 docarbiter 技能”会读取并路由。
+- 要让隐式触发稳定：精简 Codex 技能目录，或使用最小技能集；不要把 600+ 技能和 docarbiter 混在一起后期待它稳定被选中。
+
+本机当前 `~/.codex/skills/docarbiter/SKILL.md` 是普通文件；旧 `doc-extract` 已移走。
 
 ## 结论
 
 1. **一个 harness 只能留一个文档提取路由器。** Claude Code 已证明旧路由会赢；DSH 证明旧路由会让模型同时加载两份技能。ZCode 也会从两个目录重复发现旧路由。
 2. **DSH 已永久切换。** 旧路由停用、全局 `.agents` 旧路由移出后，中英文都只触发 docarbiter；Codex / ZCode 的旧路由副本保留，未被破坏。
 3. **ZCode 子代理通过。** 子代理调用 docarbiter 并路由 MinerU；待 App 重启后的顶层会话确认。CLI 的 `--prompt` 仍需默认模型，但子代理不依赖它。
-4. **Codex 卡在发现层。** 安装成功、旧路由已移走，但 378 个技能导致 docarbiter 不可见；需要真实文件/显式调用/最小技能集诊断，不能算通过。
+4. **Codex 条件通过。** 安装和 symlink 均正确；全量 620 技能时隐式触发被容量挤掉，最小集 17 技能时隐式通过，显式调用通过。使用建议：精简技能目录，或显式说“使用 docarbiter”。
 5. **MiniMax 子会话通过。** 它扫描 `~/.agents/skills`，不扫描 `~/.minimax/skills`；文件 symlink 会被跳过，必须用整目录软链。
 
 ## 复现命令
@@ -140,7 +147,7 @@ node /Applications/ZCode.app/Contents/Resources/glm/zcode.cjs skills list | grep
 - [x] DSH 永久切换（2026-11-10，旧路由备份可回滚）
 - [x] ZCode 子代理触发（docarbiter → MinerU）
 - [ ] ZCode App 重启后的顶层新会话确认
-- [ ] Codex 的 symlink/容量诊断与中英文触发
+- [x] Codex 的 symlink/容量诊断（显式通过；最小集隐式通过；全量隐式受容量影响）
 - [x] MiniMax 子会话触发（docarbiter → MinerU）
 - [ ] MiniMax 顶层新会话确认
 - [ ] 三个 harness 的真实文件路由 / 实际提取端到端

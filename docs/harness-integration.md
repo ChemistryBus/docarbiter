@@ -29,12 +29,12 @@ ln -sfn "$PWD/skills/docarbiter" "$DIR/docarbiter"
 | Claude Code | `~/.claude/skills` | — | 已切换；旧路由备份停用 |
 | DSH | `~/.dsh/skills` | `~/.agents/skills`（全局，`DSH_AGENTS_HOME` 可改） | 已切换；全局旧路由已移出 |
 | ZCode | `~/.zcode/skills` | `~/.agents/skills`（会重复发现） | 子代理验收通过；待 App 重启后顶层会话确认 |
-| Codex | `~/.codex/skills` | 可能也读 `~/.agents` | 安装成功但未触发；诊断中 |
+| Codex | `~/.codex/skills` | 可能也读 `~/.agents` | **条件通过**：全量技能时隐式受容量影响；显式调用通过，最小集隐式通过 |
 | MiniMax | `~/.agents/skills`（不是 `~/.minimax/skills`） | 项目 `.agents/skills`；`.minimax/skills` 不被扫描 | 子会话验收通过；需整目录软链 |
 
 > **DSH 的坑**：只移 `~/.dsh/skills/doc-extract` 不够，它还会读 `~/.agents/skills`。
 > **ZCode 的坑**：`~/.zcode/skills` 和 `~/.agents/skills` 会各发现一次；切换要同时处理。
-> **MiniMax / Codex 的坑**：它们可能跳过“目录 + SKILL.md 文件软链”，只识别整目录软链或实体文件。MiniMax 实测：实体文件 ✅、SKILL.md 软链 ❌、整目录软链 ✅。
+> **MiniMax / Codex 的坑**：MiniMax 跳过“目录 + SKILL.md 文件软链”，只识别实体文件或整目录软链。MiniMax 实测：实体文件 ✅、SKILL.md 软链 ❌、整目录软链 ✅。Codex 能识别两种链接，但全量 600+ 技能时 `docarbiter` 可能因技能容量不可见；此时用显式“使用 docarbiter”，或精简技能目录。
 > **共享目录的坑**：`~/.agents/skills` 被多个 harness 共用，动它之前先确认每个 harness 都有可用的旧路由副本。
 
 ## 3. 切换步骤（每个 harness 一次）
