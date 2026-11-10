@@ -12,7 +12,7 @@
 - [ ] Python 版本：3.10 / 3.11 / 3.12；3.11.11 实测
 - [ ] 默认安装 profile：`core`；`extra` / `full` 标注「未逐项实测」
 - [ ] 不发布任何 AGPL / Proprietary 工具代码或模型
-- [ ] `README.md`（中文）与 `README.en.md`（英文）内容一致
+- [x] `README.md`（英文，GitHub 默认）与 `README.zh-CN.md`（中文）内容一致，顶部可切换
 - [ ] 所有「待测」项在发布说明里可见，不藏
 
 ## 1. 干净环境安装
@@ -150,8 +150,8 @@
 
 ## 8. 文档
 
-- [ ] `README.md` 中文：问题、适用人群、图、安装、评测、许可、路线图
-- [ ] `README.en.md` 英文：与中文内容一致
+- [x] `README.md` 英文：问题、快速开始、路由、工具、验证、安装、许可
+- [x] `README.zh-CN.md` 中文：与英文一致，图片为中文版
 - [ ] 配图：`docs/assets/overview-zh.svg` / `overview-en.svg` 在 GitHub 正常渲染
 - [ ] 快速开始 5 分钟内可跑通
 - [ ] 常见失败（缺工具 / 没 GPU / 网络失败）有排查路径
