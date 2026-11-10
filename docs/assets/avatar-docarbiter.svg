@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024" role="img" aria-label="docarbiter avatar: a document with three routing paths">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1220"/>
+      <stop offset="0.55" stop-color="#111c33"/>
+      <stop offset="1" stop-color="#0b2b2a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.72" cy="0.38" r="0.55">
+      <stop offset="0" stop-color="#2dd4bf" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#2dd4bf" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="paper" x1="0" y1="0" x2="0.8" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#dbeafe"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="28" stdDeviation="30" flood-color="#020617" flood-opacity="0.55"/>
+    </filter>
+  </defs>
+
+  <rect width="1024" height="1024" rx="224" fill="url(#bg)"/>
+  <rect width="1024" height="1024" rx="224" fill="url(#glow)"/>
+
+  <!-- document -->
+  <g filter="url(#shadow)" transform="translate(176 208)">
+    <path d="M0 44C0 20 20 0 44 0H360L456 96V576C456 600 436 620 412 620H44C20 620 0 600 0 576Z" fill="url(#paper)"/>
+    <path d="M360 0L456 96H396C376 96 360 80 360 60Z" fill="#bfdbfe"/>
+    <rect x="64" y="118" width="252" height="26" rx="13" fill="#0f172a" opacity="0.9"/>
+    <rect x="64" y="190" width="318" height="16" rx="8" fill="#334155" opacity="0.55"/>
+    <rect x="64" y="232" width="280" height="16" rx="8" fill="#334155" opacity="0.45"/>
+    <rect x="64" y="274" width="310" height="16" rx="8" fill="#334155" opacity="0.35"/>
+    <rect x="64" y="350" width="110" height="16" rx="8" fill="#0f766e" opacity="0.9"/>
+    <rect x="64" y="392" width="200" height="16" rx="8" fill="#334155" opacity="0.4"/>
+    <rect x="64" y="434" width="170" height="16" rx="8" fill="#334155" opacity="0.3"/>
+  </g>
+
+  <!-- routing branches -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M582 470C690 470 700 350 812 350" stroke="#2dd4bf" stroke-width="24"/>
+    <path d="M582 522H812" stroke="#fbbf24" stroke-width="24"/>
+    <path d="M582 574C690 574 700 694 812 694" stroke="#818cf8" stroke-width="24"/>
+  </g>
+
+  <!-- route nodes -->
+  <g>
+    <circle cx="830" cy="350" r="46" fill="#2dd4bf"/>
+    <circle cx="830" cy="350" r="18" fill="#0b1220"/>
+    <circle cx="830" cy="522" r="46" fill="#fbbf24"/>
+    <circle cx="830" cy="522" r="18" fill="#0b1220"/>
+    <circle cx="830" cy="694" r="46" fill="#818cf8"/>
+    <circle cx="830" cy="694" r="18" fill="#0b1220"/>
+  </g>
+
+  <!-- small anchor dot at document edge -->
+  <circle cx="582" cy="522" r="18" fill="#f8fafc"/>
+</svg>
