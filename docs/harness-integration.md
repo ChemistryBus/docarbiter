@@ -200,6 +200,12 @@ name is shown, at least include the full answer and say whether the UI displayed
 | MiniMax | `~/.agents/skills/docarbiter` → `~/.local/share/docarbiter/skills/docarbiter` whole-directory symlink | old router moved out | full pass (top-level, zh/en); 97 discoverable skills under `~/.agents` |
 | Codex | `~/.codex/skills/docarbiter/SKILL.md` regular file | old router moved out | conditional; `doctor.sh` currently reports this copy as DRIFT until it is refreshed with `--skill-mode copy` |
 
+Re-test after the frontmatter fix (2026-11-11, English prompt): Claude Code and DSH both
+load `docarbiter` and route MinerU. Claude Code records `Skill {"skill":"docarbiter"}`;
+DSH's session log records `skill({"name":"docarbiter"})` even though its stdout prints only
+the final answer. Before the fix, DSH silently dropped the skill from its catalog because
+the description contained an unquoted `: ` (see gotcha 24).
+
 `doctor.sh` reports each harness's shape, whether it is the same source as this checkout,
 whether its content matches, and whether its version is behind. It also prints the
 discoverable skill count and warns above the catalog budget.

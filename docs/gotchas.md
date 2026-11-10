@@ -353,6 +353,14 @@ MinerU is missing about **35%** of the content on page 1, mainly Latin character
 
 **Reproduce**: Compare `pdftotext -f 65 -l 65 FILE -` with `mineru parse FILE --pages 65 ...`.
 
+## 24. Unquoted `: ` in SKILL.md frontmatter can silently remove the skill
+
+**Measured**: Appending ` English: Chinese/English-first ...` to the `description` value produced invalid YAML. Claude Code still loaded the skill, but DSH's catalog omitted `docarbiter` entirely: a headless English prompt routed to Docling instead, and the session log had 0 mentions of `docarbiter`. After replacing the colon with a dash and front-loading the English description, the same prompt loaded `docarbiter` and routed MinerU.
+
+**Fix**: Keep frontmatter values free of an unquoted `: `; use a dash or quote the value. `scripts/validate.py` now rejects an unquoted `: ` in any skill's frontmatter. Treat "skill silently absent from one harness" as a YAML/catalog-parse issue before debugging the harness.
+
+**Reproduce**: Put `description: test: value` in a SKILL.md, start a new DSH session, and check the available-skills catalog; then change it to `description: test - value` and repeat.
+
 ---
 
 ## Unverified / to be added
