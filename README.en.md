@@ -351,7 +351,7 @@ Known points:
 
 ## Before release
 
-This is **not published yet**. No git repository, no remote, no tag. The release gate is in [`docs/release-checklist.md`](docs/release-checklist.md): clean-room install, bilingual corpus, 12-tool CER, license audit, harness compatibility, failure modes, security, bilingual docs, and release mechanics. Completed isolated-HOME / routing / conflict tests are in [`docs/reliability.md`](docs/reliability.md).
+**Published as v0.1.0**: [GitHub Release](https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.0). The `validate` CI is green; clean-venv install, bilingual corpus, license audit, core routing, and bilingual docs are complete. `extra/full`, Windows, and ZCode / Codex / MiniMax triggering remain under Known Limitations in [`docs/release-checklist.md`](docs/release-checklist.md).
 
 ## Roadmap
 

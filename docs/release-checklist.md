@@ -1,7 +1,7 @@
 # 发布前检查清单
 
-> 状态：**未发布**。仓库未初始化 git、未推远端、未打 tag。
-> 发布计划与待确认事项见 [`docs/release-plan.md`](release-plan.md)。
+> 状态：**已发布 v0.1.0**（2026-11-10）。`main` 初始提交 `5e1f9fd`；GitHub Actions `validate` 已通过；Release 已创建。
+> 发布计划与执行记录见 [`docs/release-plan.md`](release-plan.md)。
 > 当前进度（2026-11-10）：11 篇双语合成样本 + 4 篇真实 CC BY-SA 维基样本 + CID/繁体/交错双栏/真竖排边缘样本 + 6 个文字层工具 + 2 条 OCR 路径 + 干净 venv 安装 + 工作区 8,444 个真实 PDF 只读抽样（48+24 样本、4 文件 smoke）+ P0 policy benchmark（22 个有答案文档）+ 5 份真实高频表（WS/T 578.1、GB 28050、DRIs 2023、GB 2760、中国食物成分表）已完成；P1 verify 负结果不发布、P2 真实表分流完成（Docling/MinerU/pdfplumber）、P3 默认策略已定、Claude Code P4 真实触发完成（旧 doc-extract 已备份停用）、DSH headless 触发通过并永久切换（全局 .agents 旧路由已备份）、ZCode 技能发现通过但 CLI 需先设默认模型、Codex 未找到 CLI、MiniMax 未测试；真竖排全量、真实双栏全文 CER、真实表逐单元格 CER、扩展层工具尚未完成。
 > 本清单的目标：把「能跑」变成「可复现、可解释、可维护」。
 

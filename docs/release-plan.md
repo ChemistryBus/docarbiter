@@ -1,8 +1,8 @@
-# GitHub 发布计划（待审）
+# GitHub 发布计划（已执行）
 
 > 目标：把当前仓库作为 **首个公开预览版** 发布到 GitHub。
-> 当前状态：未 `git init`、未 push、未打 tag；本地验证基本通过，仍有发布前阻塞项。
-> 这份计划先给用户审，确认后再执行。
+> 2026-11-10：已发布 **v0.1.0**（`main` 初始提交 `5e1f9fd`，CI `validate` 绿，Release 已创建）。
+> 本地验证、隐私修复、干净 venv 和提交预演均已完成。
 
 ## 0. 发布范围（建议）
 
@@ -55,11 +55,11 @@
 - [x] 在 `/tmp/docarbiter-release-preview` 做提交预演：128 个文件、1.6MB、`benchmarks/private` / `__pycache__` / `blobs` 均 0
 - [x] 真实 `git add` 前审查 `git status`：128 文件，私有/缓存 0
 - [x] 首次 commit（conventional commit，f40b18c）
-- [ ] 创建远端仓库并 `git push -u origin main`
-- [ ] GitHub Actions `validate` 跑绿
-- [ ] 打 tag `v0.1.0`
-- [ ] 创建 Release notes
-- [ ] 发布后 fresh clone + core install + route selftest 再验一次
+- [x] 创建远端仓库并 `git push -u origin main`
+- [x] GitHub Actions `validate` 跑绿（25s）
+- [x] 打 tag `v0.1.0`
+- [x] 创建 Release notes
+- [x] 发布后 fresh clone + validate + route selftest 再验一次
 
 ## 2. 发布说明必须写的边界
 

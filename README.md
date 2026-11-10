@@ -356,7 +356,7 @@ cd docarbiter
 
 ## 发布前
 
-**当前未发布**：没有初始化 git、没有远端、没有 tag。发布前按 [`docs/release-checklist.md`](docs/release-checklist.md) 逐项验证：干净环境安装、中英文语料、12 个工具 CER、许可审计、四个 harness 兼容、失败模式、安全、双语文档。已完成的隔离 HOME / 路由 / 冲突测试见 [`docs/reliability.md`](docs/reliability.md)。
+**已发布 v0.1.0**：[GitHub Release](https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.0)。`validate` CI 已通过；干净 venv、中英文语料、许可审计、核心路由和双语文档已完成。`extra/full`、Windows、ZCode / Codex / MiniMax 触发等仍按 [`docs/release-checklist.md`](docs/release-checklist.md) 的 Known Limitations 处理。
 
 ## 状态与路线图
 
