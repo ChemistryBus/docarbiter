@@ -74,10 +74,11 @@ Conclusion:
 
 ## P2b: real two-column full-text CER (2026-11-11)
 
-Two papers with independent truth:
+Three papers with independent truth:
 
 - BERT, NAACL 2019 (arXiv:1810.04805) → ar5iv HTML.
 - Cell 2020 MoTrPAC Perspective (PMC8800485) → PMC JATS XML.
+- ResNet, CVPR 2016 (arXiv:1512.03385) → ar5iv HTML.
 
 Scope: abstract plus main body, excluding references, figure/table content and captions, and appendices. A row is valid only with `start+end` alignment and coverage 0.5–1.5.
 
@@ -85,12 +86,14 @@ Scope: abstract plus main body, excluding references, figure/table content and c
 |---|---:|---:|---:|---:|
 | BERT | 0.2108 | 0.1398 | **0.0656** | 0.0773 |
 | Cell | **0.0349** | — (alignment failed) | 0.1099 | 0.0953 |
+| ResNet | 0.4212 | 0.2287 | 0.1537 | **0.1214** |
 
 Values are `nopunct` CER; coverage and text-CER are in `docs/benchmarks.md` section 5-13.
 
-- **BERT is the cleaner comparison.** Docling is best, MinerU close, liteparse worse, pdftotext worst. `pdftotext -layout` is invalid on two-column because it preserves physical order.
+- **BERT and ResNet are the cleaner comparisons.** Docling/MinerU are consistently the top two, but which one wins varies: Docling on BERT, MinerU on ResNet. liteparse is third and pdftotext last. `pdftotext -layout` is invalid on two-column because it preserves physical order.
 - **Cell has a scope caveat.** pdftotext is lowest, but Docling/MinerU coverage is 1.08–1.10 because this Perspective has text inside its figures, which the truth excludes. Their CER includes extra figure text, so the ranking is not directly comparable. Do not read this as "pdftotext always wins".
-- Two papers only; full-text CER is sensitive to figure text, headers/footers, and caption stripping. Do not generalise.
+- **Nature 2024 MoTrPAC (PMC11062907) was downloaded and tested but is not in the table.** The 35-page flagship includes Methods/Extended Data and figure legends; the main-body truth scope is too narrow, so all tools fail alignment (coverage 2.3–2.6). It needs a full-article scope.
+- Three papers only; full-text CER is sensitive to figure text, headers/footers, and caption stripping. Do not generalise.
 
 Runtime (this machine, M2 Pro, models warm): pdfplumber <0.5s per page; MinerU about 2.5s per page; Docling about 3–5s/page with no-OCR, about 10–12s/page with OCR.
 

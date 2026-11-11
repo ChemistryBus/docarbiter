@@ -324,10 +324,12 @@ Decision: use a whole-directory symlink for MiniMax; keep exactly one document-e
 
 ### Real two-column full-text CER (2026-11-11)
 
-- Inputs: BERT, NAACL 2019 full paper (16 pages, ACL two-column; ar5iv HTML truth) and Cell 2020 MoTrPAC Perspective (11 pages; PMC8800485 JATS truth). Private PDFs; not redistributed.
+- Inputs: BERT, NAACL 2019 full paper (16 pages, ACL two-column; ar5iv HTML truth), Cell 2020 MoTrPAC Perspective (11 pages; PMC8800485 JATS truth), and ResNet, CVPR 2016 (12 pages, arXiv:1512.03385; ar5iv HTML truth). Private PDFs; not redistributed.
 - Scope: abstract plus main body (section headings and paragraphs); excludes references, figure/table content and captions, and appendices. Tool output is aligned to the truth's first/last anchors; a row is valid only with `start+end` alignment and coverage 0.5–1.5.
 - Results (`nopunct` CER):
   - BERT: Docling 0.0656; MinerU 0.0773; liteparse 0.1398; pdftotext 0.2108. `pdftotext -layout` invalid.
   - Cell: pdftotext 0.0349; MinerU 0.0953; Docling 0.1099; liteparse and `pdftotext -layout` invalid (alignment).
-- Caveat: the Cell Perspective has text inside its figures; Docling/MinerU coverage is 1.08–1.10 because their output includes that extra text while the truth excludes it, so the ranking is not directly comparable. BERT is the cleaner comparison.
+  - ResNet: MinerU 0.1214; Docling 0.1537; liteparse 0.2287; pdftotext 0.4212; `pdftotext -layout` invalid.
+- Caveat: the Cell Perspective has text inside its figures; Docling/MinerU coverage is 1.08–1.10 because their output includes that extra text while the truth excludes it, so the ranking is not directly comparable. BERT and ResNet are the cleaner comparisons; Docling/MinerU are consistently top two, but the winner varies by paper.
+- Nature 2024 MoTrPAC (PMC11062907) was downloaded and tested but is not in the table: the 35-page flagship includes Methods/Extended Data and figure legends, so the main-body truth scope is too narrow and all tools fail alignment (coverage 2.3–2.6). It needs a full-article scope.
 - Decision: keep MinerU/Docling as the two-column quality paths; do not claim pdftotext wins from the Cell result; collect more papers before changing any default.

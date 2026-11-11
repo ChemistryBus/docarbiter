@@ -104,20 +104,24 @@ Fixed in this round:
   pdfplumber `text` 0.9916. Truth was drafted from Docling and hand-checked, so
   Docling's zero is a ceiling check; the pdfplumber/MinerU numbers are independent.
   These are two pages only.
-- `scripts/bench_fulltext.py`: full-text CER on two real two-column papers with
+- `scripts/bench_fulltext.py`: full-text CER on three real two-column papers with
   independent truth (PMC JATS / ar5iv). BERT — Docling 0.0656, MinerU 0.0773,
   liteparse 0.1398, pdftotext 0.2108 `nopunct`; Cell Perspective — pdftotext
-  0.0349, MinerU 0.0953, Docling 0.1099. The Cell figures contain text, so
+  0.0349, MinerU 0.0953, Docling 0.1099; ResNet — MinerU 0.1214, Docling
+  0.1537, liteparse 0.2287, pdftotext 0.4212. The Cell figures contain text, so
   Docling/MinerU coverage is 1.08–1.10 and the ranking is not directly comparable.
-  These are two papers only.
+  Nature 2024 MoTrPAC was downloaded and tested but excluded: its Methods/Extended
+  Data exceed the main-body scope, so all tools fail alignment. These are three
+  papers only.
 - English README install prompt; user-facing docs translated to English.
 
 Still open:
 
 - Per-cell CER on the remaining real tables and other editions (WS/T p8 and
   GB 28050 p6 are done).
-- Full-text CER on more papers and layouts (BERT full and the Cell Perspective
-  are done; the Cell figure-text caveat still needs a cleaner scope).
+- Full-text CER on more papers and layouts (BERT, Cell Perspective, and ResNet
+  are done; the Cell figure-text caveat still needs a cleaner scope, and the
+  Nature flagship needs a full-article scope).
 - True vertical text; all tools are weak.
 - `extra` tools (PaddleOCR/Marker/Unstructured/olmOCR) not fully benchmarked.
 - Mixed-document detection is implemented, but end-to-end OCR recall on mixed documents

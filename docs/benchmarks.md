@@ -514,18 +514,19 @@ python3 -I scripts/bench_real_tables.py \
 CI only `py_compile`s this script; it does not run it, because the PDFs and truth
 are private and gitignored.
 
-## 5-13. Full-text CER on two real two-column papers (2026-11-11)
+## 5-13. Full-text CER on three real two-column papers (2026-11-11)
 
 Scope: abstract plus main body (section headings and paragraphs). References,
 figure/table content and captions, and appendices are excluded. Truth comes from
 an independent source, not from a tool under test:
 
 - Cell 2020 MoTrPAC Perspective, PMC8800485 → PMC JATS XML;
-- BERT, NAACL 2019 (arXiv:1810.04805) → ar5iv HTML.
+- BERT, NAACL 2019 (arXiv:1810.04805) → ar5iv HTML;
+- ResNet, CVPR 2016 (arXiv:1512.03385) → ar5iv HTML.
 
 Tool output is stripped of Markdown/HTML, cut at acknowledgments/references, and
 aligned to the truth's first/last anchors before CER. A row is valid only with
-`start+end` alignment and coverage 0.5–1.5.
+`start+end` (or a clear last-paragraph fallback) alignment and coverage 0.5–1.5.
 
 | Paper | Tool | CER (text) | CER (nopunct) | Coverage | Valid |
 |---|---|---|---:|---:|---|
@@ -539,6 +540,11 @@ aligned to the truth's first/last anchors before CER. A row is valid only with
 | Cell | MinerU | 0.1010 | 0.0953 | 1.084 | yes |
 | Cell | liteparse | — | — | 1.189 | no (start-only) |
 | Cell | pdftotext `-layout` | — | — | 0.954 | no (start-only) |
+| ResNet | pdftotext | 0.4343 | 0.4212 | 1.012 | yes |
+| ResNet | liteparse | 0.2464 | 0.2287 | 1.048 | yes |
+| ResNet | Docling | 0.1587 | 0.1537 | 0.927 | yes |
+| ResNet | MinerU | **0.1339** | **0.1214** | 1.004 | yes |
+| ResNet | pdftotext `-layout` | — | — | 1.003 | no (whole-document alignment) |
 
 Interpretation:
 
@@ -550,7 +556,15 @@ Interpretation:
   text inside its figures, which the main-body truth excludes. Their CER
   therefore includes extra figure text. pdftotext's low CER is partly a clean
   text layer and reading order, not a general win.
-- **Two papers only.** Full-text CER is still sensitive to figure text,
+- **ResNet (CVPR) is a second clean comparison.** MinerU is best (12.14%),
+  Docling close (15.37%), liteparse worse (22.87%), pdftotext worst (42.12%);
+  `-layout` is invalid. Together with BERT, Docling/MinerU are consistently the
+  top two, but which one wins varies by paper.
+- **Nature 2024 MoTrPAC (PMC11062907) was also downloaded and tested but is not
+  in the table.** The 35-page flagship includes Methods/Extended Data and figure
+  legends; the main-body truth scope is too narrow, so all tools fail alignment
+  (coverage 2.3–2.6). It needs a full-article scope.
+- **Three papers only.** Full-text CER is still sensitive to figure text,
   headers/footers, and caption stripping. Do not generalise to another paper,
   publisher layout, or tool version.
 - The script is `scripts/bench_fulltext.py`; private PDFs and truth are

@@ -211,7 +211,9 @@ def strip_markup(text: str) -> str:
     text = re.sub(r"<table\b.*?</table>", "", text, flags=re.S | re.I)
     text = re.sub(r"<script\b.*?</script>", "", text, flags=re.S | re.I)
     text = re.sub(r"<style\b.*?</style>", "", text, flags=re.S | re.I)
-    text = re.sub(r"<[^>]+>", " ", text)
+    # Require a tag name after "<": mathematical "<0.1%" is not HTML and must
+    # not swallow text up to the next ">".
+    text = re.sub(r"</?[A-Za-z][^>]*>", " ", text)
     text = html.unescape(text)
     text = re.sub(r"!\[[^\]]*\]\([^)]*\)", "", text)
     text = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", text)
@@ -316,30 +318,44 @@ def tool_text(tool: str, pdf: Path, cache: Path, timeout: int) -> tuple[str, flo
 
 
 # ---------------------------------------------------------------- alignment
-def align_span(truth: str, pred: str) -> tuple[int, int, str]:
-    """Find the body span in pred using anchors from the truth."""
+def align_span(truth: str, pred: str, last_paragraph: str = "") -> tuple[int, int, str]:
+    """Find the body span in pred using anchors from the truth.
+
+    Matching is case-insensitive because HTML/LaTeX truth and PDF extraction
+    often differ only in sentence-initial capitalisation.
+    """
     if not truth or not pred:
         return 0, len(pred), "empty"
+    haystack = pred.lower()
     start = -1
     for offset in (0, 120, 300):
         for length in (80, 60, 40):
-            anchor = truth[offset:offset + length]
+            anchor = truth[offset:offset + length].lower()
             if len(anchor) >= 20:
-                start = pred.find(anchor)
+                start = haystack.find(anchor)
                 if start >= 0:
                     break
         if start >= 0:
             break
     end = -1
-    for length in (80, 60, 40):
-        anchor = truth[-length:]
+    for length in (80, 120, 160):
+        anchor = truth[-length:].lower()
         if len(anchor) >= 20:
-            end = pred.rfind(anchor)
+            end = haystack.rfind(anchor)
             if end >= 0:
                 end += len(anchor)
                 break
     if start >= 0 and end > start:
         return start, end, "start+end"
+    # Fallback: find the start of the last truth paragraph and cut at its end.
+    if start >= 0 and last_paragraph:
+        last = last_paragraph.lower()
+        if len(last) >= 20:
+            idx = haystack.find(last[:80])
+            if idx < 0:
+                idx = haystack.find(last[:60])
+            if idx >= 0:
+                return start, min(len(pred), idx + len(last)), "last-paragraph"
     if start >= 0:
         return start, len(pred), "start only"
     return 0, len(pred), "whole"
@@ -348,7 +364,9 @@ def align_span(truth: str, pred: str) -> tuple[int, int, str]:
 def measure(truth: str, pred: str, strip_punct: bool) -> dict:
     t = norm(truth, strip_punct)
     p = norm(pred, strip_punct)
-    start, end, mode = align_span(t, p)
+    paragraphs = [x for x in re.split(r"\n\s*\n", truth) if x.strip()]
+    last_para = norm(paragraphs[-1], strip_punct) if len(paragraphs) > 1 else ""
+    start, end, mode = align_span(t, p, last_para)
     aligned = p[start:end]
     return {
         "truth_chars": len(t),
@@ -369,6 +387,7 @@ def main() -> int:
     ap.add_argument("--out", default=None)
     ap.add_argument("--tools", default="pdftotext,pdftotext-layout,liteparse,docling,mineru")
     ap.add_argument("--timeout", type=int, default=1200, help="seconds per tool per paper")
+    ap.add_argument("--papers", help="comma-separated PDF stems to include")
     args = ap.parse_args()
 
     src = Path(args.dir)
@@ -379,6 +398,9 @@ def main() -> int:
 
     pdfs = sorted(p for p in src.glob("*.pdf")
                   if any(p.with_suffix(s).exists() for s in (".truth.xml", ".truth.html", ".truth.txt")))
+    if args.papers:
+        wanted = {p.strip() for p in args.papers.split(",") if p.strip()}
+        pdfs = [p for p in pdfs if p.stem in wanted]
     if not pdfs:
         print(f"no PDF with a truth source in {src}", file=sys.stderr)
         return 2
@@ -395,7 +417,10 @@ def main() -> int:
                 continue
             for strip_punct, label in ((False, "text"), (True, "nopunct")):
                 result = measure(truth, text, strip_punct)
-                valid = result["alignment"] == "start+end" and 0.5 <= result["coverage"] <= 1.5
+                valid = (
+                    result["alignment"] in ("start+end", "last-paragraph")
+                    and 0.5 <= result["coverage"] <= 1.5
+                )
                 row = {
                     "paper": pdf.stem,
                     "tool": tool,

@@ -67,7 +67,7 @@
 - Both Chinese and English are covered, but not "all PDFs are accurate"; documents in real workspaces without answer keys are checked only for consistency/coverage, not called accuracy.
 - A fixed tool is not a silver bullet; the routing gain comes from "not choosing the wrong tool + switching tools on failure", not from a stronger algorithm.
 - Tables: complex merged tables → Docling, bad text layer/symbol tables → MinerU, simple grids → pdfplumber; dense two-column book tables may still have row misalignment.
-- True vertical writing and symbol-table glyph fidelity are still incomplete. Real-table per-cell CER is done for WS/T 578.1 p8 and GB 28050 p6 only; full-text two-column CER is done for BERT full and the Cell Perspective only (Cell figure-text caveat); the other real tables remain structure/spot checks.
+- True vertical writing and symbol-table glyph fidelity are still incomplete. Real-table per-cell CER is done for WS/T 578.1 p8 and GB 28050 p6 only; full-text two-column CER is done for BERT full, the Cell Perspective, and ResNet only (Cell figure-text caveat; Nature flagship needs a full-article scope); the other real tables remain structure/spot checks.
 - `extra/full` not individually tested; Windows not verified; Linux is only covered by CI.
 - Harness: Claude Code / DSH / ZCode / MiniMax tested; Codex conditional (large catalog). See `docs/harness-integration.md`.
 
@@ -76,7 +76,7 @@
 - Real install experience on Linux x86_64 / Windows (CI covers only minimal verification)
 - Per-tool CER for the 12 tools in `--profile extra`
 - Extension layer such as Marker / Surya / olmOCR / Camelot
-- Full-text CER on more papers and layouts (BERT full and the Cell Perspective are done; Cell figure-text caveat)
+- Full-text CER on more papers and layouts (BERT, Cell Perspective, and ResNet are done; Cell figure-text caveat; Nature flagship needs a full-article scope)
 - Full true vertical writing, mixed traditional and simplified Chinese
 - Per-cell CER on the remaining real tables and other editions (WS/T 578.1 p8 and GB 28050 p6 are done); first/last page misalignment in dense two-column tables such as the China Food Composition Tables
 - Triggering tests for ZCode / Codex / MiniMax
