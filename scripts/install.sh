@@ -22,7 +22,7 @@ usage() {
   --skill-mode auto|dir|file|copy
                               技能注册方式：dir=整目录软链，file=目录+SKILL.md 软链，
                               copy=目录+SKILL.md 实体副本
-                              auto: ~/.agents 用 dir；~/.codex 用 copy；其余已知目录用 file
+                              auto: 读取 registry.json 的 harnesses（dir/file/copy）；未知目录报错
   --no-skills                 只装工具，不注册技能
   --skills-only               只注册技能/装 wrapper，不装工具（用于快速试用）
   --force                     覆盖已存在的同名技能（先备份为 .bak.<时间>）
@@ -173,6 +173,7 @@ fi
 
 SKILL_SRC_DIR="$REPO_ROOT/skills/docarbiter"
 SKILL_SRC_FILE="$SKILL_SRC_DIR/SKILL.md"
+HARNESS_HELPER="$REPO_ROOT/scripts/harness_registry.py"
 INSTALL_ERRORS=0
 
 normalize_dir() {
@@ -367,11 +368,12 @@ verify_install() {
 }
 
 if [ ${#SKILLS_DIRS[@]} -eq 0 ]; then
-  # ~/.agents/skills is the shared global root for pi-agent harnesses
-  # (MiniMax Code and others); check it first so one install covers them.
-  for d in "$HOME/.agents/skills" "$HOME/.claude/skills" "$HOME/.codex/skills" "$HOME/.zcode/skills" "$HOME/.dsh/skills"; do
+  # registry.json is the source of truth for skill directories and shapes.
+  while IFS=$'\t' read -r id label rel shape status; do
+    [ "$status" = "not-scanned" ] && continue
+    d="$HOME/$rel"
     [ -d "$d" ] && SKILLS_DIRS+=("$d")
-  done
+  done < <(python3 -I "$HARNESS_HELPER" --format tsv --scanned)
   [ ${#SKILLS_DIRS[@]} -eq 0 ] && SKILLS_DIRS=("$HOME/.claude/skills")
 fi
 
@@ -379,20 +381,20 @@ for raw_dir in "${SKILLS_DIRS[@]}"; do
   dir="$(normalize_dir "$raw_dir")"
   mode="$SKILL_MODE"
   if [ "$mode" = "auto" ]; then
-    case "$dir" in
-      "$HOME/.agents/skills") mode="dir" ;;
-      "$HOME/.codex/skills") mode="copy" ;;
-      "$HOME/.claude/skills"|"$HOME/.dsh/skills"|"$HOME/.zcode/skills") mode="file" ;;
-      "$HOME/.minimax/skills")
-        echo "[warn] ${dir} 不被 MiniMax Code 扫描；请改用 ~/.agents/skills" >&2
-        mode="file"
-        ;;
-      *)
-        echo "[error] 未知技能目录: ${dir}" >&2
-        echo "        请显式指定 --skill-mode dir|file|copy" >&2
-        exit 2
-        ;;
-    esac
+    lookup="$(python3 -I "$HARNESS_HELPER" --lookup "$dir" || true)"
+    if [ -z "$lookup" ]; then
+      echo "[error] 未知技能目录: ${dir}" >&2
+      echo "        请显式指定 --skill-mode dir|file|copy" >&2
+      exit 2
+    fi
+    shape="${lookup%%$'\t'*}"
+    rest="${lookup#*$'\t'}"
+    status="${rest%%$'\t'*}"
+    note="${rest#*$'\t'}"
+    mode="$shape"
+    if [ "$status" = "not-scanned" ]; then
+      echo "[warn] ${dir}: ${note}" >&2
+    fi
   fi
   mkdir -p "$dir"
   if ! {

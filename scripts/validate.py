@@ -135,6 +135,23 @@ def main() -> int:
                 if not shell.exists():
                     errors.append(f"registry.json[{tool.get('id')}]: missing {shell.relative_to(ROOT)}")
 
+        harnesses = registry.get("harnesses", [])
+        if not harnesses:
+            errors.append("registry.json: missing 'harnesses' section")
+        else:
+            required_harness = {"id", "label", "skills_dir", "shape", "status"}
+            harness_ids = [h.get("id") for h in harnesses]
+            if len(harness_ids) != len(set(harness_ids)):
+                errors.append("registry.json: duplicate harness ids")
+            for harness in harnesses:
+                missing = sorted(required_harness - set(harness))
+                if missing:
+                    errors.append(f"registry.json[harness {harness.get('id', '?')}]: missing {missing}")
+                if harness.get("shape") not in {"dir", "file", "copy"}:
+                    errors.append(f"registry.json[harness {harness.get('id', '?')}]: invalid shape")
+                if harness.get("status") not in {"full-pass", "conditional", "not-scanned"}:
+                    errors.append(f"registry.json[harness {harness.get('id', '?')}]: invalid status")
+
     notices = (ROOT / "THIRD_PARTY_NOTICES.md").read_text(encoding="utf-8")
     for tool in REQUIRED_TOOLS:
         if tool not in notices:
@@ -235,6 +252,8 @@ def main() -> int:
         errors.append("scripts/check_skill_consistency.py is missing")
     if not (ROOT / "scripts" / "check_updates.py").exists():
         errors.append("scripts/check_updates.py is missing")
+    if not (ROOT / "scripts" / "harness_registry.py").exists():
+        errors.append("scripts/harness_registry.py is missing")
     for name in ("survey_pdfs.py", "sample_real.py"):
         if not (ROOT / "scripts" / name).exists():
             errors.append(f"scripts/{name} is missing")

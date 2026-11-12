@@ -1,8 +1,64 @@
 {
   "schema_version": 1,
-  "updated": "2026-11-10",
+  "updated": "2026-11-12",
   "default_profile": "core",
-  "notes": "Machine-readable tool registry. The docarbiter skill routes by category; this file is the source of truth for what exists. Adding a tool in an existing category requires one entry here plus an optional thin shell in skills/_tools/.",
+  "notes": "Machine-readable tool registry. The docarbiter skill routes by category; this file is the source of truth for what exists. The harnesses section is the source of truth for skill directories and install shapes; install.sh and doctor.sh read it. Adding a tool in an existing category requires one entry here plus an optional thin shell in skills/_tools/.",
+  "harnesses": [
+    {
+      "id": "agents",
+      "label": "agents",
+      "skills_dir": ".agents/skills",
+      "shape": "dir",
+      "status": "full-pass",
+      "used_by": ["MiniMax Code", "pi-agent harnesses"],
+      "note": "shared global root; MiniMax Code needs a whole-directory symlink and a new session"
+    },
+    {
+      "id": "claude-code",
+      "label": "claude",
+      "skills_dir": ".claude/skills",
+      "shape": "file",
+      "status": "full-pass",
+      "used_by": ["Claude Code"],
+      "note": "file symlink; new session"
+    },
+    {
+      "id": "codex",
+      "label": "codex",
+      "skills_dir": ".codex/skills",
+      "shape": "copy",
+      "status": "conditional",
+      "used_by": ["Codex"],
+      "note": "real SKILL.md copy; 600+ skills can hide descriptions; explicit call or minimal set"
+    },
+    {
+      "id": "zcode",
+      "label": "zcode",
+      "skills_dir": ".zcode/skills",
+      "shape": "file",
+      "status": "full-pass",
+      "used_by": ["ZCode"],
+      "note": "also discovers .agents/skills; new session"
+    },
+    {
+      "id": "dsh",
+      "label": "dsh",
+      "skills_dir": ".dsh/skills",
+      "shape": "file",
+      "status": "full-pass",
+      "used_by": ["DSH"],
+      "note": "also reads .agents/skills; new session"
+    },
+    {
+      "id": "minimax-legacy",
+      "label": "minimax",
+      "skills_dir": ".minimax/skills",
+      "shape": "file",
+      "status": "not-scanned",
+      "used_by": ["legacy MiniMax layouts"],
+      "note": "MiniMax Code does not scan this directory; use .agents/skills"
+    }
+  ],
   "tools": [
     {
       "id": "mineru",

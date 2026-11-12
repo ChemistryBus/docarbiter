@@ -152,18 +152,21 @@ repo_skill_dir="$REPO_ROOT/skills/docarbiter"
 repo_skill_file="$repo_skill_dir/SKILL.md"
 repo_version="$(skill_version "$repo_skill_file")"
 
-skill_dirs=()
-# ~/.agents/skills is the shared global root for pi-agent harnesses.
-for d in "$HOME/.agents/skills" "$HOME/.claude/skills" "$HOME/.codex/skills" "$HOME/.zcode/skills" "$HOME/.dsh/skills"; do
-  [ -d "$d" ] && skill_dirs+=("$d")
-done
+skill_entries=()
+# registry.json is the source of truth for skill directories and labels.
+while IFS=$'\t' read -r id entry_label rel shape status; do
+  [ "$status" = "not-scanned" ] && continue
+  d="$HOME/$rel"
+  [ -d "$d" ] && skill_entries+=("$entry_label|$d")
+done < <(python3 -I "$REPO_ROOT/scripts/harness_registry.py" --format tsv --scanned)
 
-if [ ${#skill_dirs[@]} -eq 0 ]; then
+if [ ${#skill_entries[@]} -eq 0 ]; then
   row "skills" "none" "未找到 harness 技能目录"
 else
   routers=""
-  for d in "${skill_dirs[@]}"; do
-    label="$(basename "$(dirname "$d")")"
+  for entry in "${skill_entries[@]}"; do
+    label="${entry%%|*}"
+    d="${entry#*|}"
     found=""
     for name in docarbiter doc-extract; do
       [ -f "$d/$name/SKILL.md" ] && found="$found $name"

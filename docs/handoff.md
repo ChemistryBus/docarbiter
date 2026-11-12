@@ -164,6 +164,7 @@ Deferred from the harness feedback:
 
 - `README.md` / `README.zh-CN.md`: user-facing overview.
 - `docs/updating.md`: update matrix.
+- `registry.json` → `harnesses`: the single source of truth for skill directories and install shapes; `install.sh` and `doctor.sh` read it through `scripts/harness_registry.py`.
 - `docs/harness-integration.md`: per-harness install/switch/test cards.
 - `docs/p4-other-harnesses.md`: harness test history.
 - `docs/policy.md`, `docs/benchmarks.md`: routing and benchmark evidence.

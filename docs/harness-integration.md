@@ -4,6 +4,10 @@
 > configuration. Each harness only needs two things: **put `docarbiter/SKILL.md` in its
 > skill directory** and **keep exactly one document-extraction router**.
 
+> The machine-readable harness table is `registry.json` → `harnesses`; `install.sh` and
+> `doctor.sh` read it through `scripts/harness_registry.py`. The table below is the human
+> summary, not a second source of truth.
+
 ## 1. Generic install
 
 Prefer the repository script and pass the target harness's skill directory:
