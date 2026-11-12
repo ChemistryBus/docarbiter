@@ -61,10 +61,17 @@ One document-extraction router per harness.
 
    ```bash
    python3 -I scripts/validate.py
+   python3 -I scripts/check_skill_consistency.py
+   python3 -I scripts/check_skill_consistency.py --check-git
    python3 -I scripts/route.py --selftest   # all pass; currently 24 checks
    python3 -I scripts/check_pagemarkers.py  # real MinerU page-marker regression; skips if MinerU is absent
    for f in bootstrap.sh scripts/*.sh scripts/wrappers/*.sh; do bash -n "$f"; done
    ```
+
+   `check_skill_consistency.py` checks that every `--goal` and routed tool in
+   `route.py` is documented in `SKILL.md`, that README versions match, and that
+   camelot has not returned to the default chain. `--check-git` also fails when
+   `SKILL.md` changed against `origin/main` without a version bump.
 
 3. Push to `main` only when the change is ready; watch the Ubuntu + macOS CI matrix.
 4. Patch release for install/docs/compatibility fixes (e.g. `v0.1.1`); do not move or
@@ -73,10 +80,19 @@ One document-extraction router per harness.
 6. Never upload user documents; keep `benchmarks/private/` gitignored; do not add secrets,
    real user PDFs, or upstream code.
 7. If a harness doesn't see the skill, check the install shape before reinstalling:
-   MiniMax needs a whole-directory symlink; Codex may need a regular file and a smaller
-   catalog; Claude/DSH/ZCode file symlinks work.
+   MiniMax needs a whole-directory symlink; Codex uses a regular file copy
+   (`--skill-mode copy`) and a smaller catalog; Claude/DSH/ZCode file symlinks work.
 8. If a tool is missing, read `docs/install-routed-tools.md`, ask permission, then install
    the upstream package/tool. Do not silently clone arbitrary skill repositories.
+9. The weekly `probe-upstream` workflow runs `check_updates.py` and opens/updates an issue
+   labelled `upstream-probe` when a routed tool is behind. A pin change is a code change:
+   read the release notes, re-run the benchmark suite, and update docs with the result.
+
+**Skill version discipline:** when `skills/docarbiter/SKILL.md` changes, bump its
+`version:` line and the README/README.zh-CN versions in the same commit, then run
+`check_skill_consistency.py`. Refresh the Codex copy with
+`install.sh --skill-mode copy --skills-dir ~/.codex/skills`; other clones need
+`git pull`/`update.sh`. Harnesses load the skill only at the start of a new session.
 
 ## Current work (2026-11-11)
 
@@ -150,3 +166,4 @@ Deferred from the harness feedback:
 - `scripts/check_pagemarkers.py`: real MinerU page-structure regression (skips without MinerU).
 - `scripts/bench_real_tables.py`: real-table per-cell CER (private PDFs/truth, gitignored; CI only py_compiles it).
 - `scripts/bench_fulltext.py`: real two-column full-text CER (PMC JATS / ar5iv truth; private inputs; CI only py_compiles it).
+- `scripts/check_updates.py`: upstream probe; the weekly `probe-upstream` workflow opens/updates an issue when a routed tool is behind.

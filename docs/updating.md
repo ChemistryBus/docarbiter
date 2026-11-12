@@ -87,6 +87,43 @@ universal updater: check the skill's `SKILL.md` / upstream URL, then `git pull` 
 reinstall) in that project. Do not update a skill merely because the harness catalog
 shows a new version; read its release notes first.
 
+## Upstream probe (fixed mechanism)
+
+`scripts/check_updates.py` compares:
+
+- docarbiter: local HEAD vs `origin/main` vs the latest GitHub release;
+- routed Python tools: installed version vs `registry.json` pin vs latest PyPI;
+- upstream GitHub releases for the same repositories.
+
+Run it manually:
+
+```bash
+python3 -I scripts/check_updates.py --format markdown --exit-code
+```
+
+The weekly `probe-upstream` GitHub Actions workflow (Mondays 03:17 UTC) runs the same
+probe and opens or updates an issue labelled `upstream-probe` when anything is behind.
+It never installs or upgrades anything.
+
+Before changing a pin, treat it as a code change: read the release notes, run
+`validate.py`, `route.py --selftest`, `check_pagemarkers.py`, and the real-table /
+full-text benchmarks, then update the pin and docs together. A `pinned-behind` result
+is a prompt to evaluate, not an instruction to upgrade.
+
+## Skill version discipline
+
+`SKILL.md` is executable policy: changing it changes routing. When it changes:
+
+1. bump the frontmatter `version:` and the README / README.zh-CN versions;
+2. run `python3 -I scripts/check_skill_consistency.py` (and `--check-git` before push);
+3. refresh the Codex copy with `install.sh --skill-mode copy --skills-dir ~/.codex/skills`;
+4. start a new session in every harness (Claude/DSH/ZCode/MiniMax); Codex needs the copy
+   refresh first.
+
+`check_skill_consistency.py` fails when a `--goal` or routed tool exists in `route.py` but
+not in `SKILL.md`, when README versions differ, or when `SKILL.md` changed against
+`origin/main` without a version bump.
+
 ## After updating
 
 ```bash

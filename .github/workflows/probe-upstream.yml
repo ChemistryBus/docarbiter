@@ -1,0 +1,51 @@
+name: probe-upstream
+
+on:
+  schedule:
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Probe upstream versions
+        id: probe
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 -I scripts/check_updates.py --format markdown --exit-code > probe.md
+      - name: Open or update the probe issue
+        if: steps.probe.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh label create upstream-probe --color FBCA04 \
+            --description "Upstream dependency update" 2>/dev/null || true
+          num="$(gh issue list --label upstream-probe --state open \
+            --json number --jq '.[0].number // empty')"
+          if [ -n "$num" ]; then
+            gh issue comment "$num" --body-file probe.md
+          else
+            gh issue create \
+              --title "Upstream probe $(date -u +%F)" \
+              --label upstream-probe \
+              --body-file probe.md
+          fi
+      - name: Upload probe report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: upstream-probe
+          path: probe.md
+          if-no-files-found: ignore
