@@ -61,7 +61,7 @@ On 2026-11-10 we ran supplementary tests with real high-frequency tables from th
 | GB 2760—2024 p13 | 26 data rows × 4 columns | 27×4; spot-check correct | 84×3; broken | 27×4; characters interleaved in 4 multi-line cells | 27×4; spot-check correct |
 | China Food Composition Tables, 6th ed., Vol. 1, p246 | 65 entries, two-column book table | 0 tables | 45×4; unusable | 6 columns; 65 entries; first 3 rows misaligned | With OCR on, 7 columns, most rows correct; bottom 3 rows misaligned; no-OCR unusable |
 
-Per-cell CER (2026-11-11, hand-checked truth; two pages only): WS/T p8 — pdfplumber default / Docling / MinerU all 0.0000 micro CER after normalization; GB 28050 p6 — Docling 0.0000, MinerU 0.1237, pdfplumber default 0.3010, pdfplumber text 0.9916. Truth was drafted from Docling and hand-checked, so Docling's 0.0000 is a ceiling check; the pdfplumber/MinerU figures are independent. Details: `docs/benchmarks.md` section 5-12.
+Per-cell CER (2026-11-12, hand-checked truth; three pages only): WS/T p8 — pdfplumber default / Docling / MinerU all 0.0000 micro CER after normalization; GB 28050 p6 — Docling 0.0000, MinerU 0.1237, pdfplumber default 0.3010, pdfplumber text 0.9916; GB 2760 p13 — pdfplumber default 0.0000, Docling 0.0000, MinerU 0.1071, pdfplumber text 0.9293 (MinerU's 4 multi-line cells are interleaved). WS/T and GB 28050 truth was drafted from Docling and hand-checked, so their Docling 0.0000 is a ceiling check; GB 2760 truth was written from the rendered page. Details: `docs/benchmarks.md` section 5-12.
 
 Conclusion:
 

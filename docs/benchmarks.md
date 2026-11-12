@@ -458,13 +458,14 @@ Result on 2026-11-11: **PASS** (`full markers [1, 2, 3, 4]`, `selected markers [
 blank page preserved). The script skips with exit 0 when MinerU is not installed, so CI can
 run it on machines without the model.
 
-## 5-12. Real-table per-cell CER (2026-11-11)
+## 5-12. Real-table per-cell CER (2026-11-11/12)
 
-This is the per-cell follow-up to the structure/spot-check table above. Two
+This is the per-cell follow-up to the structure/spot-check table above. Three
 single-page PDFs were isolated from private local standards (not redistributed):
 
 - WS/T 578.1—2017 p8 (PDF page 8): 3-level header, 22 data rows, 13 columns.
 - GB 28050—2025 p6 (PDF page 6): 4 columns, 28 data rows, multi-line cells.
+- GB 2760—2024 p13 (PDF page 13): 4 columns, 26 data rows, 4 multi-line cells.
 
 Truth was written as a cell matrix and hand-checked against the rendered page.
 A merged cell keeps its text in the top-left position and `""` in covered
@@ -482,6 +483,10 @@ removes Unicode punctuation. CER is edit distance divided by truth length.
 | GB 28050 p6 | pdfplumber text | 72×6 | 0.9975 / 0.9916 | 0.000 |
 | GB 28050 p6 | Docling JSON | 29×4 | 0.0101 / 0.0000 | 1.000 |
 | GB 28050 p6 | MinerU Markdown | 29×4 | 0.1162 / 0.1237 | 0.948 |
+| GB 2760 p13 | pdfplumber default | 27×4 | 0.0668 / 0.0000 | 1.000 |
+| GB 2760 p13 | pdfplumber text | 59×3 | 0.8893 / 0.9293 | 0.061 |
+| GB 2760 p13 | Docling JSON | 27×4 | 0.0193 / 0.0000 | 1.000 |
+| GB 2760 p13 | MinerU Markdown | 27×4 | 0.1178 / 0.1071 | 0.951 |
 
 Interpretation:
 
@@ -494,11 +499,15 @@ Interpretation:
   MinerU errors are exactly the interleaved multi-line cells (`n-3`,
   mono/polyunsaturated fat, the vitamin A/E units, and the folate unit);
   pdfplumber's default strategy instead merges header/unit text into data cells.
-- **Caveats.** The truth was hand-checked but drafted from Docling's grid, so
-  Docling's 0.0000 is a ceiling/sanity check, not independent evidence; the
-  pdfplumber and MinerU numbers are independent. This covers two pages and two
-  editions only. It is cell-text CER, not proof that merged-cell semantics are
-  understood. Do not generalise it to another edition, page, or tool version.
+- **GB 2760 p13 is another clean grid.** pdfplumber default and Docling
+  reproduce every content cell after `nopunct` normalisation; MinerU is 10.71%
+  because its 4 multi-line cells (rows 11, 14, 20, 22) are interleaved;
+  pdfplumber `text` breaks the grid to 59×3.
+- **Caveats.** WS/T and GB 28050 truth was drafted from Docling and hand-checked,
+  so their Docling 0.0000 is a ceiling/sanity check; GB 2760 truth was written
+  from the rendered page. This covers three pages and three editions only. It is
+  cell-text CER, not proof that merged-cell semantics are understood. Do not
+  generalise it to another edition, page, or tool version.
 - **Earlier structure-only note corrected.** The earlier table recorded "21 data
   rows" and a flattened pdfplumber header. The isolated-page rerun with
   pdfplumber 0.11.10 finds 22 data rows (25 rows including the 3 header rows)

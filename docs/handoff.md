@@ -114,12 +114,14 @@ Fixed in this round:
 - `scripts/check_pagemarkers.py`: real MinerU regression for page order, blank-page
   preservation, and selected-page numbering (passes on the repository's 4-page fixture).
 - `scripts/bench.py`: the misnamed `per_page.csv` is now `per_document.csv`.
-- `scripts/bench_real_tables.py`: per-cell CER on two real, hand-checked tables.
+- `scripts/bench_real_tables.py`: per-cell CER on three real, hand-checked tables.
   WS/T 578.1 p8 — pdfplumber default / Docling / MinerU all 0.0000 `nopunct` CER;
   GB 28050 p6 — Docling 0.0000, MinerU 0.1237, pdfplumber default 0.3010,
-  pdfplumber `text` 0.9916. Truth was drafted from Docling and hand-checked, so
-  Docling's zero is a ceiling check; the pdfplumber/MinerU numbers are independent.
-  These are two pages only.
+  pdfplumber `text` 0.9916; GB 2760 p13 — pdfplumber default / Docling 0.0000,
+  MinerU 0.1071, pdfplumber `text` 0.9293 (4 multi-line cells interleaved).
+  WS/T and GB 28050 truth was drafted from Docling and hand-checked, so their
+  Docling zero is a ceiling check; GB 2760 truth was written from the rendered
+  page. These are three pages only.
 - `scripts/bench_fulltext.py`: full-text CER on five real two-column papers with
   independent truth (PMC JATS / ar5iv). BERT — Docling 0.0656, MinerU 0.0773,
   liteparse 0.1398, pdftotext 0.2108 `nopunct`; Cell Perspective — pdftotext
@@ -136,8 +138,8 @@ Fixed in this round:
 
 Still open:
 
-- Per-cell CER on the remaining real tables and other editions (WS/T p8 and
-  GB 28050 p6 are done).
+- Per-cell CER on the remaining real tables and other editions (WS/T p8,
+  GB 28050 p6, and GB 2760 p13 are done).
 - Full-text CER on more papers and layouts (BERT, Cell Perspective, ResNet,
   Nature Communications, and PLOS Computational Biology are done; the Cell /
   Nature Communications / PLOS figure-text caveat still needs a cleaner scope,
