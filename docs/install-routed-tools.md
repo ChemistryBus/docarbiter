@@ -27,7 +27,7 @@ If you only want the skill and will install tools yourself:
 | ID | Use it for | Upstream | License | Install |
 |---|---|---|---|---|
 | `mineru` | PDF → structured Markdown, page anchors, OCR | https://github.com/opendatalab/MinerU | Apache-2.0 + terms | `pip install mineru==4.1.7` |
-| `docling` | Office/HTML/EPUB, RAG, LaTeX, complex merged tables | https://github.com/docling-project/docling | MIT | `pip install docling==2.149.0` |
+| `docling` | Office/HTML/EPUB, RAG, LaTeX, complex merged tables | https://github.com/docling-project/docling | MIT | `pip install docling==2.150.0` |
 | `liteparse` | Fast text-layer PDF, word coordinates | https://github.com/run-llama/liteparse | Apache-2.0 | `pip install liteparse==2.18.0` |
 | `markitdown` | Simple single-column PDF/Office | https://github.com/microsoft/markitdown | MIT | `pip install markitdown==0.1.9` |
 | `rapidocr` | Chinese-first image/screenshot OCR | https://github.com/RapidAI/RapidOCR | Apache-2.0 | `pip install rapidocr==3.10.0` |

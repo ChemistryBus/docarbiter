@@ -87,7 +87,7 @@
       "output_types": ["markdown", "json", "html", "doctags", "chunks", "latex"],
       "best_for": "Office and mixed formats, RAG chunks, LaTeX, non-PDF inputs, and complex text-layer tables with merged headers or multi-line cells",
       "avoid_when": "You only need to read PDF body text quickly; Chinese borderless tables (Docling may return 0 tables; try pdfplumber text strategy)",
-      "install": "pip install docling==2.149.0",
+      "install": "pip install docling==2.150.0",
       "wrapper": null,
       "upstream": "https://github.com/docling-project/docling",
       "status": "demo-verified"

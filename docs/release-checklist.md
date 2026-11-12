@@ -1,13 +1,13 @@
 # Pre-Release Checklist
 
-> Status: **v0.1.1 — Harness Compatibility Patch released** (2026-11-11). `v0.1.0` was the first public release; `main` now includes install-compatibility and harness documentation fixes.
+> Status: **v0.1.2 — Maintenance and Evidence Update released** (2026-11-12). `v0.1.0` was the first public release; `v0.1.1` added harness compatibility; `main` now includes the Docling 2.150.0 pin, the harness registry, the consistency check, and the weekly upstream probe.
 > See [`docs/release-plan.md`](release-plan.md) for the release plan and execution log.
 > Current progress (2026-11-11): 11 bilingual synthetic samples + 4 real CC BY-SA Wikipedia samples + CID/traditional-Chinese/interleaved two-column/true vertical-writing edge samples + 6 text-layer tools + 2 OCR paths + clean venv install + read-only sampling of 8,444 real PDFs in the workspace (48+24 samples, 4-file smoke) + P0 policy benchmark (22 documents with answer keys) + 5 real high-frequency tables (WS/T 578.1, GB 28050, DRIs 2023, GB 2760, China Food Composition Tables) are complete; P1 verify negative results are not published, P2 real-table routing is complete (Docling/MinerU/pdfplumber), P3 default policy is set, Claude Code P4 real triggering is complete (old doc-extract backed up and disabled), DSH headless triggering passed and was permanently switched (global .agents old route backed up), ZCode / MiniMax top-level fully passed, Codex conditionally passed (full skill-set capacity limit); real-table per-cell CER is complete for WS/T 578.1 p8, GB 28050 p6, and GB 2760 p13; full-text two-column CER is complete for BERT, Cell Perspective, ResNet, Nature Communications, and PLOS Computational Biology; full true-vertical writing, full-text CER on more papers, the remaining real tables, and extension-layer tools are not yet complete.
 > The goal of this checklist: turn "it runs" into "reproducible, explainable, maintainable."
 
 ## 0. Release gates (decide first)
 
-- [x] Version: `v0.1.1 — Harness Compatibility Patch` (v0.1.0 was the First Public Preview)
+- [x] Version: `v0.1.2 — Maintenance and Evidence Update` (v0.1.0 was the First Public Preview; v0.1.1 was the Harness Compatibility Patch)
 - [ ] Support scope documented clearly: tested on macOS arm64; Linux x86_64 pending verification; Windows not verified
 - [ ] Python versions: 3.10 / 3.11 / 3.12; 3.11.11 tested
 - [ ] Default install profile: `core`; `extra` / `full` marked "not individually tested"
@@ -18,7 +18,7 @@
 ## 1. Clean-environment install
 
 - [x] macOS arm64 clean venv: `/tmp/docarbiter-release-venv`, Python 3.11 (rerun 2026-11-10)
-- [x] `./scripts/install.sh --profile core --no-skills` succeeded (core 7 packages version-matched: MinerU 4.1.7 / Docling 2.149.0 / liteparse 2.18.0 / MarkItDown 0.1.9 / RapidOCR 3.10.0 / OCRmyPDF 17.12.1 / pdfplumber 0.11.10)
+- [x] Core pin set installed in a fresh venv: MinerU 4.1.7 / Docling 2.150.0 / liteparse 2.18.0 / MarkItDown 0.1.9 / RapidOCR 3.10.0 / OCRmyPDF 17.12.1 / pdfplumber 0.11.10; `pip check` clean; route selftest 24/24 (2026-11-12). The earlier `install.sh --profile core` run used Docling 2.149.0.
 - [x] `install.sh` does not upgrade already-installed Homebrew formulae (`skip (no upgrade)` for poppler etc.)
 - [x] Isolated HOME + `install.sh --skills-only`: wrapper + symlink created successfully
 - [x] `doctor.sh` exits 0 under isolated HOME, no MISSING in core (MinerU model not downloaded is expected)
@@ -185,7 +185,7 @@ Four harnesses on this machine: Claude Code / Codex / zcode / DSH.
 - [ ] `git init` / commit / push only after explicit user consent
 - [ ] Remote repository name confirmed (`ChemistryBus/docarbiter`)
 - [ ] Default branch `main`
-- [x] Tag `v0.1.1`; release notes list known limitations
+- [x] Tag `v0.1.2`; release notes list known limitations
 - [ ] Release notes state: macOS tested, Linux/Windows not verified, extra not individually tested
 - [ ] Release notes state: Anthropic `pdf`, PyMuPDF, PDF-Extract-Kit are not included
 - [ ] After release, run `doctor.sh` + a two-page demo once to confirm the remote version is reproducible

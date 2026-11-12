@@ -1,6 +1,6 @@
 # Handoff — docarbiter maintenance
 
-Last updated: 2026-11-11.
+Last updated: 2026-11-12.
 
 ## What this project is
 
@@ -10,8 +10,8 @@ and gives a fallback chain. The repository contains original docs, thin shells, 
 fixtures, and install scripts; no upstream code or model weights.
 
 - Repo: https://github.com/ChemistryBus/docarbiter
-- Local repo: `/Users/wubolong/Documents/Claude/Document Extraction Skills/document-extraction-skills`
-- Latest release: `v0.1.1 — Harness Compatibility Patch`
+- Local repo: `$HOME/Documents/Claude/Document Extraction Skills/document-extraction-skills`
+- Latest release: `v0.1.2 — Maintenance and Evidence Update`
 - First release: `v0.1.0 — First Public Preview`
 - Default branch: `main`; CI: `validate` on Ubuntu + macOS.
 

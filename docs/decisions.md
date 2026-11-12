@@ -44,7 +44,7 @@ Meaning: `docarbiter` = document + arbiter. It does not extract by itself; it ad
 | liteparse | 2.18.0 | Apache-2.0 | `liteparse-doc` |
 | markitdown | 0.1.9 | MIT | `markitdown` |
 | mineru | 4.1.7 | `LicenseRef-MinerU-Open-Source-License` | `mineru-doc` / `mineru` |
-| docling | 2.149.0 | MIT | `docling` |
+| docling | 2.150.0 | MIT | `docling` |
 | rapidocr | 3.10.0 | Apache-2.0 | Python API |
 | ocrmypdf | 17.12.1 | MPL-2.0 | `ocrmypdf` |
 | pdfplumber | 0.11.10 | MIT | Python API |
@@ -347,3 +347,4 @@ Triggered by the weekly upstream probe: MinerU 4.2.1, Docling 2.150.0, OCRmyPDF 
 - **Wrapper fix.** MinerU 4.2.1 uses "No basic, standard, or advanced engine available" (commas); `mineru-doc.sh` now classifies this as a config error and exits 3 immediately instead of retrying 10 times. Tested against the isolated 4.2.1 server.
 - **Proposed pin set validated.** A fresh venv with MinerU 4.1.7 + Docling 2.150.0 + OCRmyPDF 17.12.1 (plus liteparse 2.18.0, MarkItDown 0.1.9, RapidOCR 3.10.0, pdfplumber 0.11.10) installs cleanly, `pip check` reports no broken requirements, and `route.py --selftest` is 24/24.
 - **Recommendation:** v0.1.2 should update **Docling 2.150.0 only**; keep MinerU 4.1.7 and OCRmyPDF 17.12.1. A MinerU 4.2.1 update needs a validated server/engine setup; OCRmyPDF 17.14.1 needs a separate environment or an upstream MinerU change.
+- **Shipped in v0.1.2 (2026-11-12):** the global environment and the release pin use Docling 2.150.0. MinerU 4.1.7 and OCRmyPDF 17.12.1 are unchanged. The wrapper fix and the known-blocker notes are included.

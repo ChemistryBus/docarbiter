@@ -83,7 +83,7 @@ check_pkg() {
 echo "-- core --"
 check_cmd pdftotext 1 "brew install poppler / apt install poppler-utils"
 check_pkg mineru 1 4.1.7
-check_pkg docling 1 2.149.0
+check_pkg docling 1 2.150.0
 check_pkg liteparse 1 2.18.0
 check_pkg markitdown 1 0.1.9
 check_pkg rapidocr 1 3.10.0

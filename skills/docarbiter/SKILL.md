@@ -2,7 +2,7 @@
 name: docarbiter
 description: Chinese/English-first document-extraction router for PDF, scans, images, and Office files. Use when the user asks which tool to use, or when extraction is garbled, misordered, or has broken tables; routes to mineru / docling / liteparse / markitdown / rapidocr / ocrmypdf / pdfplumber / pdftotext / paddleocr / marker / unstructured / olmocr with a fallback chain. 中英文优先的文档提取仲裁器。当用户要提取中文或英文 PDF、扫描件、图片或 Office 文档的内容，但不确定该用哪个工具，或现有提取结果乱码、乱序、表格错位时使用。它不自己提取，只判断输入格式、语言、文字层是否可用、目标产出，再路由到上述工具，并给出降级链。若用户已明确指定某个工具，或只要 PDF 合并/拆分/表单，直接调用对应工具，不使用本技能。
 license: MIT
-version: 0.1.1
+version: 0.1.2
 ---
 
 # docarbiter

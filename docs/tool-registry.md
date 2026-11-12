@@ -12,7 +12,7 @@
 | # | Tool | ★ | License | Role | Install | Chinese/English status |
 |---:|---|---:|---|---|---|---|
 | 1 | **MinerU** | 83.3k | Apache-2.0 + additional terms | PDF → structured Markdown, heading hierarchy, page anchors | `pip install mineru==4.1.7`; `mineru-doc` | Chinese/English demo 0.0046 / 0.0013; scans 1.59% / 0.20% |
-| 2 | **Docling** | 70.3k | MIT | Office / HTML / EPUB / audio-video / RAG chunks / LaTeX / complex merged tables | `pip install docling==2.149.0`; `docling convert` | Chinese/English demo 0.0061 / 0.0093; scans 1.01% / 7.12%; best structure and reading order on real merged tables |
+| 2 | **Docling** | 70.3k | MIT | Office / HTML / EPUB / audio-video / RAG chunks / LaTeX / complex merged tables | `pip install docling==2.150.0`; `docling convert` | Chinese/English demo 0.0061 / 0.0093; scans 1.01% / 7.12%; best structure and reading order on real merged tables |
 | 3 | **liteparse** | 13.0k | Apache-2.0 | Fastest for PDFs with a text layer; word-level coordinates, font information | `pip install liteparse==2.18.0`; wrapper `liteparse-doc` | Chinese/English demo 0.0061 / 0.0079; text layer usable; not applicable to scans |
 | 4 | **MarkItDown** | 194.5k | MIT | Single-column / Office fast conversion to Markdown | `pip install markitdown==0.1.9`; `markitdown` | Chinese/English demo 0.0061 / 0.0185; two-column failure not reproduced (synthetic); not applicable to scans |
 | 5 | **RapidOCR** | 8.5k | Apache-2.0 | Image / screenshot OCR | `pip install rapidocr==3.10.0`; Python API | Chinese scan 1.16%; English scan 0.10% |
@@ -76,7 +76,7 @@ Commands and pitfalls in the thin shells were tested against local versions. `in
 
 ```
 mineru==4.1.7
-docling==2.149.0
+docling==2.150.0
 liteparse==2.18.0
 markitdown==0.1.9
 rapidocr==3.10.0

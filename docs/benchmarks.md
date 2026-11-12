@@ -137,7 +137,9 @@ Machine: macOS 26 / M2 Pro / Python 3.11.11.
 | liteparse | 2.18.0 | 0.13–0.42 s | 0.0061 | 0.14 s | 0.0079 | Fastest; quotes/dashes normalized to ASCII |
 | markitdown | 0.1.9 | 0.98–1.19 s | 0.0061 | 0.90–0.98 s | 0.0185 | Usable for single column; most visible English punctuation normalization |
 | mineru | 4.1.7 | 1.0–9.6 s | **0.0046** | 1.0–3.9 s | **0.0013** | Lowest CER in both Chinese and English runs; ranges include cold/warm start |
-| docling | 2.149.0 | 9.5–19.3 s | 0.0061 | 9.5–12.2 s | 0.0093 | Slowest; usable for both Chinese and English |
+| docling | 2.150.0 | 9.5–19.3 s | 0.0061 | 9.5–12.2 s | 0.0093 | Slowest; usable for both Chinese and English |
+
+> The table values were first measured with Docling 2.149.0; the 2.150.0 re-run on 2026-11-12 covered the 3 real-table pages and 5 full-text papers and produced identical CERs.
 
 Interpretation:
 
