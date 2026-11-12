@@ -72,28 +72,33 @@ Conclusion:
 5. **Dense two-column book tables are still not guaranteed.** On the 65-entry two-column table on p246 of the China Food Composition Tables, both Docling OCR and MinerU show row misalignment at the top/bottom of the page; such tables must be manually spot-checked, and "the whole table is accurate" cannot be claimed.
 6. **Routing is file-level, not page-level.** `route.py` only looks at the first 3 pages; for DRIs 2023 the first 3 pages have a usable text layer, but the page 65 symbol table's text layer is bad. For books/standards, first locate the target page, then use `pdftotext -f PAGE -l PAGE` or pdfplumber as a page-level probe.
 
-## P2b: real two-column full-text CER (2026-11-11)
+## P2b: real two-column full-text CER (2026-11-12)
 
-Three papers with independent truth:
+Five papers with independent truth:
 
 - BERT, NAACL 2019 (arXiv:1810.04805) → ar5iv HTML.
 - Cell 2020 MoTrPAC Perspective (PMC8800485) → PMC JATS XML.
 - ResNet, CVPR 2016 (arXiv:1512.03385) → ar5iv HTML.
+- Nature Communications 2026 (PMC13482395) → PMC JATS XML.
+- PLOS Computational Biology 2026 (PMC13529250) → PMC JATS XML.
 
-Scope: abstract plus main body, excluding references, figure/table content and captions, and appendices. A row is valid only with `start+end` alignment and coverage 0.5–1.5.
+Scope: abstract plus main body, excluding references, figure/table content and captions, and appendices. A row is valid only with `start+end` (or a clear last-paragraph fallback) alignment and coverage 0.5–1.5.
 
 | Paper | pdftotext | liteparse | Docling | MinerU |
 |---|---:|---:|---:|---:|
 | BERT | 0.2108 | 0.1398 | **0.0656** | 0.0773 |
 | Cell | **0.0349** | — (alignment failed) | 0.1099 | 0.0953 |
 | ResNet | 0.4212 | 0.2287 | 0.1537 | **0.1214** |
+| Nature Communications | 0.1733 | 0.1259 | **0.1209** | 0.1322 |
+| PLOS Computational Biology | 0.1976 | 0.1950 | **0.1586** | 0.2552 |
 
 Values are `nopunct` CER; coverage and text-CER are in `docs/benchmarks.md` section 5-13.
 
-- **BERT and ResNet are the cleaner comparisons.** Docling/MinerU are consistently the top two, but which one wins varies: Docling on BERT, MinerU on ResNet. liteparse is third and pdftotext last. `pdftotext -layout` is invalid on two-column because it preserves physical order.
-- **Cell has a scope caveat.** pdftotext is lowest, but Docling/MinerU coverage is 1.08–1.10 because this Perspective has text inside its figures, which the truth excludes. Their CER includes extra figure text, so the ranking is not directly comparable. Do not read this as "pdftotext always wins".
+- **Docling is the most consistent quality path.** It is best on BERT, Nature Communications, and PLOS, and second on Cell/ResNet. MinerU wins ResNet and is strong on BERT/Cell, but is worst on the equation/table-heavy PLOS paper.
+- **BERT and ResNet are the cleanest comparisons.** liteparse is usually mid; pdftotext is last except on the clean Cell text layer. `pdftotext -layout` is invalid on BERT/Cell/ResNet and only gets a high-CER last-paragraph alignment on Nature Communications/PLOS; treat it as unsuitable for two-column.
+- **Coverage caveat.** Cell (1.08–1.10), Nature Communications (1.11), and PLOS (1.16–1.30) include figure/SI text that the main-body truth excludes; their CER includes some extra text. The Cell figure-text caveat means pdftotext's low Cell CER is partly scope, not a general win.
 - **Nature 2024 MoTrPAC (PMC11062907) was downloaded and tested but is not in the table.** The 35-page flagship includes Methods/Extended Data and figure legends; the main-body truth scope is too narrow, so all tools fail alignment (coverage 2.3–2.6). It needs a full-article scope.
-- Three papers only; full-text CER is sensitive to figure text, headers/footers, and caption stripping. Do not generalise.
+- Five papers only; full-text CER is sensitive to figure text, headers/footers, and caption stripping. Do not generalise.
 
 Runtime (this machine, M2 Pro, models warm): pdfplumber <0.5s per page; MinerU about 2.5s per page; Docling about 3–5s/page with no-OCR, about 10–12s/page with OCR.
 

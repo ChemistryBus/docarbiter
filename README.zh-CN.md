@@ -111,11 +111,11 @@ python3 -I scripts/route.py file.pdf --goal table-structure --json
 | 路由命令 | 可用性检查与生成的命令使用同一入口；空格、引号、`$`、中文路径均由自测覆盖 |
 | 页码结构 | 全页与选页导出的 MinerU 页码标记已回归；空白页保留（`scripts/check_pagemarkers.py`） |
 | 真实表逐单元格 CER | WS/T 578.1 p8：pdfplumber 默认 / Docling / MinerU 均 0.0000（nopunct）；GB 28050 p6：Docling 0.0000、MinerU 0.1237、pdfplumber 0.3010（两页人工 truth） |
-| 双栏全文 CER | BERT：Docling 0.0656 / MinerU 0.0773 / liteparse 0.1398 / pdftotext 0.2108；Cell Perspective：pdftotext 0.0349 / MinerU 0.0953 / Docling 0.1099；ResNet：MinerU 0.1214 / Docling 0.1537 / liteparse 0.2287 / pdftotext 0.4212（nopunct，三篇论文；Cell 含图内文字，需看 caveat） |
+| 双栏全文 CER | BERT：Docling 0.0656 / MinerU 0.0773 / liteparse 0.1398 / pdftotext 0.2108；Cell Perspective：pdftotext 0.0349 / MinerU 0.0953 / Docling 0.1099；ResNet：MinerU 0.1214 / Docling 0.1537 / liteparse 0.2287 / pdftotext 0.4212；Nature Communications：Docling 0.1209 / liteparse 0.1259 / MinerU 0.1322 / pdftotext 0.1733；PLOS Comp Biol：Docling 0.1586 / liteparse 0.1950 / pdftotext 0.1976 / MinerU 0.2552（nopunct，五篇论文；coverage caveat） |
 | Harness 触发 | Claude Code、DSH、ZCode、MiniMax 已测；Codex 条件通过（大技能目录） |
 | CI | GitHub Actions `validate` 通过；Ubuntu + macOS 由 CI 覆盖，Windows 未验证 |
 
-已知边界写清楚：真竖排、符号字形保真还没解决；真实表逐单元格 CER 已在两页上实测（WS/T 578.1 p8、GB 28050 p6），双栏全文 CER 已在三篇论文上实测（BERT、Cell Perspective、ResNet；Cell 图内有文字，排名需看 caveat；Nature 旗舰因 Methods/Extended Data 超出正文 scope 未纳入），都不能外推成通用准确率。README 只放摘要，完整证据在 [docs/policy.md](docs/policy.md)、[docs/benchmarks.md](docs/benchmarks.md) 和 [docs/gotchas.md](docs/gotchas.md)。
+已知边界写清楚：真竖排、符号字形保真还没解决；真实表逐单元格 CER 已在两页上实测（WS/T 578.1 p8、GB 28050 p6），双栏全文 CER 已在五篇论文上实测（BERT、Cell Perspective、ResNet、Nature Communications、PLOS Computational Biology）。Docling 最稳，MinerU 在 ACL/CVPR 强但在公式/表格多的 PLOS 上最差；coverage 大于 1.1 说明 CER 混入了部分图注/SI 文字；Nature 旗舰因 Methods/Extended Data 超出正文 scope 未纳入。都不能外推成通用准确率。README 只放摘要，完整证据在 [docs/policy.md](docs/policy.md)、[docs/benchmarks.md](docs/benchmarks.md) 和 [docs/gotchas.md](docs/gotchas.md)。
 
 ## 安装选项
 

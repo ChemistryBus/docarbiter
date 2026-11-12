@@ -296,7 +296,7 @@ Conclusions:
 - markitdown passes clean text-only two-column (synthetic); **markitdown breaks on real papers containing figures/axis labels**. Do not treat "synthetic two-column passes" as "real two-column passes".
 - For real two-column, prefer MinerU / Docling / liteparse; use pdfplumber only for tables, not for extracting the full text directly.
 - We tried PLOS ONE `10.1371/journal.pone.0296319` (CC BY 4.0): page 2 is a left sidebar + right body text, not a classic academic two-column layout; it is not used as a two-column CER fixture.
-- Done in section 5-13 (2026-11-11): BERT full text and Cell 2020 MoTrPAC Perspective, with independent PMC JATS / ar5iv truth and full-text CER.
+- Done in section 5-13 (2026-11-11/12): BERT, Cell 2020 MoTrPAC Perspective, ResNet, Nature Communications 2026, and PLOS Computational Biology 2026, with independent PMC JATS / ar5iv truth and full-text CER.
 
 ## 5-8. Table cell-level accuracy (pdfplumber, 2026-11-09)
 
@@ -514,7 +514,7 @@ python3 -I scripts/bench_real_tables.py \
 CI only `py_compile`s this script; it does not run it, because the PDFs and truth
 are private and gitignored.
 
-## 5-13. Full-text CER on three real two-column papers (2026-11-11)
+## 5-13. Full-text CER on five real two-column papers (2026-11-11/12)
 
 Scope: abstract plus main body (section headings and paragraphs). References,
 figure/table content and captions, and appendices are excluded. Truth comes from
@@ -522,7 +522,9 @@ an independent source, not from a tool under test:
 
 - Cell 2020 MoTrPAC Perspective, PMC8800485 → PMC JATS XML;
 - BERT, NAACL 2019 (arXiv:1810.04805) → ar5iv HTML;
-- ResNet, CVPR 2016 (arXiv:1512.03385) → ar5iv HTML.
+- ResNet, CVPR 2016 (arXiv:1512.03385) → ar5iv HTML;
+- Nature Communications 2026, PMC13482395 → PMC JATS XML;
+- PLOS Computational Biology 2026, PMC13529250 → PMC JATS XML.
 
 Tool output is stripped of Markdown/HTML, cut at acknowledgments/references, and
 aligned to the truth's first/last anchors before CER. A row is valid only with
@@ -545,6 +547,16 @@ aligned to the truth's first/last anchors before CER. A row is valid only with
 | ResNet | Docling | 0.1587 | 0.1537 | 0.927 | yes |
 | ResNet | MinerU | **0.1339** | **0.1214** | 1.004 | yes |
 | ResNet | pdftotext `-layout` | — | — | 1.003 | no (whole-document alignment) |
+| Nature Communications | pdftotext | 0.1760 | 0.1733 | 1.110 | yes |
+| Nature Communications | liteparse | 0.1290 | 0.1259 | 1.111 | yes |
+| Nature Communications | Docling | **0.1244** | **0.1209** | 1.110 | yes |
+| Nature Communications | MinerU | 0.1373 | 0.1322 | 1.128 | yes |
+| Nature Communications | pdftotext `-layout` | 0.7876 | 0.7759 | 1.101 | yes (last-paragraph) |
+| PLOS Computational Biology | pdftotext | 0.2081 | 0.1976 | 1.202 | yes (last-paragraph) |
+| PLOS Computational Biology | liteparse | 0.2133 | 0.1950 | 1.207 | yes |
+| PLOS Computational Biology | Docling | **0.1634** | **0.1586** | 1.162 | yes |
+| PLOS Computational Biology | MinerU | 0.3022 | 0.2552 | 1.295 | yes |
+| PLOS Computational Biology | pdftotext `-layout` | 0.2429 | 0.2294 | 1.242 | yes (last-paragraph) |
 
 Interpretation:
 
@@ -558,15 +570,25 @@ Interpretation:
   text layer and reading order, not a general win.
 - **ResNet (CVPR) is a second clean comparison.** MinerU is best (12.14%),
   Docling close (15.37%), liteparse worse (22.87%), pdftotext worst (42.12%);
-  `-layout` is invalid. Together with BERT, Docling/MinerU are consistently the
-  top two, but which one wins varies by paper.
+  `-layout` is invalid.
+- **Nature Communications is a close race.** Docling 12.09%, liteparse 12.59%,
+  MinerU 13.22%, pdftotext 17.33%; coverage 1.11 means the tool output includes
+  figure legends/SI text that the main-body truth excludes.
+- **PLOS Computational Biology is equation/table-heavy.** Docling is best
+  (15.86%), liteparse 19.50%, pdftotext 19.76%, MinerU worst (25.52%);
+  coverage 1.16–1.30 also includes extra figure/SI text.
+- **No universal winner.** Docling is the most consistent (best on BERT, Nature
+  Communications, PLOS; second on Cell/ResNet). MinerU wins ResNet and is strong
+  on BERT/Cell, but is worst on the equation-heavy PLOS paper. liteparse is
+  usually mid; pdftotext is last except on the clean Cell text layer.
 - **Nature 2024 MoTrPAC (PMC11062907) was also downloaded and tested but is not
   in the table.** The 35-page flagship includes Methods/Extended Data and figure
   legends; the main-body truth scope is too narrow, so all tools fail alignment
   (coverage 2.3–2.6). It needs a full-article scope.
-- **Three papers only.** Full-text CER is still sensitive to figure text,
-  headers/footers, and caption stripping. Do not generalise to another paper,
-  publisher layout, or tool version.
+- **Five papers only.** Full-text CER is still sensitive to figure text,
+  headers/footers, and caption stripping; coverage above 1.1 means the CER
+  includes some extra text. Do not generalise to another paper, publisher
+  layout, or tool version.
 - The script is `scripts/bench_fulltext.py`; private PDFs and truth are
   gitignored, and CI only `py_compile`s the script.
 

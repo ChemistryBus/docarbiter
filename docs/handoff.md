@@ -120,24 +120,28 @@ Fixed in this round:
   pdfplumber `text` 0.9916. Truth was drafted from Docling and hand-checked, so
   Docling's zero is a ceiling check; the pdfplumber/MinerU numbers are independent.
   These are two pages only.
-- `scripts/bench_fulltext.py`: full-text CER on three real two-column papers with
+- `scripts/bench_fulltext.py`: full-text CER on five real two-column papers with
   independent truth (PMC JATS / ar5iv). BERT — Docling 0.0656, MinerU 0.0773,
   liteparse 0.1398, pdftotext 0.2108 `nopunct`; Cell Perspective — pdftotext
   0.0349, MinerU 0.0953, Docling 0.1099; ResNet — MinerU 0.1214, Docling
-  0.1537, liteparse 0.2287, pdftotext 0.4212. The Cell figures contain text, so
-  Docling/MinerU coverage is 1.08–1.10 and the ranking is not directly comparable.
-  Nature 2024 MoTrPAC was downloaded and tested but excluded: its Methods/Extended
-  Data exceed the main-body scope, so all tools fail alignment. These are three
-  papers only.
+  0.1537, liteparse 0.2287, pdftotext 0.4212; Nature Communications — Docling
+  0.1209, liteparse 0.1259, MinerU 0.1322, pdftotext 0.1733; PLOS Computational
+  Biology — Docling 0.1586, liteparse 0.1950, pdftotext 0.1976, MinerU 0.2552.
+  Docling is the most consistent; MinerU is worst on the equation/table-heavy
+  PLOS paper. Cell/Nature Communications/PLOS coverage is 1.08–1.30 because their
+  output includes extra figure/SI text. Nature 2024 MoTrPAC was downloaded and
+  tested but excluded: its Methods/Extended Data exceed the main-body scope, so
+  all tools fail alignment. These are five papers only.
 - English README install prompt; user-facing docs translated to English.
 
 Still open:
 
 - Per-cell CER on the remaining real tables and other editions (WS/T p8 and
   GB 28050 p6 are done).
-- Full-text CER on more papers and layouts (BERT, Cell Perspective, and ResNet
-  are done; the Cell figure-text caveat still needs a cleaner scope, and the
-  Nature flagship needs a full-article scope).
+- Full-text CER on more papers and layouts (BERT, Cell Perspective, ResNet,
+  Nature Communications, and PLOS Computational Biology are done; the Cell /
+  Nature Communications / PLOS figure-text caveat still needs a cleaner scope,
+  and the Nature flagship needs a full-article scope).
 - True vertical text; all tools are weak.
 - `extra` tools (PaddleOCR/Marker/Unstructured/olmOCR) not fully benchmarked.
 - Mixed-document detection is implemented, but end-to-end OCR recall on mixed documents

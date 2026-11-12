@@ -50,8 +50,11 @@ JATS_SKIP = {
 CAPTION_RE = re.compile(r"^\s*(?:Figure|Fig\.|Table)\s+\d+[.:]|^\s*(?:图|表)\s*\d+", re.I)
 REFERENCES_RE = re.compile(r"(?:^|\n)\s*(?:References|REFERENCES|Bibliography|参考文献)\s*(?:\n|$)")
 END_RE = re.compile(
-    r"(?im)^\s*(?:Supplementary Material|Acknowledg(?:e)?ments?|Author Contributions|"
-    r"Data and Code Availability|Funding|References|Bibliography|参考文献)\s*$"
+    r"(?im)^\s*(?:Supplementary Material|Supplementary information|Reporting summary|"
+    r"Source data|Data availability|Code availability|Data and Code Availability|"
+    r"Acknowledg(?:e)?ments?|Author Contributions|Competing interests|"
+    r"Additional information|Rights and permissions|Funding|References|Bibliography|"
+    r"参考文献)\s*$"
 )
 
 
