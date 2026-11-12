@@ -134,6 +134,12 @@ Fixed in this round:
   output includes extra figure/SI text. Nature 2024 MoTrPAC was downloaded and
   tested but excluded: its Methods/Extended Data exceed the main-body scope, so
   all tools fail alignment. These are five papers only.
+- Core update evaluation (2026-11-12): Docling 2.150.0 is safe (no table/full-text
+  regression); MinerU 4.2.1 flash works but the isolated server/engine path is not
+  validated; OCRmyPDF 17.14.1 is blocked by a Pillow conflict with MinerU's gradio.
+  Recommendation: update Docling only for v0.1.2; hold MinerU and OCRmyPDF.
+- `mineru-doc` now classifies MinerU 4.2.1's comma-form "No basic, standard, or
+  advanced engine available" as a config error and exits 3 instead of retrying.
 - English README install prompt; user-facing docs translated to English.
 
 Still open:

@@ -110,6 +110,15 @@ Before changing a pin, treat it as a code change: read the release notes, run
 full-text benchmarks, then update the pin and docs together. A `pinned-behind` result
 is a prompt to evaluate, not an instruction to upgrade.
 
+As of 2026-11-12, the evaluation found:
+
+- **Docling 2.150.0 is safe** (no regression on 3 tables and 4 full-text papers);
+- **MinerU 4.2.1 flash works, but the 4.2.1 server/engine path is not yet validated**;
+- **OCRmyPDF 17.14.1 is blocked** in the core environment: it requires Pillow>=13,
+  while MinerU's gradio requires Pillow<13.
+
+See `docs/decisions.md` → "Core tool update evaluation" before changing these pins.
+
 ## Skill version discipline
 
 `SKILL.md` is executable policy: changing it changes routing. When it changes:

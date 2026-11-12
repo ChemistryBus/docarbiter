@@ -107,7 +107,7 @@ while [ "$attempt" -lt "$max_attempts" ]; do
 
   # Non-recoverable: the engine is not configured. Retrying cannot fix it.
   case "$out" in
-    *"No basic/standard/advanced engine available"*|*"engine not configured"*|*"not configured"*|*"No models"*|*"license"*)
+    *"No basic/standard/advanced engine available"*|*"No basic, standard, or advanced engine available"*|*"start a local parse-server"*|*"explicitly pass --tier flash"*|*"engine not configured"*|*"not configured"*|*"No models"*|*"license"*)
       echo "[mineru-doc] 解析引擎未就绪，且不是可重试的启动状态。" >&2
       echo "[mineru-doc] 首次诊断:" >&2
       printf '%s\n' "$first_diag" >&2
