@@ -263,7 +263,8 @@ Interpretation:
 - **Traditional Chinese**: all tools are basically correct; MinerU's 1.72% is still punctuation normalization (no-punct is 0).
 - **Interleaved two-column**: `pdftotext` / `liteparse` / `markitdown` / MinerU all read it correctly; **`pdfplumber` 60%–68%**, because it reads by content stream/position, and after interleaving the reading order is unusable; Docling 2%–3% with slight problems.
   - This **refutes** the claim in the handoff document that "markitdown does not handle two-column" (at least it did not reproduce on 0.1.9 + this synthetic sample). Do not keep asserting it in README/gotchas; real two-column still needs testing.
-- **Simulated vertical**: pdftotext / markitdown / pdfplumber / Docling are correct; liteparse 34.78% and MinerU 13.04% scramble the one-character-per-line order. **Note: this is only a simulation, not true vertical typesetting**; true vertical (vertical writing mode, columns advancing right to left) has not been tested yet.
+- **Simulated vertical**: pdftotext / markitdown / pdfplumber / Docling are correct; liteparse 34.78% and MinerU 13.04% scramble the one-character-per-line order. **Note: this is only a simulation, not true vertical typesetting**; true vertical is covered by the rerun below.
+- **True vertical rerun (2026-11-12)**: on the Chrome `vertical-rl` fixture (`zh-vertical-real.pdf`, text CER): Docling 26.67%, MinerU 29.52%, markitdown 41.90%, pdftotext 78.10%, liteparse 90.48%, pdfplumber 97.14%. These are the same values as the 2026-11-09 run; no tool is usable without manual review.
 
 Reproduce:
 

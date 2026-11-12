@@ -50,6 +50,10 @@ PYPI = {
     "pdfminer": "pdfminer.six",
 }
 CORE = {"mineru", "docling", "liteparse", "markitdown", "rapidocr", "ocrmypdf", "pdfplumber"}
+KNOWN_BLOCKERS = {
+    "mineru": "4.2.1 server/engine path is not validated; hold the pin (see docs/decisions.md)",
+    "ocrmypdf": "17.14.1 requires Pillow>=13; MinerU's gradio requires Pillow<13; cannot coexist",
+}
 
 
 def get_json(url: str, timeout: int = 15, token: str | None = None) -> dict:
@@ -209,6 +213,9 @@ def main() -> int:
             if tool["tier"] == "core"
             else "benchmark before routing; extra tools are not in the default core"
         )
+        row["blocker"] = (
+            KNOWN_BLOCKERS.get(tool["id"], "") if "pinned-behind" in status else ""
+        )
         rows.append(row)
 
     if args.format == "json":
@@ -236,6 +243,13 @@ def main() -> int:
                 f"{row['pin'] or '—'} | {row['latest'] or '—'} | "
                 f"{row['github_release'] or '—'} | {row['status']} |"
             )
+        blockers = [row for row in rows if row.get("blocker")]
+        if blockers:
+            print()
+            print("## Known blockers")
+            print()
+            for row in blockers:
+                print(f"- **{row['id']}**: {row['blocker']}")
         print()
         print("## Recommended checks")
         print()
