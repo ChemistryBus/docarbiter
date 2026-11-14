@@ -70,7 +70,7 @@ python3 -I scripts/route.py benchmarks/fixtures/zh-scan.pdf --goal manuscript
 
 ## 怎么路由
 
-<table width="100%">
+<table width="100%" style="width:100%;table-layout:fixed">
   <colgroup><col width="38%"><col width="22%"><col width="40%"></colgroup>
   <thead>
     <tr>
