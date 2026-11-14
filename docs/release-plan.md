@@ -4,6 +4,7 @@
 > 2026-11-10: **v0.1.0 — First Public Preview** published (`main` initial commit `5e1f9fd`, CI `validate` green, Release created).
 > 2026-11-11: Published **v0.1.1 — Harness Compatibility Patch** (install compatibility, wrapper backup, update mechanism, harness docs).
 > 2026-11-12: Published **v0.1.2 — Maintenance and Evidence Update** (Docling 2.150.0, harness registry, consistency check, weekly probe, five-paper full-text CER, three-page table CER).
+> 2026-11-14: Published **v0.1.3 — Chinese Corpus Routing Fixes** (Chinese-first README, hidden OCR, FzBookMaker custom encoding, colon-safe MinerU wrapper, 63-file audit).
 > Local verification, privacy fixes, clean venv, and commit rehearsal are all complete.
 
 ## 0. Release scope (recommended)
