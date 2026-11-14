@@ -70,50 +70,50 @@ The router only decides. It does not extract for you; run the suggested command 
 
 ## How it routes
 
-<table width="100%">
-  <colgroup><col width="38%"><col width="22%"><col width="40%"></colgroup>
+<table width="960">
+  <colgroup><col width="360"><col width="220"><col width="380"></colgroup>
   <thead>
     <tr>
-      <th width="38%" align="left">What you have</th>
-      <th width="22%" align="left">Default route</th>
-      <th width="40%" align="left">Why</th>
+      <th width="360" align="left">What you have</th>
+      <th width="220" align="left">Default route</th>
+      <th width="380" align="left">Why</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td width="38%" align="left">Clean text layer, speed matters</td>
-      <td width="22%" align="left"><strong>liteparse</strong> / <strong>pdftotext</strong></td>
-      <td width="40%" align="left">Fast, local, no OCR</td>
+      <td width="360" align="left">Clean text layer, speed matters</td>
+      <td width="220" align="left"><strong>liteparse</strong> / <strong>pdftotext</strong></td>
+      <td width="380" align="left">Fast, local, no OCR</td>
     </tr>
     <tr>
-      <td width="38%" align="left">Paper or book, needs headings and page anchors</td>
-      <td width="22%" align="left"><strong>MinerU</strong></td>
-      <td width="40%" align="left">Structured Markdown plus page anchors</td>
+      <td width="360" align="left">Paper or book, needs headings and page anchors</td>
+      <td width="220" align="left"><strong>MinerU</strong></td>
+      <td width="380" align="left">Structured Markdown plus page anchors</td>
     </tr>
     <tr>
-      <td width="38%" align="left">Scan, CID font, or garbled text layer</td>
-      <td width="22%" align="left"><strong>MinerU</strong></td>
-      <td width="40%" align="left">OCR plus layout; do not trust the text layer</td>
+      <td width="360" align="left">Scan, CID font, or garbled text layer</td>
+      <td width="220" align="left"><strong>MinerU</strong></td>
+      <td width="380" align="left">OCR plus layout; do not trust the text layer</td>
     </tr>
     <tr>
-      <td width="38%" align="left">Complex table: merged headers, multi-line cells, book table</td>
-      <td width="22%" align="left"><strong>Docling</strong></td>
-      <td width="40%" align="left">Best structure on the tested real tables</td>
+      <td width="360" align="left">Complex table: merged headers, multi-line cells, book table</td>
+      <td width="220" align="left"><strong>Docling</strong></td>
+      <td width="380" align="left">Best structure on the tested real tables</td>
     </tr>
     <tr>
-      <td width="38%" align="left">Simple bordered table or coordinates</td>
-      <td width="22%" align="left"><strong>pdfplumber</strong></td>
-      <td width="40%" align="left">Fast cells; not for complex book tables</td>
+      <td width="360" align="left">Simple bordered table or coordinates</td>
+      <td width="220" align="left"><strong>pdfplumber</strong></td>
+      <td width="380" align="left">Fast cells; not for complex book tables</td>
     </tr>
     <tr>
-      <td width="38%" align="left">Office, HTML, EPUB, audio/video, RAG chunks</td>
-      <td width="22%" align="left"><strong>Docling</strong></td>
-      <td width="40%" align="left">Broad format coverage</td>
+      <td width="360" align="left">Office, HTML, EPUB, audio/video, RAG chunks</td>
+      <td width="220" align="left"><strong>Docling</strong></td>
+      <td width="380" align="left">Broad format coverage</td>
     </tr>
     <tr>
-      <td width="38%" align="left">Image or screenshot</td>
-      <td width="22%" align="left"><strong>RapidOCR</strong></td>
-      <td width="40%" align="left">Lightweight, Chinese-first OCR</td>
+      <td width="360" align="left">Image or screenshot</td>
+      <td width="220" align="left"><strong>RapidOCR</strong></td>
+      <td width="380" align="left">Lightweight, Chinese-first OCR</td>
     </tr>
   </tbody>
 </table>
@@ -150,46 +150,46 @@ The router reports `probe`, `intended`, `selected`, `reason`, `command`, and `fa
 
 Eight tools are installed by default. The `full` profile registers twelve tool skills; the default install registers only `docarbiter`.
 
-<table width="100%">
-  <colgroup><col width="24%"><col width="76%"></colgroup>
+<table width="960">
+  <colgroup><col width="230"><col width="730"></colgroup>
   <thead>
     <tr>
-      <th width="24%" align="left">Tool</th>
-      <th width="76%" align="left">Best at</th>
+      <th width="230" align="left">Tool</th>
+      <th width="730" align="left">Best at</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td width="24%" align="left"><strong>MinerU</strong></td>
-      <td width="76%" align="left">Chinese and English PDF to structured Markdown, page anchors, OCR</td>
+      <td width="230" align="left"><strong>MinerU</strong></td>
+      <td width="730" align="left">Chinese and English PDF to structured Markdown, page anchors, OCR</td>
     </tr>
     <tr>
-      <td width="24%" align="left"><strong>Docling</strong></td>
-      <td width="76%" align="left">Office, HTML, EPUB, RAG, LaTeX, and complex merged tables</td>
+      <td width="230" align="left"><strong>Docling</strong></td>
+      <td width="730" align="left">Office, HTML, EPUB, RAG, LaTeX, and complex merged tables</td>
     </tr>
     <tr>
-      <td width="24%" align="left"><strong>liteparse</strong></td>
-      <td width="76%" align="left">Fast text-layer PDF and word coordinates</td>
+      <td width="230" align="left"><strong>liteparse</strong></td>
+      <td width="730" align="left">Fast text-layer PDF and word coordinates</td>
     </tr>
     <tr>
-      <td width="24%" align="left"><strong>MarkItDown</strong></td>
-      <td width="76%" align="left">Simple single-column PDF and Office files</td>
+      <td width="230" align="left"><strong>MarkItDown</strong></td>
+      <td width="730" align="left">Simple single-column PDF and Office files</td>
     </tr>
     <tr>
-      <td width="24%" align="left"><strong>RapidOCR</strong></td>
-      <td width="76%" align="left">Chinese-first image and screenshot OCR</td>
+      <td width="230" align="left"><strong>RapidOCR</strong></td>
+      <td width="730" align="left">Chinese-first image and screenshot OCR</td>
     </tr>
     <tr>
-      <td width="24%" align="left"><strong>OCRmyPDF</strong></td>
-      <td width="76%" align="left">Add a searchable text layer to scans</td>
+      <td width="230" align="left"><strong>OCRmyPDF</strong></td>
+      <td width="730" align="left">Add a searchable text layer to scans</td>
     </tr>
     <tr>
-      <td width="24%" align="left"><strong>pdfplumber</strong></td>
-      <td width="76%" align="left">Simple bordered tables and character coordinates</td>
+      <td width="230" align="left"><strong>pdfplumber</strong></td>
+      <td width="730" align="left">Simple bordered tables and character coordinates</td>
     </tr>
     <tr>
-      <td width="24%" align="left"><strong>pdftotext</strong></td>
-      <td width="76%" align="left">Plain-text baseline and text-layer probe</td>
+      <td width="230" align="left"><strong>pdftotext</strong></td>
+      <td width="730" align="left">Plain-text baseline and text-layer probe</td>
     </tr>
   </tbody>
 </table>
@@ -209,34 +209,34 @@ These results cover the tested samples only; they are not a general accuracy cla
 
 ## Harness support
 
-<table width="100%">
-  <colgroup><col width="28%"><col width="72%"></colgroup>
+<table width="960">
+  <colgroup><col width="260"><col width="700"></colgroup>
   <thead>
     <tr>
-      <th width="28%" align="left">Harness</th>
-      <th width="72%" align="left">Status</th>
+      <th width="260" align="left">Harness</th>
+      <th width="700" align="left">Status</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td width="28%" align="left">Claude Code</td>
-      <td width="72%" align="left">Full pass (file symlink)</td>
+      <td width="260" align="left">Claude Code</td>
+      <td width="700" align="left">Full pass (file symlink)</td>
     </tr>
     <tr>
-      <td width="28%" align="left">DSH</td>
-      <td width="72%" align="left">Full pass (file symlink)</td>
+      <td width="260" align="left">DSH</td>
+      <td width="700" align="left">Full pass (file symlink)</td>
     </tr>
     <tr>
-      <td width="28%" align="left">ZCode</td>
-      <td width="72%" align="left">Full pass (file symlink)</td>
+      <td width="260" align="left">ZCode</td>
+      <td width="700" align="left">Full pass (file symlink)</td>
     </tr>
     <tr>
-      <td width="28%" align="left">MiniMax</td>
-      <td width="72%" align="left">Full pass (whole-directory symlink in <code>.agents/skills</code>)</td>
+      <td width="260" align="left">MiniMax</td>
+      <td width="700" align="left">Full pass (whole-directory symlink in <code>.agents/skills</code>)</td>
     </tr>
     <tr>
-      <td width="28%" align="left">Codex</td>
-      <td width="72%" align="left">Conditional: a very large skill catalog may require an explicit "use docarbiter"</td>
+      <td width="260" align="left">Codex</td>
+      <td width="700" align="left">Conditional: a very large skill catalog may require an explicit "use docarbiter"</td>
     </tr>
   </tbody>
 </table>
@@ -293,40 +293,40 @@ Simple bordered tables: `--goal table` (pdfplumber). Merged headers, multi-line 
 
 ## Documentation
 
-<table width="100%">
-  <colgroup><col width="30%"><col width="70%"></colgroup>
+<table width="960">
+  <colgroup><col width="280"><col width="680"></colgroup>
   <tbody>
     <tr>
-      <td width="30%" align="left">Architecture and registry</td>
-      <td width="70%" align="left"><a href="docs/architecture.md">docs/architecture.md</a> · <a href="docs/tool-registry.md">docs/tool-registry.md</a></td>
+      <td width="280" align="left">Architecture and registry</td>
+      <td width="680" align="left"><a href="docs/architecture.md">docs/architecture.md</a> · <a href="docs/tool-registry.md">docs/tool-registry.md</a></td>
     </tr>
     <tr>
-      <td width="30%" align="left">Benchmarks and policy</td>
-      <td width="70%" align="left"><a href="docs/benchmarks.md">docs/benchmarks.md</a> · <a href="docs/policy.md">docs/policy.md</a></td>
+      <td width="280" align="left">Benchmarks and policy</td>
+      <td width="680" align="left"><a href="docs/benchmarks.md">docs/benchmarks.md</a> · <a href="docs/policy.md">docs/policy.md</a></td>
     </tr>
     <tr>
-      <td width="30%" align="left">Failure modes and traps</td>
-      <td width="70%" align="left"><a href="docs/gotchas.md">docs/gotchas.md</a></td>
+      <td width="280" align="left">Failure modes and traps</td>
+      <td width="680" align="left"><a href="docs/gotchas.md">docs/gotchas.md</a></td>
     </tr>
     <tr>
-      <td width="30%" align="left">Harness integration</td>
-      <td width="70%" align="left"><a href="docs/harness-integration.md">docs/harness-integration.md</a></td>
+      <td width="280" align="left">Harness integration</td>
+      <td width="680" align="left"><a href="docs/harness-integration.md">docs/harness-integration.md</a></td>
     </tr>
     <tr>
-      <td width="30%" align="left">Updating skills</td>
-      <td width="70%" align="left"><a href="docs/updating.md">docs/updating.md</a></td>
+      <td width="280" align="left">Updating skills</td>
+      <td width="680" align="left"><a href="docs/updating.md">docs/updating.md</a></td>
     </tr>
     <tr>
-      <td width="30%" align="left">Migration and rollback</td>
-      <td width="70%" align="left"><a href="docs/migration.md">docs/migration.md</a></td>
+      <td width="280" align="left">Migration and rollback</td>
+      <td width="680" align="left"><a href="docs/migration.md">docs/migration.md</a></td>
     </tr>
     <tr>
-      <td width="30%" align="left">Maintainer handoff</td>
-      <td width="70%" align="left"><a href="docs/handoff.md">docs/handoff.md</a></td>
+      <td width="280" align="left">Maintainer handoff</td>
+      <td width="680" align="left"><a href="docs/handoff.md">docs/handoff.md</a></td>
     </tr>
     <tr>
-      <td width="30%" align="left">Release notes</td>
-      <td width="70%" align="left"><a href="https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.3">v0.1.3</a> · <a href="docs/release-notes-v0.1.3.md">docs/release-notes-v0.1.3.md</a></td>
+      <td width="280" align="left">Release notes</td>
+      <td width="680" align="left"><a href="https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.3">v0.1.3</a> · <a href="docs/release-notes-v0.1.3.md">docs/release-notes-v0.1.3.md</a></td>
     </tr>
   </tbody>
 </table>
