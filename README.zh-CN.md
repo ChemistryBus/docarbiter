@@ -4,11 +4,11 @@
 
 <p align="center"><strong>中英文文档提取的唯一路由入口。</strong></p>
 <p align="center">先探测 PDF，再选工具；工具不行时，给出可解释的降级链。</p>
-<p align="center"><strong>v0.1.2 — Maintenance and Evidence Update</strong></p>
+<p align="center"><strong>v0.1.3 — Chinese Corpus Routing Fixes</strong></p>
 
 <p align="center">
   <a href="https://github.com/ChemistryBus/docarbiter/actions/workflows/validate.yml"><img src="https://github.com/ChemistryBus/docarbiter/actions/workflows/validate.yml/badge.svg" alt="validate"></a>
-  <a href="https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.2"><img src="https://img.shields.io/github/v/release/ChemistryBus/docarbiter?color=blue" alt="release"></a>
+  <a href="https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.3"><img src="https://img.shields.io/github/v/release/ChemistryBus/docarbiter?color=blue" alt="release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT"></a>
   <img src="https://img.shields.io/badge/python-3.10--3.12-blue" alt="Python 3.10-3.12">
 </p>
@@ -159,7 +159,7 @@ python3 -I scripts/route.py file.pdf --goal table-structure --json
 | Harness 接入 | [docs/harness-integration.md](docs/harness-integration.md) |
 | 更新技能 | [docs/updating.md](docs/updating.md) |
 | 维护交接 | [docs/handoff.md](docs/handoff.md) |
-| Release notes | [v0.1.2](https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.2) · [docs/release-notes-v0.1.2.md](docs/release-notes-v0.1.2.md) |
+| Release notes | [v0.1.3](https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.3) · [docs/release-notes-v0.1.3.md](docs/release-notes-v0.1.3.md) |
 
 ## 许可
 

@@ -1,6 +1,6 @@
 # Handoff — docarbiter maintenance
 
-Last updated: 2026-11-12.
+Last updated: 2026-11-14.
 
 ## What this project is
 
@@ -63,7 +63,7 @@ One document-extraction router per harness.
    python3 -I scripts/validate.py
    python3 -I scripts/check_skill_consistency.py
    python3 -I scripts/check_skill_consistency.py --check-git
-   python3 -I scripts/route.py --selftest   # all pass; currently 24 checks
+   python3 -I scripts/route.py --selftest   # all pass; currently 31 checks
    python3 -I scripts/check_pagemarkers.py  # real MinerU page-marker regression; skips if MinerU is absent
    for f in bootstrap.sh scripts/*.sh scripts/wrappers/*.sh; do bash -n "$f"; done
    ```

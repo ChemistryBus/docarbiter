@@ -4,11 +4,11 @@
 
 <p align="center"><strong>One routing entry for Chinese and English document extraction.</strong></p>
 <p align="center">It probes the PDF, picks the right tool, and gives you a fallback when that tool breaks.</p>
-<p align="center"><strong>v0.1.2 — Maintenance and Evidence Update</strong></p>
+<p align="center"><strong>v0.1.3 — Chinese Corpus Routing Fixes</strong></p>
 
 <p align="center">
   <a href="https://github.com/ChemistryBus/docarbiter/actions/workflows/validate.yml"><img src="https://github.com/ChemistryBus/docarbiter/actions/workflows/validate.yml/badge.svg" alt="validate"></a>
-  <a href="https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.2"><img src="https://img.shields.io/github/v/release/ChemistryBus/docarbiter?color=blue" alt="release"></a>
+  <a href="https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.3"><img src="https://img.shields.io/github/v/release/ChemistryBus/docarbiter?color=blue" alt="release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT"></a>
   <img src="https://img.shields.io/badge/python-3.10--3.12-blue" alt="Python 3.10-3.12">
 </p>
@@ -161,7 +161,7 @@ Keep **exactly one** document-extraction router per harness. If `doc-extract` an
 | Harness integration | [docs/harness-integration.md](docs/harness-integration.md) |
 | Updating skills | [docs/updating.md](docs/updating.md) |
 | Maintainer handoff | [docs/handoff.md](docs/handoff.md) |
-| Release notes | [v0.1.2](https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.2) · [docs/release-notes-v0.1.2.md](docs/release-notes-v0.1.2.md) |
+| Release notes | [v0.1.3](https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.3) · [docs/release-notes-v0.1.3.md](docs/release-notes-v0.1.3.md) |
 
 ## License
 

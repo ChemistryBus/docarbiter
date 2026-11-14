@@ -175,6 +175,73 @@ def _classify_text(text: str) -> dict:
     }
 
 
+def _language_from_counts(cjk: int, latin: int) -> str:
+    """Classify language from CJK and Latin letter counts.
+
+    A Chinese paper with a long English abstract or reference list can have
+    more Latin letters than CJK characters. A strict `cjk > latin` test then
+    mislabels it as English and can select the wrong OCR language. Use a share
+    threshold instead; anything bilingual stays `mixed` so the command keeps
+    both `chi_sim` and `eng`.
+    """
+    total = cjk + latin
+    if total == 0:
+        return "unknown"
+    share = cjk / total
+    if share >= 0.35:
+        return "zh"
+    if share <= 0.05:
+        return "en"
+    return "mixed"
+
+
+def _parse_font_signals(output: str) -> dict:
+    """Parse `pdffonts` output into counts and a hidden-OCR flag.
+
+    Some scanned PDFs ship a vendor OCR layer with font names such as
+    `HiddenHorzOCR`. pdftotext reads that hidden layer, so the text looks
+    usable while containing silent character substitutions (for example
+    二萜酚 -> 二秸酚). Detect it and route to a real OCR pass.
+    """
+    total = 0
+    no_unicode = 0
+    hidden_ocr = False
+    for line in output.splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.lower().startswith("name"):
+            continue
+        if stripped and all(ch in "- " for ch in stripped):
+            continue
+        parts = stripped.split()
+        if len(parts) < 7:
+            continue
+        total += 1
+        if parts[-3].lower() == "no":
+            no_unicode += 1
+        if re.search(r"hidden.*ocr|ocr.*hidden", stripped, re.IGNORECASE):
+            hidden_ocr = True
+    return {
+        "fonts_total": total,
+        "fonts_no_unicode": no_unicode,
+        "hidden_ocr": hidden_ocr,
+    }
+
+
+def _font_signals(path: Path) -> dict:
+    if not _cmd("pdffonts"):
+        return {"fonts_total": 0, "fonts_no_unicode": 0, "hidden_ocr": False}
+    try:
+        proc = subprocess.run(
+            ["pdffonts", str(path)], capture_output=True, text=True,
+            encoding="utf-8", errors="replace", timeout=30,
+        )
+    except Exception:  # noqa: BLE001 - a bad PDF must not crash the router
+        return {"fonts_total": 0, "fonts_no_unicode": 0, "hidden_ocr": False}
+    if proc.returncode != 0:
+        return {"fonts_total": 0, "fonts_no_unicode": 0, "hidden_ocr": False}
+    return _parse_font_signals(proc.stdout)
+
+
 def _pdftotext_range(path: Path, first: int, last: int) -> tuple[str | None, str | None]:
     try:
         proc = subprocess.run(
@@ -223,7 +290,8 @@ def probe_pdf(path: Path) -> dict:
     if not _cmd("pdftotext"):
         return {
             "status": "no-pdftotext", "chars": 0, "bad": 0, "ctrl": 0, "cjk": 0,
-            "latin": 0, "bad_ratio": 0.0, "language": "unknown",
+            "latin": 0, "bad_ratio": 0.0, "cjk_share": 0.0, "language": "unknown",
+            "fonts_total": 0, "fonts_no_unicode": 0, "hidden_ocr": False,
             "page_count": None, "sampled": "none", "coverage": "pdftotext missing",
             "pages": [],
         }
@@ -278,20 +346,20 @@ def probe_pdf(path: Path) -> dict:
         for key in ("chars", "bad", "ctrl", "cjk", "latin")
     }
     ratio = (totals["bad"] + totals["ctrl"]) / max(totals["chars"], 1)
-    if totals["cjk"] > totals["latin"]:
-        language = "zh"
-    elif totals["latin"] > totals["cjk"]:
-        language = "en"
-    elif totals["cjk"] == totals["latin"] == 0:
-        language = "unknown"
-    else:
-        language = "mixed"
+    cjk_share = totals["cjk"] / max(totals["cjk"] + totals["latin"], 1)
+    language = _language_from_counts(totals["cjk"], totals["latin"])
+    fonts = _font_signals(path)
+    status = _aggregate_status(pages)
+    if fonts["hidden_ocr"] and status in ("usable", "mixed", "scan", "garbled"):
+        status = "hidden-ocr"
 
     result = {
-        "status": _aggregate_status(pages),
+        "status": status,
         "chars": totals["chars"], "bad": totals["bad"], "ctrl": totals["ctrl"],
         "cjk": totals["cjk"], "latin": totals["latin"],
-        "bad_ratio": round(ratio, 4), "language": language,
+        "bad_ratio": round(ratio, 4), "cjk_share": round(cjk_share, 4),
+        "language": language,
+        **fonts,
         "page_count": page_count, "sampled": sampled,
         "coverage": coverage,
         "pages": [
@@ -349,6 +417,10 @@ def _route_pdf(path: Path, goal: str, page: int = 1) -> dict:
         intended = "mineru"
         reason = "CID / missing ToUnicode; the text layer is garbled, so MinerU OCR is the reliable path"
         fallback = ["rapidocr", "olmocr"]
+    elif status == "hidden-ocr":
+        intended = "mineru"
+        reason = "hidden OCR text layer detected; the embedded OCR can contain silent character substitutions, so re-OCR with MinerU instead of trusting pdftotext"
+        fallback = ["rapidocr", "docling"]
     elif status == "mixed":
         if goal in ("table", "table-structure"):
             intended = "docling"
@@ -390,10 +462,22 @@ def _route_pdf(path: Path, goal: str, page: int = 1) -> dict:
         chain = [intended] + fallback
         selected = _select(chain)
 
+    warnings: list[str] = []
+    page_count = probe.get("page_count")
+    if (
+        isinstance(page_count, int) and page_count > 50
+        and status in ("scan", "mixed", "garbled", "hidden-ocr")
+        and intended in ("mineru", "docling")
+    ):
+        warnings.append(
+            f"long OCR document ({page_count} pages); start with a 10-20 page range "
+            "and extend after a spot check"
+        )
+
     return {
         "kind": "pdf", "probe": probe, "goal": goal, "page": page,
         "intended": intended, "selected": selected, "reason": reason,
-        "fallback": fallback, "chain": chain,
+        "fallback": fallback, "chain": chain, "warnings": warnings,
     }
 
 
@@ -504,8 +588,14 @@ def print_human(path: Path, result: dict) -> None:
             f"probe: status={probe['status']} language={probe['language']} "
             f"pages={probe.get('sampled', '-')} chars={probe['chars']} "
             f"cjk={probe['cjk']} bad={probe['bad']} ctrl={probe['ctrl']} "
-            f"bad_ratio={probe['bad_ratio']:.2%}"
+            f"bad_ratio={probe['bad_ratio']:.2%} "
+            f"cjk_share={probe.get('cjk_share', 0):.2f}"
         )
+        if probe.get("hidden_ocr"):
+            print(
+                f"fonts: total={probe.get('fonts_total', 0)} "
+                f"no_unicode={probe.get('fonts_no_unicode', 0)} hidden_ocr=yes"
+            )
         if probe.get("pages"):
             detail = ", ".join(f"{p['page']}:{p['status']}" for p in probe["pages"])
             print(f"sample: {detail} ({probe.get('coverage', '-')})")
@@ -518,6 +608,8 @@ def print_human(path: Path, result: dict) -> None:
     print(f"command: {command_for(path, result)}")
     if result.get("fallback"):
         print(f"fallback: {', '.join(result['fallback'])}")
+    for warning in result.get("warnings", []):
+        print(f"warning: {warning}")
     if result["selected"] == "install-needed":
         print("warning: intended tool is not installed; run ./scripts/install.sh --profile core")
 
@@ -662,6 +754,53 @@ def selftest() -> int:
     ok = "pdftoppm" in rapid_pdf and "image_path" not in rapid_pdf
     print(f"{'OK  ' if ok else 'FAIL'} rapidocr PDF command renders pages first")
     failed += 0 if ok else 1
+
+    # Language must follow CJK share, not a strict cjk > latin comparison:
+    # Chinese papers with a long English abstract/reference list are common.
+    lang_cases = [
+        (0, 1000, "en"),
+        (3085, 3625, "zh"),
+        (100, 900, "mixed"),
+        (0, 0, "unknown"),
+    ]
+    for cjk, latin, expected in lang_cases:
+        got = _language_from_counts(cjk, latin)
+        ok = got == expected
+        print(f"{'OK  ' if ok else 'FAIL'} language cjk={cjk} latin={latin} got={got} expected={expected}")
+        failed += 0 if ok else 1
+
+    # Hidden vendor OCR layers must be detected from font names.
+    font_sample = """name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+HiddenHorzOCR                        CID Type 0C       Identity-H       yes no  yes    676  0
+SimSun                               CID TrueType      GBK-EUC-H        no  no  no     275  0
+"""
+    signals = _parse_font_signals(font_sample)
+    ok = signals == {"fonts_total": 2, "fonts_no_unicode": 1, "hidden_ocr": True}
+    print(f"{'OK  ' if ok else 'FAIL'} font signals {signals}")
+    failed += 0 if ok else 1
+
+    # A hidden OCR layer must route to MinerU, not trust the embedded text.
+    original_probe = globals()["probe_pdf"]
+    try:
+        globals()["probe_pdf"] = lambda _path: {
+            "status": "hidden-ocr", "page_count": 12, "language": "zh",
+        }
+        hidden = _route_pdf(Path("hidden-ocr.pdf"), "manuscript")
+        ok = hidden["intended"] == "mineru" and "hidden OCR" in hidden["reason"]
+        print(f"{'OK  ' if ok else 'FAIL'} hidden OCR route intended={hidden['intended']}")
+        failed += 0 if ok else 1
+
+        # Long OCR documents should tell the user to start with a page range.
+        globals()["probe_pdf"] = lambda _path: {
+            "status": "mixed", "page_count": 214, "language": "zh",
+        }
+        long_doc = _route_pdf(Path("long.pdf"), "manuscript")
+        ok = bool(long_doc.get("warnings")) and "214 pages" in long_doc["warnings"][0]
+        print(f"{'OK  ' if ok else 'FAIL'} long document warning={long_doc.get('warnings')}")
+        failed += 0 if ok else 1
+    finally:
+        globals()["probe_pdf"] = original_probe
 
     return 1 if failed else 0
 

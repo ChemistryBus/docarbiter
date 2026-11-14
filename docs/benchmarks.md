@@ -604,6 +604,38 @@ Interpretation:
 - The script is `scripts/bench_fulltext.py`; private PDFs and truth are
   gitignored, and CI only `py_compile`s the script.
 
+## 5-14. Complex Chinese corpus audit (private, 2026-11-14)
+
+Corpus: 43 private PDFs supplied for a routing audit (private, gitignored, not
+redistributed), 122 MB. It is mostly Chinese journal articles plus nine long
+theses (largest 214 pages). This is a **routing/probe audit**, not an accuracy
+benchmark: there is no independent truth for every page.
+
+Findings:
+
+- **Status:** 31 usable text layers, 10 mixed documents, 1 pure scan, and 1
+  hidden vendor OCR layer.
+- **Language:** the old `cjk > latin` rule labelled five Chinese papers as
+  `en`, because their English abstracts and reference lists outweighed the
+  Chinese body by letter count. The new `cjk_share` rule uses `>= 0.35` for
+  `zh`, `<= 0.05` for `en`, and `mixed` in between.
+- **Hidden OCR:** one 168-page thesis carried `HiddenHorzOCR` /
+  `HiddenVertOCR` fonts. `pdftotext` returned plausible but wrong characters
+  (二萜酚 -> 二秸酚, 原产于 -> 原产千, 并有 -> 井有). MinerU re-OCR on
+  pages 1–2 returned the correct forms. `route.py` now reports `hidden-ocr`
+  and routes to MinerU instead of trusting the embedded layer.
+- **Corrupt OCR layers on scanned theses:** four long documents had 30/81,
+  71/108, 4/88, and 124/214 pages above the 10% bad/control-character
+  threshold. They are classified `mixed` and route to MinerU; a sampled
+  page-level OCR recovered readable body text.
+- **Long OCR documents:** seven files were 78–214 pages. The route now warns
+  to start with a 10–20 page range and extend after a spot check.
+- **Control characters:** several CNKI text layers contain `Cc` characters
+  (about 3–4% of characters) but readable body text. They remain `usable` and
+  route to MinerU for a manuscript goal.
+- **No generalisation claim:** the corpus is private, from one review topic,
+  and no CER or table-accuracy score was computed for it.
+
 ## 6. Anti-patterns (enforced in CI)
 
 - ❌ Using `pdftotext` output as ground truth.
@@ -625,7 +657,9 @@ Interpretation:
 - [x] Real CC BY two-column paper abstract CER (BERT, ACL N19-1423)
 - [x] Table cell-level accuracy (bordered/merged 1.000; borderless default 0 tables)
 - [x] Structure and spot checks of 5 real high-frequency tables (Docling / MinerU / pdfplumber routing)
-- [ ] Per-cell CER on real tables (currently only structure and spot checks)
+- [x] Per-cell CER on three real table pages (WS/T 578.1 p8, GB 28050 p6, GB 2760 p13)
+- [ ] Per-cell CER on the remaining real tables and other editions
+- [x] Complex Chinese corpus audit: language share, hidden OCR layer, long-document warning (2026-11-14)
 - [ ] `table_settings` / Camelot strategy for borderless tables
 - [ ] Mixed traditional/simplified + public-domain classics samples (optional)
 - [ ] Run all 12 primary tools (including the extension layer)

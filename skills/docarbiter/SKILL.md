@@ -2,7 +2,7 @@
 name: docarbiter
 description: Chinese/English-first document-extraction router for PDF, scans, images, and Office files. Use when the user asks which tool to use, or when extraction is garbled, misordered, or has broken tables; routes to mineru / docling / liteparse / markitdown / rapidocr / ocrmypdf / pdfplumber / pdftotext / paddleocr / marker / unstructured / olmocr with a fallback chain. 中英文优先的文档提取仲裁器。当用户要提取中文或英文 PDF、扫描件、图片或 Office 文档的内容，但不确定该用哪个工具，或现有提取结果乱码、乱序、表格错位时使用。它不自己提取，只判断输入格式、语言、文字层是否可用、目标产出，再路由到上述工具，并给出降级链。若用户已明确指定某个工具，或只要 PDF 合并/拆分/表单，直接调用对应工具，不使用本技能。
 license: MIT
-version: 0.1.2
+version: 0.1.3
 ---
 
 # docarbiter
@@ -86,10 +86,20 @@ cjk = sum(1 for c in s if 0x3400 <= ord(c) <= 0x4DBF
           or 0x4E00 <= ord(c) <= 0x9FFF
           or 0x20000 <= ord(c) <= 0x2FA1F)
 latin = sum(1 for c in s if c.isascii() and c.isalpha())
-language = "zh" if cjk > latin else ("en" if latin > cjk else "mixed")
+total = cjk + latin
+share = cjk / max(total, 1)
+language = ("unknown" if total == 0 else
+            "zh" if share >= 0.35 else
+            "en" if share <= 0.05 else "mixed")
 print(f"chars={n} bad={bad} ctrl={ctrl} cjk={cjk} latin={latin} "
-      f"language={language} bad_ratio={(bad+ctrl)/max(n,1):.2%}")
+      f"cjk_share={share:.2f} language={language} bad_ratio={(bad+ctrl)/max(n,1):.2%}")
 '
+```
+
+> 扫描件还要查字体：如果 `pdffonts` 里出现 `HiddenHorzOCR` / `HiddenVertOCR`，说明 PDF 自带一层厂商 OCR 文字。`pdftotext` 读到的可能是“看起来正常、实际有形近错字”的文本（例如“二萜酚”变成“二秸酚”）。这时不要信文字层，直接用 MinerU 重新 OCR。
+
+```bash
+pdffonts "$f" 2>/dev/null | grep -iE 'hidden.*ocr' && echo "hidden OCR layer: re-OCR with MinerU"
 ```
 
 > 这只是前 3 页。短文档（≤20 页）逐页探测；长文档再抽中间 2 页和末尾 2 页，否则「前 3 页是封面/目录」会误判整本。`scripts/route.py` 已实现同样的抽样，并把结果写成 `sampled` / `pages`。空白页和扫描页要分开看：空白页没有 `<0x50` 字符也没有图像；扫描页通常有图像对象（`pdfimages -list` 可确认）。
@@ -102,11 +112,12 @@ print(f"chars={n} bad={bad} ctrl={ctrl} cjk={cjk} latin={latin} "
 | `chars < 50` 且 `bad_ratio <= 5%` 且有图像 | 扫描件 / 图片型 PDF | `ocrmypdf` 或 MinerU / PaddleOCR / olmOCR |
 | `chars < 50` 且 `bad_ratio <= 5%` 且无图像 | 稀疏文字层 | 表格目标可先试 Docling/pdfplumber；正文仍走 MinerU |
 | `bad_ratio > 10%`（尤其 `ctrl` 高） | CID / 无 ToUnicode / 乱码 | **不要信文字层**；走 OCR 或 MinerU |
-| `chars >= 50` 且 `bad_ratio <= 5%` | 文字层可用 | 第 3 步 |
+| `chars >= 50` 且 `bad_ratio <= 5%` | 文字层可用 | 第 3 步；但先查 `pdffonts` 是否有隐藏 OCR 层 |
+| 字体名含 `Hidden*OCR` | 厂商隐藏 OCR 文字层 | 不要信 `pdftotext`；MinerU 重新 OCR |
 | 有的页可用，有的页扫描/空白/乱码 | 混合文档 | MinerU 覆盖文字+扫描；表格目标用 Docling |
 | 前 3 页是封面/目录 | 样本不代表正文 | 再抽中间页和末尾页复测 |
 
-> `language` 由 `cjk` 与 `latin` 比较得出：`zh` / `en` / `mixed`。中文文档额外看 `cjk`；英文文档看 `bad_ratio` 和 mojibake（`Ã` / `Â` / `â€`）。不要因为 `cjk=0` 就判英文 PDF 有故障。
+> `language` 由 `cjk_share = cjk / (cjk + latin)` 得出：`>= 0.35` 为 `zh`，`<= 0.05` 为 `en`，中间为 `mixed`。中文论文常有很长的英文摘要/参考文献，不能再用 `cjk > latin` 直接判英文。中文文档额外看 `cjk`；英文文档看 `bad_ratio` 和 mojibake（`Ã` / `Â` / `â€`）。不要因为 `cjk=0` 就判英文 PDF 有故障。
 
 ### 第 3 步：要什么产出？
 
