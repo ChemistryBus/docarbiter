@@ -606,15 +606,17 @@ Interpretation:
 
 ## 5-14. Complex Chinese corpus audit (private, 2026-11-14)
 
-Corpus: 43 private PDFs supplied for a routing audit (private, gitignored, not
-redistributed), 122 MB. It is mostly Chinese journal articles plus nine long
-theses (largest 214 pages). This is a **routing/probe audit**, not an accuracy
-benchmark: there is no independent truth for every page.
+Corpus: 63 private PDFs in two batches (private, gitignored, not redistributed).
+The first batch is 43 journal articles and theses (122 MB, nine long theses,
+largest 214 pages). The second batch is 20 standards and regulations, including
+two pure scans, seven 322–417 page sampling rules, and a 34-page landscape
+standard. This is a **routing/probe audit**, not an accuracy benchmark: there is
+no independent truth for every page.
 
 Findings:
 
-- **Status:** 31 usable text layers, 10 mixed documents, 1 pure scan, and 1
-  hidden vendor OCR layer.
+- **Status across 63 files:** 38 usable text layers, 19 mixed documents, 3 pure
+  scans, 2 custom-encoding documents, and 1 hidden vendor OCR layer.
 - **Language:** the old `cjk > latin` rule labelled five Chinese papers as
   `en`, because their English abstracts and reference lists outweighed the
   Chinese body by letter count. The new `cjk_share` rule uses `>= 0.35` for
@@ -624,17 +626,31 @@ Findings:
   (二萜酚 -> 二秸酚, 原产于 -> 原产千, 并有 -> 井有). MinerU re-OCR on
   pages 1–2 returned the correct forms. `route.py` now reports `hidden-ocr`
   and routes to MinerU instead of trusting the embedded layer.
+- **Custom FzBookMaker encoding:** two standards returned valid-looking but
+  unrelated CJK glyphs (`犅犑犛２０２１０２` instead of `BJS 202102`,
+  `犌犅／犜１．１` instead of `GB/T 1.1`) with a near-zero bad-character ratio.
+  `route.py` now reports `custom-encoding` and routes to MinerU; a one-page
+  re-OCR recovered the correct titles.
+- **MinerU filename restriction:** the MinerU server rejects `:` in the uploaded
+  basename, and many CNKI filenames contain it. `mineru-doc` now copies these
+  inputs to a safe temporary name before parsing; the original path and output
+  path are unchanged.
 - **Corrupt OCR layers on scanned theses:** four long documents had 30/81,
   71/108, 4/88, and 124/214 pages above the 10% bad/control-character
   threshold. They are classified `mixed` and route to MinerU; a sampled
   page-level OCR recovered readable body text.
-- **Long OCR documents:** seven files were 78–214 pages. The route now warns
-  to start with a 10–20 page range and extend after a spot check.
+- **Long OCR documents:** the first batch had seven files of 78–214 pages; the
+  second batch adds seven 322–417 page rules. The route warns to start with a
+  10–20 page range and extend after a spot check.
 - **Control characters:** several CNKI text layers contain `Cc` characters
   (about 3–4% of characters) but readable body text. They remain `usable` and
   route to MinerU for a manuscript goal.
-- **No generalisation claim:** the corpus is private, from one review topic,
-  and no CER or table-accuracy score was computed for it.
+- **Japanese is a known gap:** one 46-page notification contains 15,997 kana
+  characters but is classified `zh`, because the current language rule only
+  distinguishes Chinese and English. The Chinese/English OCR presets are not a
+  Japanese solution; verify output or use a Japanese OCR model.
+- **No generalisation claim:** the corpus is private and no CER or
+  table-accuracy score was computed for it.
 
 ## 6. Anti-patterns (enforced in CI)
 

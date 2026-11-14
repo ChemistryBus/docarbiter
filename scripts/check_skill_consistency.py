@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SKILL = ROOT / "skills" / "docarbiter" / "SKILL.md"
 ROUTE = ROOT / "scripts" / "route.py"
 README = ROOT / "README.md"
-README_ZH = ROOT / "README.zh-CN.md"
+README_EN = ROOT / "README.en.md"
 
 TOOL_ALIASES = {
     "ocrmypdf+mineru": ("ocrmypdf", "mineru"),
@@ -129,7 +129,7 @@ def main() -> int:
     if re.search(r"pdfplumber\s*(?:→|->)\s*camelot", text):
         errors.append("camelot is still in the default simple-table chain in SKILL.md")
 
-    for name, path in (("README.md", README), ("README.zh-CN.md", README_ZH)):
+    for name, path in (("README.md", README), ("README.en.md", README_EN)):
         if not path.exists():
             errors.append(f"{name} is missing")
             continue

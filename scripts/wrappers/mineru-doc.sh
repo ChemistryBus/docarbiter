@@ -46,6 +46,32 @@ fi
 
 mkdir -p "$MINERU_HOME"
 
+# MinerU's server rejects ':' and '\' in the uploaded basename. CNKI exports
+# often contain ':' (for example 10.3390:nu17182965.pdf), so copy those inputs
+# to a safe temporary name before calling the parser.
+args=("$@")
+tmpdir=""
+cleanup() { [ -n "${tmpdir:-}" ] && rm -rf "$tmpdir"; }
+trap cleanup EXIT
+first="${args[0]:-}"
+base="$(basename "$first" 2>/dev/null || printf '%s' "$first")"
+case "$base" in
+  *:*|*\\*)
+    tmpdir="$(mktemp -d "${TMPDIR:-/tmp}/mineru-doc.XXXXXX")" || {
+      echo "[mineru-doc] 无法创建临时目录，终止。" >&2
+      exit 1
+    }
+    ext="${base##*.}"
+    [ "$ext" = "$base" ] && ext="pdf"
+    if ! cp "$first" "$tmpdir/input.$ext"; then
+      echo "[mineru-doc] 无法复制文件名含特殊字符的输入：$first" >&2
+      exit 1
+    fi
+    args[0]="$tmpdir/input.$ext"
+    echo "[mineru-doc] 文件名含 ':' 或 '\\'，已复制到临时安全路径。" >&2
+    ;;
+esac
+
 # `--tier flash` does not need the local server at all.
 use_flash=0
 for a in "$@"; do
@@ -96,7 +122,7 @@ record_diag() {
 attempt=0
 max_attempts=10
 while [ "$attempt" -lt "$max_attempts" ]; do
-  out=$(mineru parse "$@" $extra 2>&1)
+  out=$(mineru parse "${args[@]}" $extra 2>&1)
   rc=$?
   if [ "$rc" -eq 0 ]; then
     printf '%s\n' "$out"

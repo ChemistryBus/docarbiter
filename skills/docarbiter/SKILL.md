@@ -97,9 +97,11 @@ print(f"chars={n} bad={bad} ctrl={ctrl} cjk={cjk} latin={latin} "
 ```
 
 > 扫描件还要查字体：如果 `pdffonts` 里出现 `HiddenHorzOCR` / `HiddenVertOCR`，说明 PDF 自带一层厂商 OCR 文字。`pdftotext` 读到的可能是“看起来正常、实际有形近错字”的文本（例如“二萜酚”变成“二秸酚”）。这时不要信文字层，直接用 MinerU 重新 OCR。
+>
+> 另一类是 `FzBookMaker` 自定义编码：字体名含 `FzBookMaker` 时，`pdftotext` 可能把 ASCII 映射成无关汉字（例如 `GB/T 1.1` 变成 `犌犅／犜１．１`），坏字符率却接近 0。同样不要信文字层，走 MinerU 重新 OCR。
 
 ```bash
-pdffonts "$f" 2>/dev/null | grep -iE 'hidden.*ocr' && echo "hidden OCR layer: re-OCR with MinerU"
+pdffonts "$f" 2>/dev/null | grep -iE 'hidden.*ocr|fzbookmaker' && echo "suspicious font layer: re-OCR with MinerU"
 ```
 
 > 这只是前 3 页。短文档（≤20 页）逐页探测；长文档再抽中间 2 页和末尾 2 页，否则「前 3 页是封面/目录」会误判整本。`scripts/route.py` 已实现同样的抽样，并把结果写成 `sampled` / `pages`。空白页和扫描页要分开看：空白页没有 `<0x50` 字符也没有图像；扫描页通常有图像对象（`pdfimages -list` 可确认）。
@@ -114,6 +116,7 @@ pdffonts "$f" 2>/dev/null | grep -iE 'hidden.*ocr' && echo "hidden OCR layer: re
 | `bad_ratio > 10%`（尤其 `ctrl` 高） | CID / 无 ToUnicode / 乱码 | **不要信文字层**；走 OCR 或 MinerU |
 | `chars >= 50` 且 `bad_ratio <= 5%` | 文字层可用 | 第 3 步；但先查 `pdffonts` 是否有隐藏 OCR 层 |
 | 字体名含 `Hidden*OCR` | 厂商隐藏 OCR 文字层 | 不要信 `pdftotext`；MinerU 重新 OCR |
+| 字体名含 `FzBookMaker` | 自定义编码，ASCII 被映射成汉字 | 不要信 `pdftotext`；MinerU 重新 OCR |
 | 有的页可用，有的页扫描/空白/乱码 | 混合文档 | MinerU 覆盖文字+扫描；表格目标用 Docling |
 | 前 3 页是封面/目录 | 样本不代表正文 | 再抽中间页和末尾页复测 |
 

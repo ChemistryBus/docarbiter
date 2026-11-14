@@ -123,7 +123,7 @@ See `docs/decisions.md` → "Core tool update evaluation" before changing these 
 
 `SKILL.md` is executable policy: changing it changes routing. When it changes:
 
-1. bump the frontmatter `version:` and the README / README.zh-CN versions;
+1. bump the frontmatter `version:` and the README / README.en versions;
 2. run `python3 -I scripts/check_skill_consistency.py` (and `--check-git` before push);
 3. refresh the Codex copy with `install.sh --skill-mode copy --skills-dir ~/.codex/skills`;
 4. start a new session in every harness (Claude/DSH/ZCode/MiniMax); Codex needs the copy

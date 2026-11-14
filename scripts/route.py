@@ -206,6 +206,7 @@ def _parse_font_signals(output: str) -> dict:
     total = 0
     no_unicode = 0
     hidden_ocr = False
+    suspect_encoding = False
     for line in output.splitlines():
         stripped = line.strip()
         if not stripped or stripped.lower().startswith("name"):
@@ -220,25 +221,37 @@ def _parse_font_signals(output: str) -> dict:
             no_unicode += 1
         if re.search(r"hidden.*ocr|ocr.*hidden", stripped, re.IGNORECASE):
             hidden_ocr = True
+        if re.search(r"fzbookmaker", stripped, re.IGNORECASE):
+            suspect_encoding = True
     return {
         "fonts_total": total,
         "fonts_no_unicode": no_unicode,
         "hidden_ocr": hidden_ocr,
+        "suspect_encoding": suspect_encoding,
     }
 
 
 def _font_signals(path: Path) -> dict:
     if not _cmd("pdffonts"):
-        return {"fonts_total": 0, "fonts_no_unicode": 0, "hidden_ocr": False}
+        return {
+            "fonts_total": 0, "fonts_no_unicode": 0,
+            "hidden_ocr": False, "suspect_encoding": False,
+        }
     try:
         proc = subprocess.run(
             ["pdffonts", str(path)], capture_output=True, text=True,
             encoding="utf-8", errors="replace", timeout=30,
         )
     except Exception:  # noqa: BLE001 - a bad PDF must not crash the router
-        return {"fonts_total": 0, "fonts_no_unicode": 0, "hidden_ocr": False}
+        return {
+            "fonts_total": 0, "fonts_no_unicode": 0,
+            "hidden_ocr": False, "suspect_encoding": False,
+        }
     if proc.returncode != 0:
-        return {"fonts_total": 0, "fonts_no_unicode": 0, "hidden_ocr": False}
+        return {
+            "fonts_total": 0, "fonts_no_unicode": 0,
+            "hidden_ocr": False, "suspect_encoding": False,
+        }
     return _parse_font_signals(proc.stdout)
 
 
@@ -291,7 +304,8 @@ def probe_pdf(path: Path) -> dict:
         return {
             "status": "no-pdftotext", "chars": 0, "bad": 0, "ctrl": 0, "cjk": 0,
             "latin": 0, "bad_ratio": 0.0, "cjk_share": 0.0, "language": "unknown",
-            "fonts_total": 0, "fonts_no_unicode": 0, "hidden_ocr": False,
+            "fonts_total": 0, "fonts_no_unicode": 0,
+            "hidden_ocr": False, "suspect_encoding": False,
             "page_count": None, "sampled": "none", "coverage": "pdftotext missing",
             "pages": [],
         }
@@ -349,9 +363,14 @@ def probe_pdf(path: Path) -> dict:
     cjk_share = totals["cjk"] / max(totals["cjk"] + totals["latin"], 1)
     language = _language_from_counts(totals["cjk"], totals["latin"])
     fonts = _font_signals(path)
+    if fonts["suspect_encoding"] and language == "en":
+        # The text layer is mojibake; an `en` result is not trustworthy.
+        language = "mixed"
     status = _aggregate_status(pages)
     if fonts["hidden_ocr"] and status in ("usable", "mixed", "scan", "garbled"):
         status = "hidden-ocr"
+    elif fonts["suspect_encoding"] and status in ("usable", "mixed", "scan", "garbled"):
+        status = "custom-encoding"
 
     result = {
         "status": status,
@@ -421,6 +440,10 @@ def _route_pdf(path: Path, goal: str, page: int = 1) -> dict:
         intended = "mineru"
         reason = "hidden OCR text layer detected; the embedded OCR can contain silent character substitutions, so re-OCR with MinerU instead of trusting pdftotext"
         fallback = ["rapidocr", "docling"]
+    elif status == "custom-encoding":
+        intended = "mineru"
+        reason = "custom FzBookMaker font encoding detected; pdftotext can map ASCII to unrelated CJK glyphs, so re-OCR with MinerU instead of trusting the text layer"
+        fallback = ["rapidocr", "docling"]
     elif status == "mixed":
         if goal in ("table", "table-structure"):
             intended = "docling"
@@ -466,7 +489,7 @@ def _route_pdf(path: Path, goal: str, page: int = 1) -> dict:
     page_count = probe.get("page_count")
     if (
         isinstance(page_count, int) and page_count > 50
-        and status in ("scan", "mixed", "garbled", "hidden-ocr")
+        and status in ("scan", "mixed", "garbled", "hidden-ocr", "custom-encoding")
         and intended in ("mineru", "docling")
     ):
         warnings.append(
@@ -595,6 +618,11 @@ def print_human(path: Path, result: dict) -> None:
             print(
                 f"fonts: total={probe.get('fonts_total', 0)} "
                 f"no_unicode={probe.get('fonts_no_unicode', 0)} hidden_ocr=yes"
+            )
+        if probe.get("suspect_encoding"):
+            print(
+                f"fonts: total={probe.get('fonts_total', 0)} "
+                f"no_unicode={probe.get('fonts_no_unicode', 0)} suspect_encoding=yes"
             )
         if probe.get("pages"):
             detail = ", ".join(f"{p['page']}:{p['status']}" for p in probe["pages"])
@@ -774,9 +802,13 @@ def selftest() -> int:
 ------------------------------------ ----------------- ---------------- --- --- --- ---------
 HiddenHorzOCR                        CID Type 0C       Identity-H       yes no  yes    676  0
 SimSun                               CID TrueType      GBK-EUC-H        no  no  no     275  0
+VARFZP+FzBookMaker0DlFont00536887399 Type 1C           Custom           yes yes no      14  0
 """
     signals = _parse_font_signals(font_sample)
-    ok = signals == {"fonts_total": 2, "fonts_no_unicode": 1, "hidden_ocr": True}
+    ok = signals == {
+        "fonts_total": 3, "fonts_no_unicode": 2,
+        "hidden_ocr": True, "suspect_encoding": True,
+    }
     print(f"{'OK  ' if ok else 'FAIL'} font signals {signals}")
     failed += 0 if ok else 1
 
@@ -789,6 +821,15 @@ SimSun                               CID TrueType      GBK-EUC-H        no  no  
         hidden = _route_pdf(Path("hidden-ocr.pdf"), "manuscript")
         ok = hidden["intended"] == "mineru" and "hidden OCR" in hidden["reason"]
         print(f"{'OK  ' if ok else 'FAIL'} hidden OCR route intended={hidden['intended']}")
+        failed += 0 if ok else 1
+
+        # FzBookMaker maps ASCII to unrelated CJK glyphs; do not trust it.
+        globals()["probe_pdf"] = lambda _path: {
+            "status": "custom-encoding", "page_count": 72, "language": "zh",
+        }
+        custom = _route_pdf(Path("custom-encoding.pdf"), "speed")
+        ok = custom["intended"] == "mineru" and "FzBookMaker" in custom["reason"]
+        print(f"{'OK  ' if ok else 'FAIL'} custom encoding route intended={custom['intended']}")
         failed += 0 if ok else 1
 
         # Long OCR documents should tell the user to start with a page range.

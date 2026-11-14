@@ -158,8 +158,8 @@ def main() -> int:
             errors.append(f"THIRD_PARTY_NOTICES.md: missing '{tool}'")
 
     readme_checks = {
-        "README.md": ("docarbiter", "English", "CER", "MinerU"),
-        "README.zh-CN.md": ("docarbiter", "中文", "CER", "MinerU"),
+        "README.md": ("docarbiter", "中文", "CER", "MinerU"),
+        "README.en.md": ("docarbiter", "English", "CER", "MinerU"),
     }
     for name, needles in readme_checks.items():
         path = ROOT / name

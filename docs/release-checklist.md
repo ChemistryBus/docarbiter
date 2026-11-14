@@ -12,7 +12,7 @@
 - [ ] Python versions: 3.10 / 3.11 / 3.12; 3.11.11 tested
 - [ ] Default install profile: `core`; `extra` / `full` marked "not individually tested"
 - [ ] No AGPL / Proprietary tool code or models are distributed
-- [x] `README.md` (English, GitHub default) and `README.zh-CN.md` (Chinese) have identical content, switchable at the top
+- [x] `README.md` (Chinese, GitHub default) and `README.en.md` (English) have identical content, switchable at the top
 - [ ] All "pending test" items are visible in the release notes, not hidden
 
 ## 1. Clean-environment install
@@ -154,7 +154,7 @@ Four harnesses on this machine: Claude Code / Codex / zcode / DSH.
 ## 8. Documentation
 
 - [x] `README.md` English: problem, quick start, routing, tools, verification, install, license
-- [x] `README.zh-CN.md` Chinese: consistent with English, images in Chinese
+- [x] `README.en.md` English: consistent with Chinese, images in English
 - [ ] Images: `docs/assets/overview-zh.svg` / `overview-en.svg` render correctly on GitHub
 - [ ] Quick start works within 5 minutes
 - [ ] Common failures (missing tool / no GPU / network failure) have troubleshooting paths

@@ -22,9 +22,9 @@ fixtures, and install scripts; no upstream code or model weights.
   used but its large skill catalog is a known constraint.
 - The user cares about not overstating accuracy. Real PDFs without independent answer keys
   are reported as agreement/coverage, never "accuracy".
-- Release titles and version labels should be English. README default is English; Chinese
-  is `README.zh-CN.md`.
-- Do not create a GitHub profile README; keep the profile simple.
+- Release titles and version labels should be English. README default is Chinese
+  (`README.md`); English is `README.en.md`.
+- The user previously said not to create a GitHub profile README; ask before creating one.
 
 ## Current harness state
 
@@ -63,7 +63,7 @@ One document-extraction router per harness.
    python3 -I scripts/validate.py
    python3 -I scripts/check_skill_consistency.py
    python3 -I scripts/check_skill_consistency.py --check-git
-   python3 -I scripts/route.py --selftest   # all pass; currently 31 checks
+   python3 -I scripts/route.py --selftest   # all pass; currently 32 checks
    python3 -I scripts/check_pagemarkers.py  # real MinerU page-marker regression; skips if MinerU is absent
    for f in bootstrap.sh scripts/*.sh scripts/wrappers/*.sh; do bash -n "$f"; done
    ```
@@ -89,7 +89,7 @@ One document-extraction router per harness.
    read the release notes, re-run the benchmark suite, and update docs with the result.
 
 **Skill version discipline:** when `skills/docarbiter/SKILL.md` changes, bump its
-`version:` line and the README/README.zh-CN versions in the same commit, then run
+`version:` line and the README/README.en versions in the same commit, then run
 `check_skill_consistency.py`. Refresh the Codex copy with
 `install.sh --skill-mode copy --skills-dir ~/.codex/skills`; other clones need
 `git pull`/`update.sh`. Harnesses load the skill only at the start of a new session.
@@ -168,7 +168,7 @@ Deferred from the harness feedback:
 
 ## Useful entry points
 
-- `README.md` / `README.zh-CN.md`: user-facing overview.
+- `README.md` / `README.en.md`: user-facing overview.
 - `docs/updating.md`: update matrix.
 - `registry.json` → `harnesses`: the single source of truth for skill directories and install shapes; `install.sh` and `doctor.sh` read it through `scripts/harness_registry.py`.
 - `docs/harness-integration.md`: per-harness install/switch/test cards.
