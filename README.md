@@ -70,15 +70,53 @@ python3 -I scripts/route.py benchmarks/fixtures/zh-scan.pdf --goal manuscript
 
 ## 怎么路由
 
-| 你手上的文件 | 默认路由 | 为什么 |
-|---|---|---|
-| 文字层干净，只想快速读 | **liteparse** / **pdftotext** | 快、本地、不跑 OCR |
-| 论文 / 书，需要标题层级和页码锚点 | **MinerU** | 结构化 Markdown + 页码 |
-| 扫描件、CID 字体、乱码文字层 | **MinerU** | OCR + 版面；不要信文字层 |
-| 复杂表格：合并表头、多行单元格、书刊表 | **Docling** | 在已测真实表格上结构最稳 |
-| 简单有框表格、字符坐标 | **pdfplumber** | 快；不适合复杂书刊表 |
-| Office / HTML / EPUB / 音视频 / RAG 分块 | **Docling** | 格式覆盖广 |
-| 图片 / 截图 | **RapidOCR** | 轻量、中文优先 |
+<table width="100%">
+  <colgroup><col width="38%"><col width="22%"><col width="40%"></colgroup>
+  <thead>
+    <tr>
+      <th width="38%" align="left">你手上的文件</th>
+      <th width="22%" align="left">默认路由</th>
+      <th width="40%" align="left">为什么</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td width="38%" align="left">文字层干净，只想快速读</td>
+      <td width="22%" align="left"><strong>liteparse</strong> / <strong>pdftotext</strong></td>
+      <td width="40%" align="left">快、本地、不跑 OCR</td>
+    </tr>
+    <tr>
+      <td width="38%" align="left">论文 / 书，需要标题层级和页码锚点</td>
+      <td width="22%" align="left"><strong>MinerU</strong></td>
+      <td width="40%" align="left">结构化 Markdown + 页码</td>
+    </tr>
+    <tr>
+      <td width="38%" align="left">扫描件、CID 字体、乱码文字层</td>
+      <td width="22%" align="left"><strong>MinerU</strong></td>
+      <td width="40%" align="left">OCR + 版面；不要信文字层</td>
+    </tr>
+    <tr>
+      <td width="38%" align="left">复杂表格：合并表头、多行单元格、书刊表</td>
+      <td width="22%" align="left"><strong>Docling</strong></td>
+      <td width="40%" align="left">在已测真实表格上结构最稳</td>
+    </tr>
+    <tr>
+      <td width="38%" align="left">简单有框表格、字符坐标</td>
+      <td width="22%" align="left"><strong>pdfplumber</strong></td>
+      <td width="40%" align="left">快；不适合复杂书刊表</td>
+    </tr>
+    <tr>
+      <td width="38%" align="left">Office / HTML / EPUB / 音视频 / RAG 分块</td>
+      <td width="22%" align="left"><strong>Docling</strong></td>
+      <td width="40%" align="left">格式覆盖广</td>
+    </tr>
+    <tr>
+      <td width="38%" align="left">图片 / 截图</td>
+      <td width="22%" align="left"><strong>RapidOCR</strong></td>
+      <td width="40%" align="left">轻量、中文优先</td>
+    </tr>
+  </tbody>
+</table>
 
 ```bash
 # 简单网格表：先走快路径
@@ -112,16 +150,49 @@ python3 -I scripts/route.py 文件.pdf --goal table-structure --json
 
 默认安装 8 个核心工具；`full` 会注册 12 个工具技能。默认只注册 `docarbiter` 一个入口。
 
-| 工具 | 最擅长 |
-|---|---|
-| **MinerU** | 中英文 PDF → 结构化 Markdown、页码锚点、OCR |
-| **Docling** | Office / HTML / EPUB / RAG / LaTeX，复杂合并表格 |
-| **liteparse** | 快速读文字层 PDF、词级坐标 |
-| **MarkItDown** | 简单单栏 PDF / Office |
-| **RapidOCR** | 中文优先的图片、截图 OCR |
-| **OCRmyPDF** | 给扫描件加可搜索文字层 |
-| **pdfplumber** | 简单有框表格、字符坐标 |
-| **pdftotext** | 纯文本基线、文字层探测 |
+<table width="100%">
+  <colgroup><col width="24%"><col width="76%"></colgroup>
+  <thead>
+    <tr>
+      <th width="24%" align="left">工具</th>
+      <th width="76%" align="left">最擅长</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td width="24%" align="left"><strong>MinerU</strong></td>
+      <td width="76%" align="left">中英文 PDF → 结构化 Markdown、页码锚点、OCR</td>
+    </tr>
+    <tr>
+      <td width="24%" align="left"><strong>Docling</strong></td>
+      <td width="76%" align="left">Office / HTML / EPUB / RAG / LaTeX，复杂合并表格</td>
+    </tr>
+    <tr>
+      <td width="24%" align="left"><strong>liteparse</strong></td>
+      <td width="76%" align="left">快速读文字层 PDF、词级坐标</td>
+    </tr>
+    <tr>
+      <td width="24%" align="left"><strong>MarkItDown</strong></td>
+      <td width="76%" align="left">简单单栏 PDF / Office</td>
+    </tr>
+    <tr>
+      <td width="24%" align="left"><strong>RapidOCR</strong></td>
+      <td width="76%" align="left">中文优先的图片、截图 OCR</td>
+    </tr>
+    <tr>
+      <td width="24%" align="left"><strong>OCRmyPDF</strong></td>
+      <td width="76%" align="left">给扫描件加可搜索文字层</td>
+    </tr>
+    <tr>
+      <td width="24%" align="left"><strong>pdfplumber</strong></td>
+      <td width="76%" align="left">简单有框表格、字符坐标</td>
+    </tr>
+    <tr>
+      <td width="24%" align="left"><strong>pdftotext</strong></td>
+      <td width="76%" align="left">纯文本基线、文字层探测</td>
+    </tr>
+  </tbody>
+</table>
 
 完整许可证、安装命令和不收录原因：[docs/tool-registry.md](docs/tool-registry.md) 和 [registry.json](registry.json)。
 
@@ -138,13 +209,37 @@ python3 -I scripts/route.py 文件.pdf --goal table-structure --json
 
 ## 支持哪些 harness
 
-| Harness | 状态 |
-|---|---|
-| Claude Code | 完整通过（文件软链） |
-| DSH | 完整通过（文件软链） |
-| ZCode | 完整通过（文件软链） |
-| MiniMax | 完整通过（`.agents/skills` 整目录软链） |
-| Codex | 条件通过：技能目录很大时，可能需要显式说“用 docarbiter” |
+<table width="100%">
+  <colgroup><col width="28%"><col width="72%"></colgroup>
+  <thead>
+    <tr>
+      <th width="28%" align="left">Harness</th>
+      <th width="72%" align="left">状态</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td width="28%" align="left">Claude Code</td>
+      <td width="72%" align="left">完整通过（文件软链）</td>
+    </tr>
+    <tr>
+      <td width="28%" align="left">DSH</td>
+      <td width="72%" align="left">完整通过（文件软链）</td>
+    </tr>
+    <tr>
+      <td width="28%" align="left">ZCode</td>
+      <td width="72%" align="left">完整通过（文件软链）</td>
+    </tr>
+    <tr>
+      <td width="28%" align="left">MiniMax</td>
+      <td width="72%" align="left">完整通过（<code>.agents/skills</code> 整目录软链）</td>
+    </tr>
+    <tr>
+      <td width="28%" align="left">Codex</td>
+      <td width="72%" align="left">条件通过：技能目录很大时，可能需要显式说“用 docarbiter”</td>
+    </tr>
+  </tbody>
+</table>
 
 每个 harness **只保留一个**文档提取路由器。如果 `doc-extract` 和 `docarbiter` 同时存在，agent 可能选旧的那个。迁移和回滚见 [docs/migration.md](docs/migration.md)。
 
@@ -204,16 +299,43 @@ python3 -I scripts/route.py 文件.pdf --goal table-structure --json
 
 ## 文档
 
-| | |
-|---|---|
-| 架构与工具注册表 | [docs/architecture.md](docs/architecture.md) · [docs/tool-registry.md](docs/tool-registry.md) |
-| 基准与策略 | [docs/benchmarks.md](docs/benchmarks.md) · [docs/policy.md](docs/policy.md) |
-| 失败模式与坑 | [docs/gotchas.md](docs/gotchas.md) |
-| Harness 接入 | [docs/harness-integration.md](docs/harness-integration.md) |
-| 更新技能 | [docs/updating.md](docs/updating.md) |
-| 迁移与回滚 | [docs/migration.md](docs/migration.md) |
-| 维护交接 | [docs/handoff.md](docs/handoff.md) |
-| 发布说明 | [v0.1.3](https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.3) · [docs/release-notes-v0.1.3.md](docs/release-notes-v0.1.3.md) |
+<table width="100%">
+  <colgroup><col width="30%"><col width="70%"></colgroup>
+  <tbody>
+    <tr>
+      <td width="30%" align="left">架构与工具注册表</td>
+      <td width="70%" align="left"><a href="docs/architecture.md">docs/architecture.md</a> · <a href="docs/tool-registry.md">docs/tool-registry.md</a></td>
+    </tr>
+    <tr>
+      <td width="30%" align="left">基准与策略</td>
+      <td width="70%" align="left"><a href="docs/benchmarks.md">docs/benchmarks.md</a> · <a href="docs/policy.md">docs/policy.md</a></td>
+    </tr>
+    <tr>
+      <td width="30%" align="left">失败模式与坑</td>
+      <td width="70%" align="left"><a href="docs/gotchas.md">docs/gotchas.md</a></td>
+    </tr>
+    <tr>
+      <td width="30%" align="left">Harness 接入</td>
+      <td width="70%" align="left"><a href="docs/harness-integration.md">docs/harness-integration.md</a></td>
+    </tr>
+    <tr>
+      <td width="30%" align="left">更新技能</td>
+      <td width="70%" align="left"><a href="docs/updating.md">docs/updating.md</a></td>
+    </tr>
+    <tr>
+      <td width="30%" align="left">迁移与回滚</td>
+      <td width="70%" align="left"><a href="docs/migration.md">docs/migration.md</a></td>
+    </tr>
+    <tr>
+      <td width="30%" align="left">维护交接</td>
+      <td width="70%" align="left"><a href="docs/handoff.md">docs/handoff.md</a></td>
+    </tr>
+    <tr>
+      <td width="30%" align="left">发布说明</td>
+      <td width="70%" align="left"><a href="https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.3">v0.1.3</a> · <a href="docs/release-notes-v0.1.3.md">docs/release-notes-v0.1.3.md</a></td>
+    </tr>
+  </tbody>
+</table>
 
 ## 许可
 

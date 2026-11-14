@@ -70,15 +70,53 @@ The router only decides. It does not extract for you; run the suggested command 
 
 ## How it routes
 
-| What you have | Default route | Why |
-|---|---|---|
-| Clean text layer, speed matters | **liteparse** / **pdftotext** | Fast, local, no OCR |
-| Paper or book, needs headings and page anchors | **MinerU** | Structured Markdown plus page anchors |
-| Scan, CID font, or garbled text layer | **MinerU** | OCR plus layout; do not trust the text layer |
-| Complex table: merged headers, multi-line cells, book table | **Docling** | Best structure on the tested real tables |
-| Simple bordered table or coordinates | **pdfplumber** | Fast cells; not for complex book tables |
-| Office, HTML, EPUB, audio/video, RAG chunks | **Docling** | Broad format coverage |
-| Image or screenshot | **RapidOCR** | Lightweight, Chinese-first OCR |
+<table width="100%">
+  <colgroup><col width="38%"><col width="22%"><col width="40%"></colgroup>
+  <thead>
+    <tr>
+      <th width="38%" align="left">What you have</th>
+      <th width="22%" align="left">Default route</th>
+      <th width="40%" align="left">Why</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td width="38%" align="left">Clean text layer, speed matters</td>
+      <td width="22%" align="left"><strong>liteparse</strong> / <strong>pdftotext</strong></td>
+      <td width="40%" align="left">Fast, local, no OCR</td>
+    </tr>
+    <tr>
+      <td width="38%" align="left">Paper or book, needs headings and page anchors</td>
+      <td width="22%" align="left"><strong>MinerU</strong></td>
+      <td width="40%" align="left">Structured Markdown plus page anchors</td>
+    </tr>
+    <tr>
+      <td width="38%" align="left">Scan, CID font, or garbled text layer</td>
+      <td width="22%" align="left"><strong>MinerU</strong></td>
+      <td width="40%" align="left">OCR plus layout; do not trust the text layer</td>
+    </tr>
+    <tr>
+      <td width="38%" align="left">Complex table: merged headers, multi-line cells, book table</td>
+      <td width="22%" align="left"><strong>Docling</strong></td>
+      <td width="40%" align="left">Best structure on the tested real tables</td>
+    </tr>
+    <tr>
+      <td width="38%" align="left">Simple bordered table or coordinates</td>
+      <td width="22%" align="left"><strong>pdfplumber</strong></td>
+      <td width="40%" align="left">Fast cells; not for complex book tables</td>
+    </tr>
+    <tr>
+      <td width="38%" align="left">Office, HTML, EPUB, audio/video, RAG chunks</td>
+      <td width="22%" align="left"><strong>Docling</strong></td>
+      <td width="40%" align="left">Broad format coverage</td>
+    </tr>
+    <tr>
+      <td width="38%" align="left">Image or screenshot</td>
+      <td width="22%" align="left"><strong>RapidOCR</strong></td>
+      <td width="40%" align="left">Lightweight, Chinese-first OCR</td>
+    </tr>
+  </tbody>
+</table>
 
 ```bash
 # Simple grid: fast path
@@ -112,16 +150,49 @@ The router reports `probe`, `intended`, `selected`, `reason`, `command`, and `fa
 
 Eight tools are installed by default. The `full` profile registers twelve tool skills; the default install registers only `docarbiter`.
 
-| Tool | Best at |
-|---|---|
-| **MinerU** | Chinese and English PDF to structured Markdown, page anchors, OCR |
-| **Docling** | Office, HTML, EPUB, RAG, LaTeX, and complex merged tables |
-| **liteparse** | Fast text-layer PDF and word coordinates |
-| **MarkItDown** | Simple single-column PDF and Office files |
-| **RapidOCR** | Chinese-first image and screenshot OCR |
-| **OCRmyPDF** | Add a searchable text layer to scans |
-| **pdfplumber** | Simple bordered tables and character coordinates |
-| **pdftotext** | Plain-text baseline and text-layer probe |
+<table width="100%">
+  <colgroup><col width="24%"><col width="76%"></colgroup>
+  <thead>
+    <tr>
+      <th width="24%" align="left">Tool</th>
+      <th width="76%" align="left">Best at</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td width="24%" align="left"><strong>MinerU</strong></td>
+      <td width="76%" align="left">Chinese and English PDF to structured Markdown, page anchors, OCR</td>
+    </tr>
+    <tr>
+      <td width="24%" align="left"><strong>Docling</strong></td>
+      <td width="76%" align="left">Office, HTML, EPUB, RAG, LaTeX, and complex merged tables</td>
+    </tr>
+    <tr>
+      <td width="24%" align="left"><strong>liteparse</strong></td>
+      <td width="76%" align="left">Fast text-layer PDF and word coordinates</td>
+    </tr>
+    <tr>
+      <td width="24%" align="left"><strong>MarkItDown</strong></td>
+      <td width="76%" align="left">Simple single-column PDF and Office files</td>
+    </tr>
+    <tr>
+      <td width="24%" align="left"><strong>RapidOCR</strong></td>
+      <td width="76%" align="left">Chinese-first image and screenshot OCR</td>
+    </tr>
+    <tr>
+      <td width="24%" align="left"><strong>OCRmyPDF</strong></td>
+      <td width="76%" align="left">Add a searchable text layer to scans</td>
+    </tr>
+    <tr>
+      <td width="24%" align="left"><strong>pdfplumber</strong></td>
+      <td width="76%" align="left">Simple bordered tables and character coordinates</td>
+    </tr>
+    <tr>
+      <td width="24%" align="left"><strong>pdftotext</strong></td>
+      <td width="76%" align="left">Plain-text baseline and text-layer probe</td>
+    </tr>
+  </tbody>
+</table>
 
 Full licenses, install commands, and exclusion reasons: [docs/tool-registry.md](docs/tool-registry.md) and [registry.json](registry.json).
 
@@ -138,13 +209,37 @@ These results cover the tested samples only; they are not a general accuracy cla
 
 ## Harness support
 
-| Harness | Status |
-|---|---|
-| Claude Code | Full pass (file symlink) |
-| DSH | Full pass (file symlink) |
-| ZCode | Full pass (file symlink) |
-| MiniMax | Full pass (whole-directory symlink in `.agents/skills`) |
-| Codex | Conditional: a very large skill catalog may require an explicit "use docarbiter" |
+<table width="100%">
+  <colgroup><col width="28%"><col width="72%"></colgroup>
+  <thead>
+    <tr>
+      <th width="28%" align="left">Harness</th>
+      <th width="72%" align="left">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td width="28%" align="left">Claude Code</td>
+      <td width="72%" align="left">Full pass (file symlink)</td>
+    </tr>
+    <tr>
+      <td width="28%" align="left">DSH</td>
+      <td width="72%" align="left">Full pass (file symlink)</td>
+    </tr>
+    <tr>
+      <td width="28%" align="left">ZCode</td>
+      <td width="72%" align="left">Full pass (file symlink)</td>
+    </tr>
+    <tr>
+      <td width="28%" align="left">MiniMax</td>
+      <td width="72%" align="left">Full pass (whole-directory symlink in <code>.agents/skills</code>)</td>
+    </tr>
+    <tr>
+      <td width="28%" align="left">Codex</td>
+      <td width="72%" align="left">Conditional: a very large skill catalog may require an explicit "use docarbiter"</td>
+    </tr>
+  </tbody>
+</table>
 
 Keep **exactly one** document-extraction router per harness. If `doc-extract` and `docarbiter` coexist, the agent may pick the old one. Migration and rollback: [docs/migration.md](docs/migration.md).
 
@@ -198,16 +293,43 @@ Simple bordered tables: `--goal table` (pdfplumber). Merged headers, multi-line 
 
 ## Documentation
 
-| | |
-|---|---|
-| Architecture and registry | [docs/architecture.md](docs/architecture.md) · [docs/tool-registry.md](docs/tool-registry.md) |
-| Benchmarks and policy | [docs/benchmarks.md](docs/benchmarks.md) · [docs/policy.md](docs/policy.md) |
-| Failure modes and traps | [docs/gotchas.md](docs/gotchas.md) |
-| Harness integration | [docs/harness-integration.md](docs/harness-integration.md) |
-| Updating skills | [docs/updating.md](docs/updating.md) |
-| Migration and rollback | [docs/migration.md](docs/migration.md) |
-| Maintainer handoff | [docs/handoff.md](docs/handoff.md) |
-| Release notes | [v0.1.3](https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.3) · [docs/release-notes-v0.1.3.md](docs/release-notes-v0.1.3.md) |
+<table width="100%">
+  <colgroup><col width="30%"><col width="70%"></colgroup>
+  <tbody>
+    <tr>
+      <td width="30%" align="left">Architecture and registry</td>
+      <td width="70%" align="left"><a href="docs/architecture.md">docs/architecture.md</a> · <a href="docs/tool-registry.md">docs/tool-registry.md</a></td>
+    </tr>
+    <tr>
+      <td width="30%" align="left">Benchmarks and policy</td>
+      <td width="70%" align="left"><a href="docs/benchmarks.md">docs/benchmarks.md</a> · <a href="docs/policy.md">docs/policy.md</a></td>
+    </tr>
+    <tr>
+      <td width="30%" align="left">Failure modes and traps</td>
+      <td width="70%" align="left"><a href="docs/gotchas.md">docs/gotchas.md</a></td>
+    </tr>
+    <tr>
+      <td width="30%" align="left">Harness integration</td>
+      <td width="70%" align="left"><a href="docs/harness-integration.md">docs/harness-integration.md</a></td>
+    </tr>
+    <tr>
+      <td width="30%" align="left">Updating skills</td>
+      <td width="70%" align="left"><a href="docs/updating.md">docs/updating.md</a></td>
+    </tr>
+    <tr>
+      <td width="30%" align="left">Migration and rollback</td>
+      <td width="70%" align="left"><a href="docs/migration.md">docs/migration.md</a></td>
+    </tr>
+    <tr>
+      <td width="30%" align="left">Maintainer handoff</td>
+      <td width="70%" align="left"><a href="docs/handoff.md">docs/handoff.md</a></td>
+    </tr>
+    <tr>
+      <td width="30%" align="left">Release notes</td>
+      <td width="70%" align="left"><a href="https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.3">v0.1.3</a> · <a href="docs/release-notes-v0.1.3.md">docs/release-notes-v0.1.3.md</a></td>
+    </tr>
+  </tbody>
+</table>
 
 ## License
 
