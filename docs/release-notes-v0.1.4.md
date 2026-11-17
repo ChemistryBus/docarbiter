@@ -1,6 +1,6 @@
 # v0.1.4 — Dependency Refresh and Probe Hygiene
 
-Release candidate prepared 2026-11-17.
+Released 2026-11-17.
 
 This patch updates two verified core pins and reduces noise from the weekly upstream probe.
 It does **not** change routing goals, tool selection logic, or the MinerU/OCRmyPDF pins.

@@ -1,13 +1,13 @@
 # Pre-Release Checklist
 
-> Status: **v0.1.3 — Chinese Corpus Routing Fixes released** (2026-11-14). `v0.1.0` was the first public release; `v0.1.1` added harness compatibility; `v0.1.2` updated Docling and evidence; `main` now also includes hidden-OCR, FzBookMaker, and Chinese-language routing fixes.
+> Status: **v0.1.4 — Dependency Refresh and Probe Hygiene released** (2026-11-17). `v0.1.0` was the first public release; `v0.1.1` added harness compatibility; `v0.1.2` updated Docling and evidence; `v0.1.3` fixed Chinese routing; `main` now also includes the Docling 2.150.1 / liteparse 2.19.0 refresh and probe hygiene.
 > See [`docs/release-plan.md`](release-plan.md) for the release plan and execution log.
 > Current progress (2026-11-11): 11 bilingual synthetic samples + 4 real CC BY-SA Wikipedia samples + CID/traditional-Chinese/interleaved two-column/true vertical-writing edge samples + 6 text-layer tools + 2 OCR paths + clean venv install + read-only sampling of 8,444 real PDFs in the workspace (48+24 samples, 4-file smoke) + P0 policy benchmark (22 documents with answer keys) + 5 real high-frequency tables (WS/T 578.1, GB 28050, DRIs 2023, GB 2760, China Food Composition Tables) are complete; P1 verify negative results are not published, P2 real-table routing is complete (Docling/MinerU/pdfplumber), P3 default policy is set, Claude Code P4 real triggering is complete (old doc-extract backed up and disabled), DSH headless triggering passed and was permanently switched (global .agents old route backed up), ZCode / MiniMax top-level fully passed, Codex conditionally passed (full skill-set capacity limit); real-table per-cell CER is complete for WS/T 578.1 p8, GB 28050 p6, and GB 2760 p13; full-text two-column CER is complete for BERT, Cell Perspective, ResNet, Nature Communications, and PLOS Computational Biology; full true-vertical writing, full-text CER on more papers, the remaining real tables, and extension-layer tools are not yet complete.
 > The goal of this checklist: turn "it runs" into "reproducible, explainable, maintainable."
 
 ## 0. Release gates (decide first)
 
-- [x] Version: `v0.1.3 — Chinese Corpus Routing Fixes` (v0.1.0 was the First Public Preview; v0.1.1 was the Harness Compatibility Patch; v0.1.2 was the Docling/evidence update)
+- [x] Version: `v0.1.4 — Dependency Refresh and Probe Hygiene` (v0.1.0 was the First Public Preview; v0.1.1 was the Harness Compatibility Patch; v0.1.2 was the Docling/evidence update; v0.1.3 was the Chinese routing fix)
 - [ ] Support scope documented clearly: tested on macOS arm64; Linux x86_64 pending verification; Windows not verified
 - [ ] Python versions: 3.10 / 3.11 / 3.12; 3.11.11 tested
 - [ ] Default install profile: `core`; `extra` / `full` marked "not individually tested"
@@ -185,7 +185,7 @@ Four harnesses on this machine: Claude Code / Codex / zcode / DSH.
 - [ ] `git init` / commit / push only after explicit user consent
 - [ ] Remote repository name confirmed (`ChemistryBus/docarbiter`)
 - [ ] Default branch `main`
-- [x] Tag `v0.1.3`; release notes list known limitations
+- [x] Tag `v0.1.4`; release notes list known limitations
 - [ ] Release notes state: macOS tested, Linux/Windows not verified, extra not individually tested
 - [ ] Release notes state: Anthropic `pdf`, PyMuPDF, PDF-Extract-Kit are not included
 - [ ] After release, run `doctor.sh` + a two-page demo once to confirm the remote version is reproducible

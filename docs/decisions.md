@@ -359,4 +359,4 @@ Triggered by the weekly upstream probe: MinerU 4.2.3, Docling 2.150.1, liteparse
 - **MinerU 4.2.3: held.** The 4.2.x flash path is usable, but the isolated server/engine path is still not validated. Do not update the pin.
 - **OCRmyPDF 17.14.2: held.** The Pillow>=13 requirement still conflicts with MinerU's gradio Pillow<13 constraint.
 - **Probe hygiene.** `check_updates.py --ci` now labels installed versions as `n/a (CI)` and does not report false `core tool is not installed` issues. The workflow skips an issue comment when the normalized probe output has not changed; blocker text now uses `4.2.x` / `17.14.x`.
-- **Prepared for v0.1.4:** Docling 2.150.1 and liteparse 2.19.0 pins; MinerU 4.1.7 and OCRmyPDF 17.12.1 unchanged.
+- **Shipped in v0.1.4:** Docling 2.150.1 and liteparse 2.19.0 pins; MinerU 4.1.7 and OCRmyPDF 17.12.1 unchanged.

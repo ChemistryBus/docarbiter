@@ -11,7 +11,7 @@ fixtures, and install scripts; no upstream code or model weights.
 
 - Repo: https://github.com/ChemistryBus/docarbiter
 - Local repo: `$HOME/Documents/Claude/Document Extraction Skills/document-extraction-skills`
-- Latest release: `v0.1.3 — Chinese Corpus Routing Fixes`
+- Latest release: `v0.1.4 — Dependency Refresh and Probe Hygiene`
 - First release: `v0.1.0 — First Public Preview`
 - Default branch: `main`; CI: `validate` on Ubuntu + macOS.
 
