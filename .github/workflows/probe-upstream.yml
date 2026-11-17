@@ -24,7 +24,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python3 -I scripts/check_updates.py --format markdown --exit-code > probe.md
+          python3 -I scripts/check_updates.py --format markdown --exit-code --ci > probe.md
       - name: Open or update the probe issue
         if: steps.probe.outcome == 'failure'
         env:
@@ -32,9 +32,21 @@ jobs:
         run: |
           gh label create upstream-probe --color FBCA04 \
             --description "Upstream dependency update" 2>/dev/null || true
+          [ -s probe.md ] || { echo "probe.md is empty; skip issue update."; exit 0; }
           num="$(gh issue list --label upstream-probe --state open \
             --json number --jq '.[0].number // empty')"
           if [ -n "$num" ]; then
+            prev="$(gh issue view "$num" --json body,comments \
+              --jq '.comments[-1].body // .body')"
+            normalize() {
+              sed -E 's/^# Upstream probe — .*$/# Upstream probe — DATE/;
+                      s/^- local HEAD: .*$/- local HEAD: HEAD/;
+                      s/^- origin\/main: .*$/- origin\/main: HEAD/'
+            }
+            if [ "$(printf '%s\n' "$prev" | normalize)" = "$(normalize < probe.md)" ]; then
+              echo "No upstream change since the last comment; skip."
+              exit 0
+            fi
             gh issue comment "$num" --body-file probe.md
           else
             gh issue create \

@@ -41,10 +41,10 @@ Meaning: `docarbiter` = document + arbiter. It does not extract by itself; it ad
 
 | Tool | Local version | License (package metadata) | CLI |
 |---|---|---|---|
-| liteparse | 2.18.0 | Apache-2.0 | `liteparse-doc` |
+| liteparse | 2.19.0 | Apache-2.0 | `liteparse-doc` |
 | markitdown | 0.1.9 | MIT | `markitdown` |
 | mineru | 4.1.7 | `LicenseRef-MinerU-Open-Source-License` | `mineru-doc` / `mineru` |
-| docling | 2.150.0 | MIT | `docling` |
+| docling | 2.150.1 | MIT | `docling` |
 | rapidocr | 3.10.0 | Apache-2.0 | Python API |
 | ocrmypdf | 17.12.1 | MPL-2.0 | `ocrmypdf` |
 | pdfplumber | 0.11.10 | MIT | Python API |
@@ -349,3 +349,14 @@ Triggered by the weekly upstream probe: MinerU 4.2.1, Docling 2.150.0, OCRmyPDF 
 - **Recommendation:** v0.1.2 should update **Docling 2.150.0 only**; keep MinerU 4.1.7 and OCRmyPDF 17.12.1. A MinerU 4.2.1 update needs a validated server/engine setup; OCRmyPDF 17.14.1 needs a separate environment or an upstream MinerU change.
 - **Shipped in v0.1.2 (2026-11-12):** the global environment and the release pin use Docling 2.150.0. MinerU 4.1.7 and OCRmyPDF 17.12.1 are unchanged. The wrapper fix and the known-blocker notes are included.
 - **Shipped in v0.1.3 (2026-11-14):** language detection uses CJK share; hidden-OCR and FzBookMaker layers route to MinerU; MinerU inputs with `:` in the basename are copied to a safe temporary name. No tool pin changed.
+
+### v0.1.4 dependency refresh (2026-11-17)
+
+Triggered by the weekly upstream probe: MinerU 4.2.3, Docling 2.150.1, liteparse 2.19.0, OCRmyPDF 17.14.2. Testing used the existing private `pin-venv`; only Docling and liteparse were upgraded.
+
+- **Docling 2.150.1: safe.** `pip check` is clean and `route.py --selftest` is 32/32. Real-table `nopunct` CER is unchanged on WS/T 578.1 p8 (0.0000), GB 28050 p6 (0.0000), and GB 2760 p13 (0.0000). Full-text `nopunct` CER is unchanged: BERT 0.0656, Cell 0.1099, ResNet 0.1537, Nature Communications 0.1209, PLOS 0.1586.
+- **liteparse 2.19.0: safe.** Full-text `nopunct` CER is unchanged: BERT 0.1398, Nature Communications 0.1259, PLOS 0.1950, ResNet 0.2287; Cell remains alignment-invalid as before.
+- **MinerU 4.2.3: held.** The 4.2.x flash path is usable, but the isolated server/engine path is still not validated. Do not update the pin.
+- **OCRmyPDF 17.14.2: held.** The Pillow>=13 requirement still conflicts with MinerU's gradio Pillow<13 constraint.
+- **Probe hygiene.** `check_updates.py --ci` now labels installed versions as `n/a (CI)` and does not report false `core tool is not installed` issues. The workflow skips an issue comment when the normalized probe output has not changed; blocker text now uses `4.2.x` / `17.14.x`.
+- **Prepared for v0.1.4:** Docling 2.150.1 and liteparse 2.19.0 pins; MinerU 4.1.7 and OCRmyPDF 17.12.1 unchanged.

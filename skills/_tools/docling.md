@@ -16,7 +16,7 @@ license: MIT
 ## 装
 
 ```bash
-pip install docling==2.150.0
+pip install docling==2.150.1
 # 首次运行会下载版面/表格模型
 ```
 

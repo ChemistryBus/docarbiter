@@ -4,11 +4,11 @@
 
 <p align="center"><strong>One routing layer for Chinese and English document extraction.</strong></p>
 <p align="center">Probe the file, pick the right tool, and keep an explainable fallback when it fails.</p>
-<p align="center"><strong>v0.1.3 — Chinese Corpus Routing Fixes</strong></p>
+<p align="center"><strong>v0.1.4 — Dependency Refresh and Probe Hygiene</strong></p>
 
 <p align="center">
   <a href="https://github.com/ChemistryBus/docarbiter/actions/workflows/validate.yml"><img src="https://github.com/ChemistryBus/docarbiter/actions/workflows/validate.yml/badge.svg" alt="validate"></a>
-  <a href="https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.3"><img src="https://img.shields.io/github/v/release/ChemistryBus/docarbiter?color=blue&cacheSeconds=300" alt="release"></a>
+  <a href="https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.4"><img src="https://img.shields.io/github/v/release/ChemistryBus/docarbiter?color=blue&cacheSeconds=300" alt="release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT"></a>
   <img src="https://img.shields.io/badge/python-3.10--3.12-blue" alt="Python 3.10-3.12">
 </p>
@@ -326,7 +326,7 @@ Simple bordered tables: `--goal table` (pdfplumber). Merged headers, multi-line 
     </tr>
     <tr>
       <td width="280" align="left">Release notes</td>
-      <td width="680" align="left"><a href="https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.3">v0.1.3</a> · <a href="docs/release-notes-v0.1.3.md">docs/release-notes-v0.1.3.md</a></td>
+      <td width="680" align="left"><a href="https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.4">v0.1.4</a> · <a href="docs/release-notes-v0.1.4.md">docs/release-notes-v0.1.4.md</a></td>
     </tr>
   </tbody>
 </table>

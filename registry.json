@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated": "2026-11-12",
+  "updated": "2026-11-17",
   "default_profile": "core",
   "notes": "Machine-readable tool registry. The docarbiter skill routes by category; this file is the source of truth for what exists. The harnesses section is the source of truth for skill directories and install shapes; install.sh and doctor.sh read it. Adding a tool in an existing category requires one entry here plus an optional thin shell in skills/_tools/.",
   "harnesses": [
@@ -87,7 +87,7 @@
       "output_types": ["markdown", "json", "html", "doctags", "chunks", "latex"],
       "best_for": "Office and mixed formats, RAG chunks, LaTeX, non-PDF inputs, and complex text-layer tables with merged headers or multi-line cells",
       "avoid_when": "You only need to read PDF body text quickly; Chinese borderless tables (Docling may return 0 tables; try pdfplumber text strategy)",
-      "install": "pip install docling==2.150.0",
+      "install": "pip install docling==2.150.1",
       "wrapper": null,
       "upstream": "https://github.com/docling-project/docling",
       "status": "demo-verified"
@@ -103,7 +103,7 @@
       "output_types": ["markdown", "json", "text"],
       "best_for": "Fast reading of a PDF with a usable text layer; word-level coordinates and font metadata",
       "avoid_when": "Scanned PDF; you need clean paragraphs and stable heading levels for a manuscript",
-      "install": "pip install liteparse==2.18.0",
+      "install": "pip install liteparse==2.19.0",
       "wrapper": "liteparse-doc",
       "upstream": "https://github.com/run-llama/liteparse",
       "status": "demo-verified"

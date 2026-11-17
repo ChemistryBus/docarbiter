@@ -51,8 +51,8 @@ PYPI = {
 }
 CORE = {"mineru", "docling", "liteparse", "markitdown", "rapidocr", "ocrmypdf", "pdfplumber"}
 KNOWN_BLOCKERS = {
-    "mineru": "4.2.1 server/engine path is not validated; hold the pin (see docs/decisions.md)",
-    "ocrmypdf": "17.14.1 requires Pillow>=13; MinerU's gradio requires Pillow<13; cannot coexist",
+    "mineru": "4.2.x server/engine path is not validated; hold the pin (see docs/decisions.md)",
+    "ocrmypdf": "17.14.x requires Pillow>=13; MinerU's gradio requires Pillow<13; cannot coexist",
 }
 
 
@@ -150,8 +150,10 @@ def main() -> int:
     ap.add_argument("--format", choices=["text", "markdown", "json"], default="text")
     ap.add_argument("--exit-code", action="store_true", help="exit 1 when any update or drift is found")
     ap.add_argument("--no-github", action="store_true", help="skip GitHub release API calls")
+    ap.add_argument("--ci", action="store_true", help="skip installed-version checks (clean CI runner)")
     ap.add_argument("--timeout", type=int, default=15)
     args = ap.parse_args()
+    ci = args.ci or os.environ.get("GITHUB_ACTIONS") == "true"
 
     token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
     issues: list[str] = []
@@ -180,7 +182,8 @@ def main() -> int:
     rows = []
     for tool in load_tools():
         row = dict(tool)
-        row["installed"] = installed(tool["pypi"])
+        row["ci"] = ci
+        row["installed"] = None if ci else installed(tool["pypi"])
         row["latest"], row["latest_date"], row["pypi_error"] = pypi_latest(tool["pypi"], token)
         row["github_release"], row["github_date"], row["github_error"] = (None, None, "skipped")
         if not args.no_github:
@@ -195,17 +198,17 @@ def main() -> int:
             status = "probe-error"
         elif compare(row["latest"], row["pin"]) > 0:
             status = "pinned-behind"
-        if row["installed"] and row["pin"] and row["installed"] != row["pin"]:
+        if not ci and row["installed"] and row["pin"] and row["installed"] != row["pin"]:
             status = "env-drift" if status == "ok" else status + "+env-drift"
-        if not row["installed"]:
+        if not ci and not row["installed"]:
             status = "not-installed" if status == "ok" else status + "+not-installed"
         row["status"] = status
 
         if tool["tier"] in ("core", "extra") and "pinned-behind" in status:
             issues.append(f"{tool['id']}: upstream {row['latest']} > pinned {row['pin']}")
-        if tool["tier"] == "core" and "env-drift" in status:
+        if not ci and tool["tier"] == "core" and "env-drift" in status:
             issues.append(f"{tool['id']}: installed {row['installed']} != pinned {row['pin']}")
-        if tool["tier"] == "core" and "not-installed" in status:
+        if not ci and tool["tier"] == "core" and "not-installed" in status:
             issues.append(f"{tool['id']}: core tool is not installed")
         row["impact"] = (
             "rerun route selftest, page-marker regression, and real-table/full-text benchmarks; "
@@ -220,8 +223,8 @@ def main() -> int:
 
     if args.format == "json":
         print(json.dumps({"generated": datetime.now(timezone.utc).isoformat(),
-                          "docarbiter": docarbiter, "tools": rows, "issues": issues},
-                         ensure_ascii=False, indent=2))
+                          "ci": ci, "docarbiter": docarbiter, "tools": rows,
+                          "issues": issues}, ensure_ascii=False, indent=2))
     elif args.format == "markdown":
         print(f"# Upstream probe — {datetime.now(timezone.utc).date().isoformat()}")
         print()
@@ -235,11 +238,16 @@ def main() -> int:
         print()
         print("## Routed tools")
         print()
+        if ci:
+            print("> Installed versions are not checked on GitHub Actions; the runner has no "
+                  "routed tools. `pinned-behind` still compares the registry pin with upstream.")
+            print()
         print("| tool | tier | installed | pinned | latest | latest release | status |")
         print("|---|---|---|---|---|---|---|")
         for row in rows:
+            shown_installed = "n/a (CI)" if ci else (row["installed"] or "—")
             print(
-                f"| {row['id']} | {row['tier']} | {row['installed'] or '—'} | "
+                f"| {row['id']} | {row['tier']} | {shown_installed} | "
                 f"{row['pin'] or '—'} | {row['latest'] or '—'} | "
                 f"{row['github_release'] or '—'} | {row['status']} |"
             )
@@ -268,7 +276,8 @@ def main() -> int:
         print(f"docarbiter: local={docarbiter['local'] or '?'} remote={docarbiter['remote'] or '?'} "
               f"release={docarbiter['release'] or '?'}")
         for row in rows:
-            print(f"{row['id']:14} tier={row['tier']:9} installed={row['installed'] or '—':12} "
+            shown_installed = "n/a (CI)" if ci else (row["installed"] or "—")
+            print(f"{row['id']:14} tier={row['tier']:9} installed={shown_installed:12} "
                   f"pinned={row['pin'] or '—':12} latest={row['latest'] or '—':12} {row['status']}")
         if issues:
             print("\nissues:")

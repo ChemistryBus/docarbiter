@@ -18,7 +18,7 @@
 ## 1. Clean-environment install
 
 - [x] macOS arm64 clean venv: `/tmp/docarbiter-release-venv`, Python 3.11 (rerun 2026-11-10)
-- [x] Core pin set installed in a fresh venv: MinerU 4.1.7 / Docling 2.150.0 / liteparse 2.18.0 / MarkItDown 0.1.9 / RapidOCR 3.10.0 / OCRmyPDF 17.12.1 / pdfplumber 0.11.10; `pip check` clean; route selftest 32/32 (2026-11-14; it was 24/24 when the venv was built on 2026-11-12). The earlier `install.sh --profile core` run used Docling 2.149.0.
+- [x] Core pin set validated in an isolated venv: MinerU 4.1.7 / Docling 2.150.1 / liteparse 2.19.0 / MarkItDown 0.1.9 / RapidOCR 3.10.0 / OCRmyPDF 17.12.1 / pdfplumber 0.11.10; `pip check` clean; route selftest 32/32 (2026-11-17). The earlier `install.sh --profile core` run used Docling 2.149.0.
 - [x] `install.sh` does not upgrade already-installed Homebrew formulae (`skip (no upgrade)` for poppler etc.)
 - [x] Isolated HOME + `install.sh --skills-only`: wrapper + symlink created successfully
 - [x] `doctor.sh` exits 0 under isolated HOME, no MISSING in core (MinerU model not downloaded is expected)

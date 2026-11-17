@@ -16,7 +16,7 @@ license: Apache-2.0
 ## 装
 
 ```bash
-pip install liteparse==2.18.0
+pip install liteparse==2.19.0
 # 本合集提供封装 liteparse-doc（见 scripts/wrappers/liteparse-doc.sh）
 ```
 

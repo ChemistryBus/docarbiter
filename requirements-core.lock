@@ -1,8 +1,8 @@
-# Core profile — verified on macOS 26 / M2 Pro / Python 3.11.11 on 2026-11-09; Docling 2.150.0 re-verified 2026-11-12.
+# Core profile — verified on macOS 26 / M2 Pro / Python 3.11.11 on 2026-11-09; Docling 2.150.1 and liteparse 2.19.0 re-verified 2026-11-17.
 # Poppler and qpdf are system packages; install.sh handles them separately.
 mineru==4.1.7
-docling==2.150.0
-liteparse==2.18.0
+docling==2.150.1
+liteparse==2.19.0
 markitdown==0.1.9
 rapidocr==3.10.0
 ocrmypdf==17.12.1

@@ -66,7 +66,7 @@ while i < len(rest):
 try:
     from liteparse import LiteParse
 except ImportError:
-    print("缺少 liteparse。安装: pip install liteparse==2.18.0", file=sys.stderr)
+    print("缺少 liteparse。安装: pip install liteparse==2.19.0", file=sys.stderr)
     sys.exit(1)
 
 kw = dict(ocr_enabled=ocr, quiet=True, output_format="markdown")

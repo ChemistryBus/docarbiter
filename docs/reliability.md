@@ -102,8 +102,8 @@ Result: **exit 0**. The venv is about 2.0GB, and all core versions match the loc
 
 ```
 mineru 4.1.7
-docling 2.149.0
-liteparse 2.18.0
+docling 2.150.1
+liteparse 2.19.0
 markitdown 0.1.9
 rapidocr 3.10.0
 ocrmypdf 17.12.1

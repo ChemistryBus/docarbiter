@@ -4,11 +4,11 @@
 
 <p align="center"><strong>中英文文档提取的路由层</strong></p>
 <p align="center">先探测文件，再选工具；工具不行时，给出可解释的降级链。</p>
-<p align="center"><strong>v0.1.3 — Chinese Corpus Routing Fixes</strong></p>
+<p align="center"><strong>v0.1.4 — Dependency Refresh and Probe Hygiene</strong></p>
 
 <p align="center">
   <a href="https://github.com/ChemistryBus/docarbiter/actions/workflows/validate.yml"><img src="https://github.com/ChemistryBus/docarbiter/actions/workflows/validate.yml/badge.svg" alt="validate"></a>
-  <a href="https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.3"><img src="https://img.shields.io/github/v/release/ChemistryBus/docarbiter?color=blue&cacheSeconds=300" alt="release"></a>
+  <a href="https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.4"><img src="https://img.shields.io/github/v/release/ChemistryBus/docarbiter?color=blue&cacheSeconds=300" alt="release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT"></a>
   <img src="https://img.shields.io/badge/python-3.10--3.12-blue" alt="Python 3.10-3.12">
 </p>
@@ -332,7 +332,7 @@ python3 -I scripts/route.py 文件.pdf --goal table-structure --json
     </tr>
     <tr>
       <td width="280" align="left">发布说明</td>
-      <td width="680" align="left"><a href="https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.3">v0.1.3</a> · <a href="docs/release-notes-v0.1.3.md">docs/release-notes-v0.1.3.md</a></td>
+      <td width="680" align="left"><a href="https://github.com/ChemistryBus/docarbiter/releases/tag/v0.1.4">v0.1.4</a> · <a href="docs/release-notes-v0.1.4.md">docs/release-notes-v0.1.4.md</a></td>
     </tr>
   </tbody>
 </table>

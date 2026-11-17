@@ -110,11 +110,12 @@ Before changing a pin, treat it as a code change: read the release notes, run
 full-text benchmarks, then update the pin and docs together. A `pinned-behind` result
 is a prompt to evaluate, not an instruction to upgrade.
 
-As of 2026-11-12, the evaluation found:
+As of 2026-11-17, the evaluation found:
 
-- **Docling 2.150.0 is safe** (no regression on 3 tables and 4 full-text papers);
-- **MinerU 4.2.1 flash works, but the 4.2.1 server/engine path is not yet validated**;
-- **OCRmyPDF 17.14.1 is blocked** in the core environment: it requires Pillow>=13,
+- **Docling 2.150.1 is safe** (no regression on 3 tables and 5 full-text papers);
+- **liteparse 2.19.0 is safe** (same full-text CER as 2.18.0);
+- **MinerU 4.2.x flash works, but the server/engine path is not yet validated**;
+- **OCRmyPDF 17.14.x is blocked** in the core environment: it requires Pillow>=13,
   while MinerU's gradio requires Pillow<13.
 
 See `docs/decisions.md` → "Core tool update evaluation" before changing these pins.
